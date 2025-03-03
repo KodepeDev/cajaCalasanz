@@ -390,9 +390,9 @@ class NuevoGasto extends Component
             'etapa' => 1,
             'is_ative' =>true,
             'is_client' => true,
-            'is_suplier' => true,
-            'partner_id' => null,
-            'sublet_id' => null,
+            'is_tutor' => false,
+            'student_id' => null,
+            'student_tutor_id' => null,
         ]);
 
         $this->emit('customer_added', 'Cliente o proveedor registrado exitosamente');
@@ -451,9 +451,9 @@ class NuevoGasto extends Component
 
             }
 
-            if(isset($this->dataApi->error)){
+            if(isset($this->dataApi['error'])){
 
-                $this->mensaje = $this->dataApi->error;
+                $this->mensaje = $this->dataApi['error'];
                 $this->emit('error', $this->mensaje);
                 return;
 
@@ -468,22 +468,22 @@ class NuevoGasto extends Component
 
                     }else{
 
-                        switch ($this->dataApi->tipoDocumento) {
+                        switch ($this->dataApi['tipoDocumento']) {
                             case '1':
-                                $this->full_name = $this->dataApi->nombre;
-                                $this->first_name = $this->dataApi->nombres;
-                                $this->last_name = $this->dataApi->apellidoPaterno . ' '. $this->dataApi->apellidoMaterno;
-                                $this->document_type = $this->dataApi->tipoDocumento;
-                                $this->document = $this->dataApi->numeroDocumento;
-                                $this->address = ''.$this->dataApi->viaTipo. ' ' . $this->dataApi->viaNombre . ' ' . $this->dataApi->numero. ' - '. $this->dataApi->zonaCodigo. ' ' . $this->dataApi->zonaTipo. ' - ' . $this->dataApi->departamento. ' - '. $this->dataApi->provincia. ' - '.$this->dataApi->distrito.'';
+                                $this->full_name = $this->dataApi['nombre'];
+                                $this->first_name = $this->dataApi['nombres'];
+                                $this->last_name = $this->dataApi['apellidoPaterno'] . ' '. $this->dataApi['apellidoMaterno'];
+                                $this->document_type = $this->dataApi['tipoDocumento'];
+                                $this->document = $this->dataApi['numeroDocumento'];
+                                $this->address = ''.$this->dataApi['viaTipo']. ' ' . $this->dataApi['viaNombre'] . ' ' . $this->dataApi['numero']. ' - '. $this->dataApi['zonaCodigo']. ' ' . $this->dataApi['zonaTipo']. ' - ' . $this->dataApi['departamento']. ' - '. $this->dataApi['provincia']. ' - '.$this->dataApi['distrito'].'';
                                 break;
                             case '6':
-                                $this->full_name = $this->dataApi->nombre;
+                                $this->full_name = $this->dataApi['nombre'];
                                 $this->first_name = null;
                                 $this->last_name = null;
-                                $this->document_type = $this->dataApi->tipoDocumento;
-                                $this->document = $this->dataApi->numeroDocumento;
-                                $this->address = ''.$this->dataApi->viaTipo. ' ' . $this->dataApi->viaNombre . ' ' . $this->dataApi->numero. ' - '. $this->dataApi->zonaCodigo. ' ' . $this->dataApi->zonaTipo. ' - ' . $this->dataApi->departamento. ' - '. $this->dataApi->provincia. ' - '.$this->dataApi->distrito.'';
+                                $this->document_type = $this->dataApi['tipoDocumento'];
+                                $this->document = $this->dataApi['numeroDocumento'];
+                                $this->address = ''.$this->dataApi['viaTipo']. ' ' . $this->dataApi['viaNombre'] . ' ' . $this->dataApi['numero']. ' - '. $this->dataApi['zonaCodigo']. ' ' . $this->dataApi['zonaTipo']. ' - ' . $this->dataApi['departamento']. ' - '. $this->dataApi['provincia']. ' - '.$this->dataApi['distrito'].'';
                                 break;
 
                             default:
