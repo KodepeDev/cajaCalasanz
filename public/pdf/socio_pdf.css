@@ -1,0 +1,66 @@
+@page {
+    /* margin-top: 310px; */
+    size: A4;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    font-size: 1.2rem;
+    line-height: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+
+    @bottom-left {
+        content: counter(page) ' of ' counter(pages);
+    }
+}
+header {
+    text-align: center;
+    line-height: 1;
+}
+header h1 {
+    font-size: 0.8rem;
+}
+header h6{
+    line-height: 1;
+}
+.ticket_logo {
+    width: 150px;
+}
+.cabecera{
+    margin-top: 0;
+    font-size: 1rem;
+    padding: 0.8rem;
+    border: 0.5px solid grey;
+    background-color: #f5e642;
+    border-radius: 0.5rem;
+}
+.nombre_socio {
+    border: 0.5px solid grey;
+    border-radius: 0.5rem;
+    background-color: whitesmoke;
+    float: left;
+    font-size: 0.6rem;
+    width: 85%;
+}
+.foto_socio{
+    border: 0.5px solid grey;
+    border-radius: 0.5rem;
+    width: 25%;
+    float: right;
+    height: 9rem;
+}
+
+.footer {
+    color: #000;
+    border-top: 1px solid #1f1f1f;
+    z-index: 1000;
+}
+.footer tr th {
+    font-size: 0.6rem;
+}
+footer {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    bottom: -12px;
+    height: 35px;
+}

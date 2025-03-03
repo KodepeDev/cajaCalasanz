@@ -1,0 +1,31 @@
+@page {
+    /* margin-top: 310px; */
+    size: A4;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    position: relative;
+
+    @bottom-left {
+        content: counter(page) ' of ' counter(pages);
+    }
+}
+
+.header h1 {
+    margin: 0;
+}
+
+.footer {
+    font-size: 7pt;
+    color: #333333;
+    border-top: 1px solid #1f1f1f;
+    z-index: 1000;
+}
+footer {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    bottom: -15px;
+    height: 30px;
+    /* margin-top: -60px; */
+}
+
