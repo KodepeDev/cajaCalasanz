@@ -70,6 +70,10 @@ class CrearMovimiento extends Component
         ]);
         // dd($this->provision_code);
         $student = Student::where('document', $this->provision_code)->first();
+        if(!$student) {
+            $this->emit('error', 'No Existen Datos');
+            return;
+        }
         $baseQuery = Detail::where('student_id', $student->id)->whereStatus(false)->orderBy('date', 'asc');
         // Obtener detalles del stand
         $student_details = (clone $baseQuery)->get();
