@@ -2,3 +2,83 @@
     color: red;
     font-style: italic;
 }
+
+:root {
+    --calasanz: #76143d;
+    --calasanz-hover: #c42969;
+}
+
+/* === Fondos === */
+.bg-calasanz {
+    background-color: var(--calasanz) !important;
+}
+
+/* === Texto === */
+.text-calasanz {
+    color: var(--calasanz) !important;
+}
+.text-calasanz:hover,
+.text-calasanz:focus {
+    color: var(--calasanz-hover) !important;
+}
+
+/* === Bordes === */
+.border-calasanz {
+    border-color: var(--calasanz) !important;
+}
+
+/* === Botones === */
+.btn-calasanz {
+    background-color: var(--calasanz) !important;
+    border-color: var(--calasanz) !important;
+    color: white !important;
+}
+.btn-calasanz:hover,
+.btn-calasanz:focus,
+.btn-calasanz:active {
+    background-color: var(--calasanz-hover) !important;
+    border-color: var(--calasanz-hover) !important;
+}
+
+/* === Alertas === */
+.alert-calasanz {
+    background-color: var(--calasanz) !important;
+    border-color: var(--calasanz-hover) !important;
+    color: white !important;
+}
+
+/* === Paginación === */
+.page-item.active .page-link {
+    background-color: var(--calasanz) !important;
+    border-color: var(--calasanz) !important;
+}
+
+/* === Badges === */
+.badge-calasanz {
+    background-color: var(--calasanz) !important;
+    color: white !important;
+}
+
+/* === Progress Bars === */
+.progress-bar {
+    background-color: var(--calasanz) !important;
+}
+
+/* === Nav Pills & Tabs === */
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: var(--calasanz) !important;
+    border-color: var(--calasanz) !important;
+}
+
+/* === Form Inputs (Checkbox, Radio, Range) === */
+.form-check-input:checked {
+    background-color: var(--calasanz) !important;
+    border-color: var(--calasanz) !important;
+}
+.form-range::-webkit-slider-thumb,
+.form-range::-moz-range-thumb,
+.form-range::-ms-thumb {
+    background: var(--calasanz) !important;
+}
+

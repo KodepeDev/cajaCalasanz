@@ -19,10 +19,10 @@ class Student extends Model
         'phone',
         'address',
         'photo',
-        'grade',
         'is_active',
         'description',
         'student_tutor_id',
+        'teacher_id',
     ];
 
     public function summaries(){
@@ -38,6 +38,39 @@ class Student extends Model
     public function tutor()
     {
         return $this->belongsTo(StudentTutor::class, 'student_tutor_id');
+    }
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class);
+    }
+
+    // para relaciones de tablas base de ciclo escolar
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function currentEnrollment()
+    {
+        return $this->hasOne(Enrollment::class)->latestOfMany(); // Última matrícula del estudiante
+    }
+
+    public function grade()
+    {
+        return $this->hasOneThrough(Grade::class, Enrollment::class, 'student_id', 'id', 'id', 'grade_id');
+    }
+
+    public function section()
+    {
+        return $this->hasOneThrough(Section::class, Enrollment::class, 'student_id', 'id', 'id', 'section_id');
+    }
+
+    public function getGradeAndSectionAttribute()
+    {
+        $grade = $this->grade ? $this->grade->name : 'Sin grado';
+        $section = $this->section ? $this->section->name : 'Sin sección';
+
+        return "{$grade} - {$section}";
     }
 
 

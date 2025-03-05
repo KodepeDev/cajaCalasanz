@@ -24,12 +24,12 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
             $table->string('photo')->nullable();
-            $table->string('grade')->nullable();
             $table->boolean('is_active')->default(true);
             $table->text('description')->nullable();
 
             $table->unsignedBigInteger('student_tutor_id');
             $table->foreign('student_tutor_id')->references('id')->on('student_tutors');
+
             $table->timestamps();
         });
     }

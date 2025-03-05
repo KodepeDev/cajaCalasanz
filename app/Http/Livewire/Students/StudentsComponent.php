@@ -10,8 +10,12 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ApiConsultasController;
+use App\Models\Grade;
+use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Models\StudentTutor;
+use App\Models\Teacher;
+use Illuminate\Support\Facades\DB;
 
 class StudentsComponent extends Component
 {
@@ -19,10 +23,12 @@ class StudentsComponent extends Component
     use WithPagination;
     use WithFileUploads;
 
-    public $full_name, $first_name, $last_name, $email, $document_type, $document, $phone, $address, $photo, $grade, $is_active, $description;
+    public $full_name, $first_name, $last_name, $email, $document_type, $document, $phone, $address, $photo, $is_active, $description;
     public $tutor_full_name, $tutor_first_name, $tutor_last_name, $tutor_email, $tutor_document_type, $tutor_document, $tutor_phone, $tutor_address, $tutor_is_active, $tutor_is_client, $tutor_type, $tutor_description;
     public $componentName, $selected_id, $mensaje, $photoId, $search="";
     private $dataApi = [];
+
+    public $teachers, $teacher_id, $grades, $grade_id, $sections, $section_id, $schoolYear;
 
     protected $listeners = [
         'resetUI',
@@ -56,6 +62,10 @@ class StudentsComponent extends Component
         $this->document_type = 1;
         $this->tutor_document_type = 1;
         $this->selected_id = 0;
+
+        $this->teachers = Teacher::where('is_active', true)->pluck('id', 'full_name');
+        $this->grades = Grade::pluck('id', 'name');
+        $this->schoolYear = SchoolYear::current();
     }
 
     public function render()
@@ -81,7 +91,6 @@ class StudentsComponent extends Component
             'first_name' => 'required|min:3',
             'last_name' => 'required|min:3',
             'document_type' => 'required',
-            'grade' => 'required',
             'document' => 'required|min:8|max:11|unique:students',
             'photo' => 'nullable|image|max:2048',
             'description' => 'nullable',
@@ -92,6 +101,8 @@ class StudentsComponent extends Component
             'tutor_document' => 'required|min:8|max:11',
             'tutor_type' => 'required',
             'tutor_description' => 'nullable',
+            'grade_id' => 'required',
+            'teacher_id' => 'required',
 
         ];
 
@@ -141,27 +152,37 @@ class StudentsComponent extends Component
                 'document' => $this->document,
                 'phone' => $this->phone,
                 'address' => $this->address,
-                'grade' => $this->grade,
                 'is_active' => true,
                 'description' => $this->description,
                 'student_tutor_id' => $tutor->id,
+                'teacher_id' => $this->teacher_id,
             ]);
 
             if($this->photo)
             {
                 $customFileName = uniqid(). '_.' .$this->photo->extension();
-                $this->photo->storeAs('public/students/', $customFileName);
+                $this->photo->storeAs('public/students', $customFileName);
 
                 $student->photo = $customFileName;
                 $student->save();
             }
 
-
-
-
-            /// esto crea la tabla de clientes y proveedores
-
-            // dd($tutor);
+            DB::table('enrollments')->insert([
+                [
+                    'student_id' => $student->id,
+                    'grade_id' => $this->grade_id,
+                    'section_id' => $this->section_id,
+                    'school_year_id' => $this->schoolYear->id,
+                ]
+            ]);
+            DB::table('teacher_assignments')->insert([
+                [
+                    'teacher_id' => $this->teacher_id,
+                    'grade_id' => $this->grade_id,
+                    'section_id' => $this->section_id,
+                    'school_year_id' => $this->schoolYear->id,
+                ]
+            ]);
 
             if($tutor->is_client){
 

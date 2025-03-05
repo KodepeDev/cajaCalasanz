@@ -37,7 +37,7 @@ class ExportController extends Controller
 
         $textoTotal = $formatter->toInvoice($data->amount, 2, 'SOLES', 'CENTIMOS');
 
-        // dd($data);
+        // dd($data->student->grade); // Verifica si obtiene el grado
 
 
         if ($data->type == "add" && $data->student_id) {

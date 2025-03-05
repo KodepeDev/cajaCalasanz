@@ -64,7 +64,7 @@ return [
     */
 
     'logo' => '<b>CALASANZ </b>SCHOOL',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+    'logo_img' => 'imagenes/logo.webp',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -86,7 +86,7 @@ return [
     'auth_logo' => [
         'enabled' => false,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => 'imagenes/logo.webp',
             'alt' => 'Auth Logo',
             'class' => '',
             'width' => 50,
@@ -113,7 +113,7 @@ return [
         'enabled' => true,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => 'imagenes/logo.webp',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
@@ -135,8 +135,8 @@ return [
 
     'usermenu_enabled' => true,
     'usermenu_header' => true,
-    'usermenu_header_class' => 'bg-primary',
-    'usermenu_image' => true,
+    'usermenu_header_class' => 'bg-maroon',
+    'usermenu_image' => false,
     'usermenu_desc' => true,
     'usermenu_profile_url' => true,
 
@@ -171,7 +171,7 @@ return [
     |
     */
 
-    'classes_auth_card' => 'card-outline card-primary',
+    'classes_auth_card' => 'card-outline card-maroon',
     'classes_auth_header' => '',
     'classes_auth_body' => '',
     'classes_auth_footer' => '',
@@ -198,7 +198,7 @@ return [
     'classes_content' => '',
     'classes_sidebar' => 'sidebar-dark-primary elevation-4',
     'classes_sidebar_nav' => '',
-    'classes_topnav' => 'navbar-dark navbar-dark',
+    'classes_topnav' => 'navbar-dark navbar-dark bg-indigo',
     'classes_topnav_nav' => 'navbar-expand',
     'classes_topnav_container' => 'container',
 
@@ -238,10 +238,10 @@ return [
 
     'right_sidebar' => false,
     'right_sidebar_icon' => 'fas fa-cogs',
-    'right_sidebar_theme' => 'dark',
+    'right_sidebar_theme' => 'indigo',
     'right_sidebar_slide' => true,
     'right_sidebar_push' => true,
-    'right_sidebar_scrollbar_theme' => 'os-theme-light',
+    'right_sidebar_scrollbar_theme' => 'os-theme-dark',
     'right_sidebar_scrollbar_auto_hide' => 'l',
 
     /*
@@ -257,7 +257,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'home',
+    'dashboard_url' => 'admin',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => false,
@@ -282,9 +282,11 @@ return [
     |
     */
 
-    'laravel_asset_bundling' => false,
-    'laravel_css_path' => 'css/app.css',
-    'laravel_js_path' => 'js/app.js',
+    'laravel_asset_bundling' => false, //estaba en false
+    // 'laravel_css_path' => 'css/app.css',
+    // 'laravel_js_path' => 'js/app.js',
+    'laravel_css_path' => 'resources/css/app.css',
+    'laravel_js_path' => 'resources/js/app.js',
 
     /*
     |--------------------------------------------------------------------------

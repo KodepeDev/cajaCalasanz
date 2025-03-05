@@ -32,6 +32,7 @@
 
                 <div class="form-row">
                     <div class="form-group col-md-6">
+                        <label for="">APELLIDOS</label>
                         <input type="text" class="form-control" wire:model.lazy='last_name' id="last_name"
                             placeholder="Apellidos">
                         @error('last_name')
@@ -40,6 +41,7 @@
                     </div>
 
                     <div class="form-group col-md-6">
+                        <label for="">NOMBRES</label>
                         <input type="text" class="form-control" wire:model.lazy='first_name' id="fist_name"
                             placeholder="Nombres">
                         @error('first_name')
@@ -50,6 +52,7 @@
 
                 <div class="form-row">
                     <div class="form-group col-md-8">
+                        <label for="">DIRECCIÓN</label>
                         <input type="text" class="form-control" wire:model.lazy='address' id="address"
                             placeholder="1234 Main St">
                         @error('address')
@@ -57,24 +60,14 @@
                         @enderror
                     </div>
                     <div class="form-group col-md-4">
-                        <select class="custom-select" name="" id="" wire:model.defer='grade'>
+                        <label for="">GRADO</label>
+                        <select class="custom-select" name="" id="" wire:model.defer='grade_id'>
                             <option value="" selected>Seleccione un Grado</option>
-                            <option value="INICIAL3">INICIAL 3 AÑOS</option>
-                            <option value="INICIAL4">INICIAL 4 AÑOS</option>
-                            <option value="INICIAL5">INICIAL 5 AÑOS</option>
-                            <option value="PRIMARIA1">PRIMARIA 1</option>
-                            <option value="PRIMARIA2">PRIMARIA 2</option>
-                            <option value="PRIMARIA3">PRIMARIA 3</option>
-                            <option value="PRIMARIA4">PRIMARIA 4</option>
-                            <option value="PRIMARIA5">PRIMARIA 5</option>
-                            <option value="PRIMARIA6">PRIMARIA 6</option>
-                            <option value="SEGUNDARIA1">SEGUNDARIA 1</option>
-                            <option value="SEGUNDARIA2">SEGUNDARIA 2</option>
-                            <option value="SEGUNDARIA3">SEGUNDARIA 3</option>
-                            <option value="SEGUNDARIA4">SEGUNDARIA 4</option>
-                            <option value="SEGUNDARIA5">SEGUNDARIA 5</option>
+                            @foreach ($grades as $name => $id)
+                                <option value="{{ $id }}">{{ $name }}</option>
+                            @endforeach
                         </select>
-                        @error('grade')
+                        @error('grade_id')
                             <span class="error">{{ $message }}</span>
                         @enderror
                     </div>
@@ -82,6 +75,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-8">
                         <div class="mb-3">
+                            <label for="">CORREO</label>
                             <input type="email" class="form-control" wire:model.defer='email' id="email"
                                 placeholder="correo">
                             @error('email')
@@ -90,6 +84,7 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
+                                <label for="">CELULAR</label>
                                 <input type="tel" class="form-control" wire:model.defer='phone' id="phone"
                                     placeholder="telefono o celular">
                                 @error('phone')
@@ -114,12 +109,11 @@
                     </div>
                     <div class="form-group col-md-4 text-center d-flex justify-content-center align-items-center">
                         @if ($photo)
-                            <img class="img-fluid img-circle shadow" src="{{ $photo->temporaryUrl() }}"
-                                width="200px" height="200px" alt="">
+                            <img class="img-fluid img-circle shadow" src="{{ $photo->temporaryUrl() }}" width="200px"
+                                height="200px" alt="">
                         @else
-                            <img class="img-fluid img-circle shadow"
-                                src="{{ asset('imagenes/profile-default.png') }}" width="200px" height="200px"
-                                alt="">
+                            <img class="img-fluid img-circle shadow" src="{{ asset('imagenes/profile-default.png') }}"
+                                width="200px" height="200px" alt="">
                         @endif
                     </div>
                 </div>
@@ -159,6 +153,7 @@
 
                 <div class="form-row">
                     <div class="form-group col-md-6">
+                        <label for="">APELLIDOS</label>
                         <input type="text" class="form-control" wire:model.lazy='tutor_last_name' id="last_name"
                             placeholder="Apellidos">
                         @error('tutor_last_name')
@@ -166,6 +161,7 @@
                         @enderror
                     </div>
                     <div class="form-group col-md-6">
+                        <label for="">NOMBRES</label>
                         <input type="text" class="form-control" wire:model.lazy='tutor_first_name' id="fist_name"
                             placeholder="Nombres">
                         @error('tutor_first_name')
@@ -176,6 +172,7 @@
 
                 <div class="form-row">
                     <div class="form-group col-md-8">
+                        <label for="">DIRECCIÓN</label>
                         <input type="text" class="form-control" wire:model.lazy='tutor_address' id="address"
                             placeholder="1234 Main St">
                         @error('tutor_address')
@@ -183,11 +180,12 @@
                         @enderror
                     </div>
                     <div class="form-group col-md-4">
+                        <label for="">PADRE/MADRE O APODERADO</label>
                         <select class="custom-select" name="" id="" wire:model.defer='tutor_type'>
                             <option value="" selected>Seleccione Parentesco</option>
                             <option value="PADRE">PADRE</option>
                             <option value="MADRE">MADRE</option>
-                            <option value="TUTOR">TURTOR</option>
+                            <option value="TUTOR">TUTOR</option>
                             <option value="APODERADO">APODERADO</option>
                             <option value="OTROS">OTROS CASOS</option>
                         </select>
@@ -198,6 +196,7 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
+                        <label for="">CORREO</label>
                         <input type="email" class="form-control" wire:model.defer='tutor_email' id="email"
                             placeholder="correo">
                         @error('tutor_email')
@@ -205,6 +204,19 @@
                         @enderror
                     </div>
                     <div class="form-group col-md-6">
+                        <label for="">DOCENTE TUTOR</label>
+                        <select class="custom-select" name="" id="" wire:model.defer='teacher_id'>
+                            <option value="" selected>Seleccione un Docente</option>
+                            @foreach ($teachers as $name => $id)
+                                <option value="{{ $id }}">{{ $name }}</option>
+                            @endforeach
+                        </select>
+                        @error('teacher_id')
+                            <span class="error">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="">CELULAR</label>
                         <input type="tel" class="form-control" wire:model.defer='tutor_phone' id="phone"
                             placeholder="telefono o celular">
                         @error('tutor_phone')
@@ -223,7 +235,7 @@
             </div>
         </div>
         <button type="submit" wire:loading.attr='disabled' wire:target='photo, save'
-            class="btn btn-warning close-modal">GUARDAR</button>
+            class="btn btn-warning close-modal"><i class="fa fa-folder" aria-hidden="true"></i> GUARDAR</button>
     </form>
 </div>
 

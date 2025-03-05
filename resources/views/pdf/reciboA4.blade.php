@@ -274,7 +274,7 @@
                                     </tr>
                                     <tr>
                                         <th style="text-align: left">GRADO:</th>
-                                        <td style="text-align: left">{{ $data->student->grade }}</td>
+                                        <td style="text-align: left">{{ $data->student->grade->name }}</td>
 
                                     </tr>
                                 </tbody>

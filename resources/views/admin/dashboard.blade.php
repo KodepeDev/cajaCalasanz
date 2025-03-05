@@ -54,14 +54,14 @@
         <div class="col-md-3">
             <div class="small-box bg-warning">
                 <div class="inner">
-                    <h3>{{ $socios }} Asociados</h3>
-                    <p>Total de Socios activos CC</p>
+                    <h3>{{ $socios }} Estudiantes</h3>
+                    <p>Total de Estudiantes</p>
                 </div>
                 <div class="icon">
                     <i class="fas fa-users"></i>
                 </div>
                 <a href="{{ route('students.index') }}" class="small-box-footer">
-                    Ir a Socios<i class="fas fa-arrow-circle-right"></i>
+                    Ir a Estudiantes<i class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
         </div>
