@@ -241,7 +241,8 @@
 
 <div class="modal-footer">
     <button type="button" wire:click.prevent="resetUI()" wire:loading.attr='disabled' wire:target='photo, resetUI'
-        class="btn btn-secondary" data-dismiss="modal">CERRAR</button>
+        class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-window-close" aria-hidden="true"></i>
+        CERRAR</button>
 </div>
 </div>
 </div>

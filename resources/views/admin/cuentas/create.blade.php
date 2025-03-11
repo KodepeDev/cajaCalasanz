@@ -13,7 +13,7 @@
     <form role="form" action = "{{ route('account.save') }}" method = "POST">
         @method('POST')
         @csrf
-        <div class="card card-danger">
+        <div class="card card-maroon">
             <div class="card-header with-border">
                 <i class="fa fa-bank"></i>
                 <h3 class="card-title">Crear Cuenta</h3>

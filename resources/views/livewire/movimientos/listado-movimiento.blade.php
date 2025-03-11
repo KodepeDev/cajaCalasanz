@@ -1,6 +1,6 @@
 <div class="pt-4">
     <div class="container-fluid">
-        <div class="card card-primary">
+        <div class="card card-maroon">
 
             <div wire:loading.class='overlay' class="d-none dark" wire:loading.class.remove='d-none'>
                 <i class="fas fa-2x fa-sync-alt fa-spin"></i>
@@ -98,7 +98,7 @@
                 <div class="row mt-2">
                     <div class="col-sm-12 table-responsive">
                         <table id="summary" class="table table-bordered table-hover" style="width:100%">
-                            <thead class="thead-dark">
+                            <thead class="bg-primary text-center">
                                 <tr>
                                     <th>RECIBO</th>
                                     <th>FECHA E.</th>

@@ -2,7 +2,7 @@
     <div class="row pt-4">
 
         <div class="col-md-12 ">
-            <div class="card card-danger">
+            <div class="card card-maroon">
                 <div class="card-header">
                     <h3 class="card-title"><b>Montos Totales </b> <i class="fa fa-credit-card"></i></h3>
                     <div class="card-tools">

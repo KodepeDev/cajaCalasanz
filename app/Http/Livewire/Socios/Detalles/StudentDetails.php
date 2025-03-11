@@ -86,7 +86,7 @@ class StudentDetails extends Component
         $movimientos = Detail::where('student_id', $this->selected_id)->whereBetween('date', [$start, $finish])->orderBy('date_paid', 'desc')->paginate(15);
 
         if($this->validarFechas()){
-            $this->url = '/admin/socios/reportePDF/'. '?socio=' . $this->student->id . '&start=' . $this->start1 . '&finish=' . $this->finish1 . '';
+            $this->url = '/admin/students/reportePDF/'. '?student=' . $this->student->id . '&start=' . $this->start1 . '&finish=' . $this->finish1 . '';
         }else{
             $this->url = null;
         }

@@ -157,7 +157,7 @@ class ProvisionVariables extends Component
         foreach ($this->students as $name => $id) {
             $this->unique_code = strval($this->date.$this->category_id.$id);
             $detail = Detail::where('unique_code', $this->unique_code)->first();
-
+            $student_tutor = Student::find($id)->first()->id;
             if(!$detail){
                 $detail = new Detail();
                 $detail->unique_code = $this->unique_code;
@@ -170,6 +170,7 @@ class ProvisionVariables extends Component
                 $detail->date_paid = $this->date_paid;
                 $detail->category_id = $this->category_id;
                 $detail->student_id = $id;
+                $detail->student_tutor_id = $student_tutor;
                 $detail->currency_id = $this->currency_id;
                 $detail->save();
             }
@@ -272,7 +273,6 @@ class ProvisionVariables extends Component
         $this->validate($rules, $messages);
 
         $categoria = Category::whereKey($this->category_id)->first();
-        $etapa = Stage::whereKey($this->stage_id)->first();
         $mes = Carbon::parse($this->date)->format('m/Y');
 
         try {

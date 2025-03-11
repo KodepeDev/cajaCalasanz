@@ -5,15 +5,15 @@
 
 @stop
 
-    @section('content_header')
+@section('content_header')
     <h1>Editar Categoría (Concepto)</h1>
-    @stop
+@stop
 
-        @section('content')
-        <form role="form" action="/admin/categories/edit/{{ $data->id }}" method="post">
-            @method('PUT')
-            @csrf
-        <div class="card card-danger">
+@section('content')
+    <form role="form" action="/admin/categories/edit/{{ $data->id }}" method="post">
+        @method('PUT')
+        @csrf
+        <div class="card card-primary">
             <div class="card-header">
                 <h3 class="card-title">Editar Categoria</h3>
                 <div class="card-tools">
@@ -38,7 +38,7 @@
                     <div class="form-group col-sm-6">
                         <label for="exampleInputPassword1">Tipo de Categoria</label>
                         <select name="type" class="form-control">
-                            @if($data->type=='add')
+                            @if ($data->type == 'add')
                                 <option value="add" selected>Categoria de Ingreso</option>
                                 <option value="out">Categoria de Gasto</option>
                             @else
@@ -55,7 +55,7 @@
                 {{-- <div class="bg-secondary rounded p-3">
                     <h5>Subcategorías</h5>
                     <hr>
-                    @foreach($data1 as $data1s)
+                    @foreach ($data1 as $data1s)
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="exampleInputPassword1">Nombre </label>
@@ -88,60 +88,62 @@
                     @endforeach
                 <div class="row" id="list_attr">
                 </div> --}}
-            {{-- </div> --}}
+                {{-- </div> --}}
             </div>
             <div class="card-footer">
                 <button type="submit" class="btn btn-warning">Actualizar</button>
             </div>
 
         </div>
-        </form>
-        @stop
+    </form>
+@stop
 
 
 
-        @section('js')
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
+@section('js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
 
-                $('#btn_add_attr').on('click',function(){
-                    console.log('el boton funciona');
-                }); //
+            $('#btn_add_attr').on('click', function() {
+                console.log('el boton funciona');
+            }); //
 
-                $('#btn_add_attr').on('click',function(){
-                    $('#list_attr').append('<div class="form-group col-sm-6"><label for="exampleInputPassword1">Nombre</label>\
-                                <input required maxlength="200" name="name_[]" type="text" class="form-control" placeholder="nombre de la subcategoria">\
-                                </div>\
-                                <div class="form-group col-sm-6">\
-                                <label for="exampleInputPassword1">Descripción</label>\
-                                <input required maxlength="200" name="value_[]" type="text"  class="form-control" placeholder="descripción de la subcategoria">\
-                                <input type="hidden" value="0" name="id[]">\
-                                </div>');
+            $('#btn_add_attr').on('click', function() {
+                $('#list_attr').append('<div class="form-group col-sm-6"><label for="exampleInputPassword1">Nombre</label>\
+                                    <input required maxlength="200" name="name_[]" type="text" class="form-control" placeholder="nombre de la subcategoria">\
+                                    </div>\
+                                    <div class="form-group col-sm-6">\
+                                    <label for="exampleInputPassword1">Descripción</label>\
+                                    <input required maxlength="200" name="value_[]" type="text"  class="form-control" placeholder="descripción de la subcategoria">\
+                                    <input type="hidden" value="0" name="id[]">\
+                                    </div>');
 
-                });
-                //tours
-                $('#btn_add_attr2').on('click',function(){
-                    $('#list_attr2').append('<div class="form-group col-sm-6"><label for="exampleInputPassword1">Fecha de salida</label>\
-                                <input required maxlength="200" name="date[]" type="date" class="form-control" placeholder="Fecha">\
-                                </div>\
-                                <div class="form-group col-sm-6">\
-                                <label for="exampleInputPassword1">precio</label>\
-                                <input required maxlength="200" name="price[]" type="text"   data-mask="000,000,000,000,000.00" data-mask-reverse="true"    class="form-control"  placeholder="Precio">\
-                                <input type="hidden" value="0" name="id[]">\
-                                </div>');
-                    $('input[type="date"]').attr('type','date1');
+            });
+            //tours
+            $('#btn_add_attr2').on('click', function() {
+                $('#list_attr2').append('<div class="form-group col-sm-6"><label for="exampleInputPassword1">Fecha de salida</label>\
+                                    <input required maxlength="200" name="date[]" type="date" class="form-control" placeholder="Fecha">\
+                                    </div>\
+                                    <div class="form-group col-sm-6">\
+                                    <label for="exampleInputPassword1">precio</label>\
+                                    <input required maxlength="200" name="price[]" type="text"   data-mask="000,000,000,000,000.00" data-mask-reverse="true"    class="form-control"  placeholder="Precio">\
+                                    <input type="hidden" value="0" name="id[]">\
+                                    </div>');
+                $('input[type="date"]').attr('type', 'date1');
                 /**/
-                $( 'input[type="date1"]' ).datepicker({dateFormat:"yy-mm-dd"});
+                $('input[type="date1"]').datepicker({
+                    dateFormat: "yy-mm-dd"
                 });
+            });
 
-                $("#buttonremove").click(function(){
+            $("#buttonremove").click(function() {
                 $("#list_attr2").empty();
-                });
+            });
 
-                $("#buttonremove").click(function(){
+            $("#buttonremove").click(function() {
                 $("#list_attr").empty();
-                });
+            });
 
-                });
-        </script>
-        @stop
+        });
+    </script>
+@stop

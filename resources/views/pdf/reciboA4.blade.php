@@ -62,11 +62,11 @@
         }
 
         header h1 {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             margin: 0;
             padding: 0;
             text-decoration: underline;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .bussiness_info p {
@@ -188,6 +188,10 @@
             font-size: 1rem;
             font-style: italic;
             font-weight: bold;
+        }
+
+        .main-table {
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -329,8 +333,7 @@
         @endif
     </header>
 
-    <hr>
-    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 content">
+    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 content main-table">
         <thead class="thead">
             <tr>
                 <th style="text-align: left" class="px-6 py-3">MES</th>

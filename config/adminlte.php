@@ -15,7 +15,7 @@ return [
     */
 
     'title' => 'CALASANZ SCHOOL',
-    'title_prefix' => '',
+    'title_prefix' => 'APP | ',
     'title_postfix' => '',
 
     /*
@@ -156,7 +156,7 @@ return [
     'layout_boxed' => null,
     'layout_fixed_sidebar' => null,
     'layout_fixed_navbar' => true,
-    'layout_fixed_footer' => null,
+    'layout_fixed_footer' => true,
     'layout_dark_mode' => null,
 
     /*
@@ -196,9 +196,9 @@ return [
     'classes_content_wrapper' => '',
     'classes_content_header' => '',
     'classes_content' => '',
-    'classes_sidebar' => 'sidebar-dark-primary elevation-4',
+    'classes_sidebar' => 'sidebar-dark-maroon elevation-4',
     'classes_sidebar_nav' => '',
-    'classes_topnav' => 'navbar-dark navbar-dark bg-indigo',
+    'classes_topnav' => 'navbar-dark navbar-dark',
     'classes_topnav_nav' => 'navbar-expand',
     'classes_topnav_container' => 'container',
 
@@ -241,7 +241,7 @@ return [
     'right_sidebar_theme' => 'indigo',
     'right_sidebar_slide' => true,
     'right_sidebar_push' => true,
-    'right_sidebar_scrollbar_theme' => 'os-theme-dark',
+    'right_sidebar_scrollbar_theme' => 'os-theme-light',
     'right_sidebar_scrollbar_auto_hide' => 'l',
 
     /*
@@ -344,35 +344,32 @@ return [
         ],
 
         [
-            'text'    => 'Movimientos',
+            'text'    => 'MOVIMIENTOS',
             'icon'    => 'fas fa-dollar-sign',
-            'label'       => 'Nuevo',
             'active' => ['admin/movimientos', 'admin/movimientos/crear_gasto_proveedor', 'admin/movimientos/crear', 'admin/movimientos/crear_por_cliente'],
             'label_color' => 'info',
             'submenu' => [
                 [
-                    'text' => 'Registros',
+                    'text' => 'LISTADO',
                     'route'  => 'movimientos.listado',
                     'icon'    => 'fas fa-dollar-sign',
                     'shift'   => 'ml-3',
                 ],
 
                 [
-                    'text' => 'Nuevo Ingreso',
+                    'text' => 'COBRANZA',
                     'url'  => '#',
-                    'label'       => '+',
                     'shift'   => 'ml-3',
-                    'label_color' => 'success',
                     'icon'    => 'fas fa-dollar-sign',
                     'submenu'    => [
                         [
-                            'text' => 'Registro x Prov',
+                            'text' => 'X PROVISION',
                             'route'  => 'movimientos.crear',
                             'icon'    => 'fas fa-plus-circle',
                             'shift'   => 'ml-4',
                         ],
                         [
-                            'text' => 'Registro x Client',
+                            'text' => 'X CLIENTE',
                             'route'  => 'movimientos.cliente',
                             'icon'    => 'fas fa-plus-circle',
                             'shift'   => 'ml-4',
@@ -380,9 +377,7 @@ return [
                     ],
                 ],
                 [
-                    'text' => 'Registro de Gastos',
-                    'label'       => '-',
-                    'label_color' => 'danger',
+                    'text' => 'GASTOS',
                     // 'active' => ['admin/movimientos/provision_fija'],
                     'icon'    => 'fas fa-minus-circle',
                     'shift'   => 'ml-3',
@@ -463,6 +458,11 @@ return [
             ],
         ],
         [
+            'text' => 'DOCENTES',
+            // 'route' => 'teachers',
+            'icon'    => 'fas fa-user',
+        ],
+        [
             'text'    => ' CUENTAS',
             'icon'    => 'fas fa-wallet',
             'submenu' => [
@@ -485,7 +485,7 @@ return [
         [
             'text'        => 'ESTUDIANTES',
             'route'         => 'students.index',
-            'icon'        => 'fa fa-handshake',
+            'icon'        => 'fa fa-users',
             'active' => ['admin/students', 'admin/students*'],
             'label'       => 'Nuevo',
             'label_color' => 'info',

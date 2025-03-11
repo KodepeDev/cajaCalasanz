@@ -1,11 +1,12 @@
 <div class="container-fluid spark-screen pt-4">
-    <div class="card card-info">
+    <div class="card card-maroon">
         <div class="card-header">
             <h3 class="card-title">LISTA DE ESTUDIANTES</h3>
             <div class="card-tools">
                 {{-- <a type="button" href="{{ route('students.deudores') }}" class="btn btn-warning">Ver
                     Deudores</a> --}}
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#globalModal">Nuevo</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#globalModal"><i
+                        class="fa fa-plus-circle" aria-hidden="true"></i> NUEVO</button>
             </div>
             <!-- /.card-tools -->
         </div>

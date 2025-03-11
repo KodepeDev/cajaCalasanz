@@ -7,11 +7,11 @@
     <meta http-equiv="Content-Type" content="application/pdf; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="{{ asset('pdf/socio_pdf.css') }}">
-    <title>Socio {{ $socio->full_name }}</title>
+    <title>ESTUDIANTE {{ $student->full_name }}</title>
 
     <style>
         .foto_socio {
-            background-image: url("{{ asset('storage/socios/' . $socio->foto) }}");
+            background-image: url("{{ asset('storage/students/' . $student->foto) }}");
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center center;
@@ -35,10 +35,6 @@
             border-collapse: collapse;
         }
 
-        table th,
-        td {
-            padding: 2px;
-        }
 
         .table-heading {
             background-color: #dfdfdf;
@@ -49,15 +45,19 @@
             border: 1px solid black;
             font-weight: bold;
             text-align: center;
+            padding: 4px;
         }
 
         .table-bordered tbody tr td {
             border: 1px solid black;
+            padding: 4px;
         }
 
         .table-bordered tfoot tr td {
             border-bottom: 1px solid black;
             font-weight: bolder;
+            padding: 4px;
+            background-color: yellow;
         }
 
         .text-center {
@@ -75,23 +75,27 @@
                 <table style="width: 100%;">
                     <thead>
                         <tr>
-                            <th rowspan="5" align="left" class="ticket_logo">
+                            <th rowspan="6" align="left" class="ticket_logo">
                                 <img src="{{ config('kodepe.logo') }}" alt="" class="invoice-logo">
                             </th>
                         </tr>
                     </thead>
                     <tbody valign="center">
                         <tr>
-                            <td colspan="1" style="text-align: left">NOMBRE:</td>
-                            <td colspan="1" style="text-align: left">{{ $socio->full_name }}</td>
+                            <td colspan="1" style="text-align: left">ESTUDIANTE:</td>
+                            <td colspan="1" style="text-align: left">{{ $student->full_name }}</td>
                         </tr>
                         <tr>
                             <td colspan="1" style="text-align: left">RUC/DNI/OTRO:</td>
-                            <td colspan="1" style="text-align: left">{{ $socio->document }}</td>
+                            <td colspan="1" style="text-align: left">{{ $student->document }}</td>
                         </tr>
                         <tr>
                             <td colspan="1" style="text-align: left">Dirección:</td>
-                            <td colspan="1" style="text-align: left">{{ $socio->address }}</td>
+                            <td colspan="1" style="text-align: left">{{ $student->address }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="1" style="text-align: left">PADRE/MADRE O TUTOR:</td>
+                            <td colspan="1" style="text-align: left">{{ $student->tutor->full_name }}</td>
                         </tr>
                         <tr>
                             <td colspan="1" style="text-align: left">Rango de Consulta:</td>
@@ -109,14 +113,13 @@
         <table class="table-bordered" style="margin-bottom: 10px; margin-top: 10px;" width="100%">
             <thead class="table-heading">
                 <tr>
-                    <th colspan="6">HISTORIAL DE PAGOS</th>
+                    <th colspan="5">HISTORIAL DE PAGOS</th>
                 </tr>
                 <tr>
                     <th style="text-align: left" class="px-6 py-3" width="10%">PERIODO</th>
                     <th style="text-align: left" class="px-6 py-3" width="10%">RECIBO</th>
                     <th style="text-align: left" class="px-6 py-3">DESCRIPCIÓN</th>
                     <th class="px-6 py-3">FECHA DE PAGO</th>
-                    <th class="px-6 py-3">STAND</th>
                     <th style="text-align: right" class="px-6 py-3">MONTO</th>
                 </tr>
             </thead>
@@ -127,10 +130,9 @@
                             <td style="text-align: left" scope="row">{{ $detail->date->format('m-Y') }}</td>
                             <td style="text-align: left" scope="row">{{ $detail->summary->recipt_series }} -
                                 {{ $detail->summary->recipt_number }}</td>
-                            <td style="text-align: left" width="50%" scope="row">{{ $detail->description }}
+                            <td style="text-align: center" width="50%" scope="row">{{ $detail->description }}
                             </td>
                             <td>{{ $detail->date_paid->format('d/m/Y') }}</td>
-                            <td>{{ $detail->stand ? $detail->stand->name : 'S/N' }}</td>
                             <td
                                 style="text-align: right; color: {{ $detail->summary_type == 'out' ? 'red' : 'auto' }}">
                                 {{ $detail->summary_type == 'out' ? '-' : '' }}{{ $detail->currency->id == 1 ? number_format($detail->amount, 2) : number_format($detail->changed_amount, 2) }}
@@ -139,13 +141,13 @@
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="6" style="text-align: center">No hay movimientos</td>
+                        <td colspan="5" style="text-align: center">No hay movimientos</td>
                     </tr>
                 @endif
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="5" scope="row" style="text-align: right"><b>TOTAL S/.:</b></td>
+                    <td colspan="4" scope="row" style="text-align: right"><b>TOTAL S/.:</b></td>
                     <td scope="row" class="text-red-800 text-right" style="text-align: right" colspan="1">
                         <b>{{ number_format($sumaTotal, 2) }}</b>
                     </td>
@@ -156,12 +158,11 @@
         <table class="table-bordered" style="margin-bottom: 20px;" width="100%">
             <thead class="table-heading">
                 <tr>
-                    <th colspan="5">HISTORIAL DE DEUDAS</th>
+                    <th colspan="4">HISTORIAL DE DEUDAS</th>
                 </tr>
                 <tr>
                     <th style="text-align: left" class="px-6 py-3">PERIODO</th>
                     <th class="px-6 py-3">DESCRIPCIÓN</th>
-                    <th class="px-6 py-3">STAND</th>
                     <th style="text-align: right" class="px-6 py-3">SOLES</th>
                     <th style="text-align: right" class="px-6 py-3">DOLARES</th>
                 </tr>
@@ -172,7 +173,6 @@
                         <tr>
                             <td style="text-align: left" scope="row">{{ $item->date->format('m-Y') }}</td>
                             <td style="text-align: left" scope="row">{{ $item->description }}</td>
-                            <td>{{ $item->stand ? $item->stand->name : 'S/N' }}</td>
                             <td style="text-align: right; color: {{ $item->summary_type == 'out' ? 'red' : 'auto' }}">
                                 {{ $item->summary_type == 'out' ? '-' : '' }}
                                 @if ($item->currency->id !== 2)
@@ -189,14 +189,14 @@
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="5" style="text-align: center">No hay movimientos</td>
+                        <td colspan="4" style="text-align: center">No hay movimientos</td>
                     </tr>
                 @endif
 
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="3" scope="row" style="text-align: right"><b>TOTAL:</b></td>
+                    <td colspan="2" scope="row" style="text-align: right"><b>TOTAL:</b></td>
                     <td scope="row" class="text-red-800 text-right" style="text-align: right">
                         <b>S/. {{ number_format($sumaTotalPendiente, 2) }}</b>
                     </td>

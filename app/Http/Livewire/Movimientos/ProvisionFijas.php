@@ -13,6 +13,7 @@ use App\Models\Currency;
 use Livewire\WithPagination;
 use App\Exports\DetailsProvisionExport;
 use App\Models\Student;
+use App\Models\StudentTutor;
 
 class ProvisionFijas extends Component
 {
@@ -119,7 +120,7 @@ class ProvisionFijas extends Component
         foreach ($this->students as $name => $id) {
             $this->unique_code = strval($this->date.$this->category_id.$id);
             $detail = Detail::where('unique_code', $this->unique_code)->first();
-            // dd($student);
+            $student_tutor = Student::find($id)->first()->id;
             if (!$detail)
             {
                 Detail::create([
@@ -133,6 +134,7 @@ class ProvisionFijas extends Component
                     'date_paid' =>$this->date_paid,
                     'category_id' =>$this->category_id,
                     'student_id' =>$id,
+                    'student_tutor_id' =>$student_tutor,
                     'currency_id' =>$this->currency_id,
                 ]);
             }

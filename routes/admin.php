@@ -54,6 +54,7 @@ use App\Http\Controllers\ReciboOriginalCc5\ReciboPrintPdfController;
 use App\Http\Livewire\Movimientos\ClaseMovimientos\MovimientoCliente;
 use App\Http\Livewire\Movimientos\Transferencias\TransferenciaComponent;
 use App\Http\Livewire\Movimientos\Provisiones\PorSocio\PorSocioComponent;
+use App\Http\Livewire\Teachers\TeacherComponent;
 
 Route::middleware(['user_status'])->group(function () {
 
@@ -131,7 +132,7 @@ Route::middleware(['user_status'])->group(function () {
         Route::get('account/detalle/{id}',CuentaDetalle::class)->name('account.show');
     });
     ///////////////////////////////
-    ///////// socios ////////////
+    ///////// estudiantes ////////////
     ////////////////////////////////////////////////////////////////////////
     Route::group(['middleware' => ['can:socios.index']], function () {
         Route::get('students', StudentsComponent::class)->name('students.index');
@@ -141,6 +142,9 @@ Route::middleware(['user_status'])->group(function () {
         Route::get('students/detalle/{id}', StudentDetails::class)->name('students.detalle');
         Route::get('students/reportePDF', [ExportController::class, 'reportePdfSocio'])->name('socio.reportePDF');
     });
+    ///////////////////////////////
+    ///////// Docentes ////////////
+    Route::get('docentes', TeacherComponent::class)->name('teachers');
     ///////////////////////////////
     ///////// Saldos - montos totales ////////////
     ////////////////////////////////////////////////////////////////////////

@@ -10,25 +10,25 @@
 @stop
 
 @section('content')
-    <div class="card card-danger">
+    <div class="card card-maroon">
         <div class="card-header">
             <h3 class="card-title"><b>Cuentas</b></h3>
             <div class="card-tools">
-                <a class="btn btn-primary " href="{{ route('account.create') }}"><i class="fa fa-plus"></i> Nuevo </a>
+                <a class="btn btn-warning " href="{{ route('account.create') }}"><i class="fa fa-plus"></i> Nuevo </a>
             </div>
         </div>
 
         <div class="card-body table-responsive">
 
             <table id="accounts" class="table table-bordered">
-                <thead class="thead-dark">
+                <thead class="thead-maroon">
                     <tr>
-                        <th>Id</th>
-                        <th>Nombre</th>
-                        <th>Numero de cuenta</th>
-                        <th>Serie Ingreso</th>
-                        <th>Serie Gasto</th>
-                        <th>Tipo</th>
+                        <th>ID</th>
+                        <th>NOMBRE</th>
+                        <th># DE CUENTA</th>
+                        <th>SERIE INGRESOS</th>
+                        <th>SERIE GASTOS</th>
+                        <th>TIPO</th>
                         <th class="text-center">Acción</th>
                     </tr>
                 </thead>

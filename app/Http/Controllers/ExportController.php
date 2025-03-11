@@ -10,6 +10,7 @@ use App\Models\Customer;
 use App\Models\Detail;
 use App\Models\Partner;
 use App\Models\Setting;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Luecano\NumeroALetras\NumeroALetras;
@@ -270,15 +271,15 @@ class ExportController extends Controller
     }
     public function reportePdfSocio(Request $request)
     {
-        $socio_id = $request->socio;
+        $student_id = $request->student;
         $start  = Carbon::parse($request->start)->format('Y-m-d');
         $finish  = Carbon::parse($request->finish)->format('Y-m-d');
-        $socio = Partner::where('id', $socio_id)->first();
+        $student = Student::where('id', $student_id)->first();
 
-        // $sumaTotal = Detail::whereStatus(1)->where('partner_id', $socio_id)->whereSummaryType('add')->whereBetween('date_paid', [$start, $finish])->sum('amount') - Detail::whereStatus(1)->where('partner_id', $socio_id)->whereSummaryType('out')->whereBetween('date_paid', [$start, $finish])->sum('amount');
+        // $sumaTotal = Detail::whereStatus(1)->where('student_id', $student_id)->whereSummaryType('add')->whereBetween('date_paid', [$start, $finish])->sum('amount') - Detail::whereStatus(1)->where('student_id', $student_id)->whereSummaryType('out')->whereBetween('date_paid', [$start, $finish])->sum('amount');
 
         $sumaTotalPendiente = Detail::where('status', 0)
-            ->where('partner_id', $socio_id)
+            ->where('student_id', $student_id)
             ->where(function ($query) {
                 $query->where('currency_id', '!=', 2)
                     ->orWhereNull('currency_id'); // Incluir currency_id NULL
@@ -287,18 +288,18 @@ class ExportController extends Controller
             ->value('total');
 
         $sumaTotalPendienteDolar = Detail::where('status', 0)
-            ->where('partner_id', $socio_id)
+            ->where('student_id', $student_id)
             ->where('currency_id', 2) // Filtra solo los dolares
             ->selectRaw("SUM(CASE WHEN summary_type = 'add' THEN amount ELSE 0 END) - SUM(CASE WHEN summary_type = 'out' THEN amount ELSE 0 END) as total")
             ->value('total');
 
-        $movimientos = Detail::where('partner_id', $socio_id)->whereStatus(1)->whereBetween('date_paid', [$start, $finish])->orderBy('date_paid', 'desc')->get();
+        $movimientos = Detail::where('student_id', $student_id)->whereStatus(1)->whereBetween('date_paid', [$start, $finish])->orderBy('date_paid', 'desc')->get();
         $sumaTotal = $movimientos->where('summary_type', 'add')->sum('amount') - $movimientos->where('summary_type', 'out')->sum('amount');
-        $pendientes = Detail::whereStatus(0)->where('partner_id', $socio_id)->get();
+        $pendientes = Detail::whereStatus(0)->where('student_id', $student_id)->get();
 
-        $pdf = Pdf::loadView('pdf.socio_pdf', compact('movimientos', 'pendientes', 'socio', 'start', 'finish', 'sumaTotal', 'sumaTotalPendiente', 'sumaTotalPendienteDolar'));
+        $pdf = Pdf::loadView('pdf.socio_pdf', compact('movimientos', 'pendientes', 'student', 'start', 'finish', 'sumaTotal', 'sumaTotalPendiente', 'sumaTotalPendienteDolar'));
 
-        return $pdf->stream('Reporte_Socio_'.$socio->full_name.'.pdf');
+        return $pdf->stream('Reporte_Estudiante_'.$student->full_name.'.pdf');
     }
 
     public function validarFechas($start, $finish)
