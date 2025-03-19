@@ -133,7 +133,7 @@
     @include('livewire.movimientos.provisiones.fijas.form')
     @include('livewire.movimientos.provisiones.fijas.form-delete')
 
-    {{-- @include('livewire.movimientos.provisiones.variables.modal-variable-export') --}}
+    @include('livewire.movimientos.provisiones.variables.modal-variable-export')
 
 </div>
 <script>

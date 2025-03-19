@@ -27,7 +27,7 @@
                             <th scope="col">DOCUMENTO</th>
                             <th scope="col">APELLIDOS Y NOMBRES</th>
                             <th scope="col">FOTO</th>
-                            <th scope="col" width="10%" class="text-center">Acciones</th>
+                            <th scope="col" width="15%" class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -59,17 +59,14 @@
                                         </span>
                                     </td>
 
-                                    <td>
-                                        <div class="btn-group d-flex justify-center" role="group" aria-label="">
-                                            <button type="button" class="btn btn-sm btn-primary text-center"
-                                                wire:click='edit({{ $student->id }})'><i
-                                                    class="fa fa-pen"></i></button>
-                                            <a href="{{ route('students.detalle', $student->id) }}"
-                                                class="btn btn-sm btn-info text-center"><i class="fa fa-eye"></i></a>
-                                            <button type="button" class="btn btn-sm btn-danger text-center"
-                                                onclick="anularStudent({{ $student->id }})"><i
-                                                    class="fa fa-trash"></i></button>
-                                        </div>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-primary text-center"
+                                            wire:click='edit({{ $student->id }})'><i class="fa fa-pen"></i></button>
+                                        <a href="{{ route('students.detalle', $student->id) }}"
+                                            class="btn btn-sm btn-info text-center"><i class="fa fa-eye"></i></a>
+                                        <button type="button" class="btn btn-sm btn-danger text-center"
+                                            onclick="anularStudent({{ $student->id }})"><i
+                                                class="fa fa-trash"></i></button>
                                     </td>
                                 </tr>
                             @endforeach

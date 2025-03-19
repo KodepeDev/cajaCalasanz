@@ -19,7 +19,7 @@ class StudentTutor extends Model
         'phone',
         'address',
         'type',
-        'is_ative',
+        'is_active',
         'is_client',
         'description',
     ];

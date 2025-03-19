@@ -17,4 +17,14 @@ class Teacher extends Model
         'photo',
         'is_active',
     ];
+
+    public function grade()
+    {
+        return $this->hasOneThrough(Grade::class, TeacherAssignment::class, 'teacher_id', 'id', 'id', 'grade_id');
+    }
+
+    public function section()
+    {
+        return $this->hasOneThrough(Section::class, TeacherAssignment::class, 'teacher_id', 'id', 'id', 'section_id');
+    }
 }

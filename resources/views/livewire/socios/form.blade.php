@@ -225,7 +225,7 @@
                     </div>
                     <div class="form-group col-md-12">
                         <label for="">Información Adicional</label>
-                        <textarea wire:model.defer='description' class="form-control" name="tutor_description" id="description"
+                        <textarea wire:model.defer='tutor_description' class="form-control" name="tutor_description" id="tutor_description"
                             rows="3"></textarea>
                         @error('tutor_description')
                             <span class="error">{{ $message }}</span>

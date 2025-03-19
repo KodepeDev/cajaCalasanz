@@ -61,7 +61,7 @@
                             </td>
                             <td>
                                 @if(Auth::id() != $user->id)
-                                    @can('usuarios.delete')
+                                    @can('usuarios.edit')
                                     <button wire:click="editUser({{ $user->id }})" class="btn btn-primary btn-sm"><i class=" fa fa-cog"></i></a></button>
                                     @endcan
                                     @can('usuarios.delete')

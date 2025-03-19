@@ -1,5 +1,5 @@
 <div class="pt-4">
-    <div class="card card-primary">
+    <div class="card card-danger">
 
         <div wire:loading.class='overlay' class="d-none dark" wire:loading.class.remove='d-none'>
             <i class="fas fa-2x fa-sync-alt fa-spin"></i>
@@ -115,7 +115,7 @@
                 <div class="form-group col-md-12">
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
-                            <thead class="bg-primary text-white">
+                            <thead class="bg-danger text-white">
                                 <tr>
                                     <th>MES</th>
                                     <th width="40%">DESCRIPCION</th>
@@ -280,6 +280,10 @@
                     title: 'Buen Trabajo!',
                     text: msg,
                 });
+                $('#customer-select').select2();
+                $("#customer-select").select2({
+                    theme: 'bootstrap4',
+                });
             });
             window.livewire.on('movimiento_added', msg => {
                 Swal.fire({
@@ -329,9 +333,23 @@
                 livewire.emit('selectSearch');
                 @this.set('customer_id', socioID);
             });
-            window.livewire.on('updateSelect', msg => {
-                $("#customer-select").val(msg).trigger('change');
-                $("#customer-select").select2();
+            Livewire.on('updateSelect', function(customerId, fullName) {
+                // Destruye el Select2 actual
+                $('#customer-select').select2('destroy');
+
+                // Vuelve a inicializar Select2
+                $('#customer-select').select2();
+
+                // Selecciona el nuevo cliente
+                if (!$('#customer-select option[value="' + customerId + '"]').length) {
+                    // Si no existe, agrega la nueva opción
+                    let newOption = new Option(fullName, customerId, true, true);
+                    $('#customer-select').append(newOption);
+                }
+
+                // Selecciona la nueva opción
+                $('#customer-select').val(customerId).trigger('change');
+
                 $("#customer-select").select2({
                     theme: 'bootstrap4',
                 });

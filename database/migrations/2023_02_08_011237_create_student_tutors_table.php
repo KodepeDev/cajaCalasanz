@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
             $table->enum('type', ['PADRE', 'MADRE', 'TUTOR', 'APODERADO', 'OTROS'])->nullable();
-            $table->boolean('is_ative')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->boolean('is_client')->default(true);
             $table->text('description')->nullable();
 

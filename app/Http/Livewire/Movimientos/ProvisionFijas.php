@@ -186,7 +186,6 @@ class ProvisionFijas extends Component
         $rules = [
             'date' => 'required|date',
             'category_id' => 'required',
-            'stage_id' => 'required',
         ];
 
         $messages = [
@@ -197,7 +196,7 @@ class ProvisionFijas extends Component
 
         $this->validate($rules, $messages);
 
-        return (new DetailsProvisionExport($this->type, $this->category_id, $this->meses, $this->stage_id))->download('Detalle_de_deudores.xlsx');
+        return (new DetailsProvisionExport($this->type, $this->category_id, $this->meses))->download('Detalle_Prov_Fijas.xlsx');
     }
 
 

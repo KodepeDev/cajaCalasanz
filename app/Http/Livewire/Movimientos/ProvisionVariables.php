@@ -260,14 +260,12 @@ class ProvisionVariables extends Component
         $rules = [
             'date' => 'required|date',
             'category_id' => 'required',
-            'stage_id' => 'required',
         ];
 
         $messages = [
             'date.required' => 'El mes a generar es requerido',
             'date.date' => 'Debe elegir un mes válido',
             'category_id.required' => 'La categoria es requerido',
-            'stage_id.required' => 'El área es requerido',
         ];
 
         $this->validate($rules, $messages);
@@ -296,19 +294,17 @@ class ProvisionVariables extends Component
         $rules = [
             'date' => 'required|date',
             'category_id' => 'required',
-            'stage_id' => 'required',
         ];
 
         $messages = [
             'date.required' => 'El mes a generar es requerido',
             'date.date' => 'Debe elegir un mes válido',
             'category_id.required' => 'La categoria es requerido',
-            'stage_id.required' => 'El área es requerido',
         ];
 
         $this->validate($rules, $messages);
 
-        return (new DetailsProvisionExport(3, $this->category_id, $this->meses, $this->stage_id))->download('Detalle_de_deudores.xlsx');
+        return (new DetailsProvisionExport(3, $this->category_id, $this->meses))->download('Detalle_Prov_Variable.xlsx');
     }
 
     public function resetUI()

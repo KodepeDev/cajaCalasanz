@@ -1,5 +1,5 @@
 <div class="pt-4">
-    <div class="card card-danger">
+    <div class="card card-maroon">
 
         <div wire:loading.class='overlay' class="d-none dark" wire:loading.class.remove='d-none'>
             <i class="fas fa-2x fa-sync-alt fa-spin"></i>
@@ -25,7 +25,7 @@
                     @endif --}}
                     <div class="input-group" wire:ignore>
                         <div class="input-group-prepend">
-                            <input type="number" wire:model.defer='documento' class="form-control"
+                            <input type="number" wire:model.defer='documento' id="customer_doc" class="form-control"
                                 wire:change='clearDataApi()' wire:loading.attr='readonly' placeholder="N° documento">
                         </div>
                         {{-- <input type="text" wire:model.defer='customer_name' class="form-control"
@@ -39,8 +39,8 @@
                         </select>
 
                         <div class="input-group-append">
-                            <button type="button" wire:click="ConsutasCustomer()" class="btn btn-info"><i
-                                    class="fas fa-search"></i></button>
+                            <button id="consulta" type="button" wire:click="ConsutasCustomer()"
+                                class="btn btn-info"><i class="fas fa-search"></i></button>
                         </div>
                     </div>
                     @error('documento')
@@ -344,6 +344,10 @@
                     title: 'Buen Trabajo!',
                     text: msg,
                 });
+                $('#customer-select').select2();
+                $("#customer-select").select2({
+                    theme: 'bootstrap4',
+                });
             });
             window.livewire.on('movimiento_added', msg => {
                 Swal.fire({
@@ -351,6 +355,7 @@
                     title: 'Buen Trabajo!',
                     text: msg,
                 });
+
             });
             window.livewire.on('registro-existente', msg => {
                 $("#globalModal").modal('hide');
@@ -383,19 +388,33 @@
                 livewire.emit('redireccionar');
             });
 
-
             $('#customer-select').select2();
             $("#customer-select").select2({
                 theme: 'bootstrap4',
             });
+
             $('#customer-select').on('change', function(e) {
                 let socioID = $('#customer-select').select2('val');
                 livewire.emit('selectSearch');
                 @this.set('customer_id', socioID);
             });
-            window.livewire.on('updateSelect', msg => {
-                $("#customer-select").val(msg).trigger('change');
-                $("#customer-select").select2();
+            Livewire.on('updateSelect', function(customerId, fullName) {
+                // Destruye el Select2 actual
+                $('#customer-select').select2('destroy');
+
+                // Vuelve a inicializar Select2
+                $('#customer-select').select2();
+
+                // Selecciona el nuevo cliente
+                if (!$('#customer-select option[value="' + customerId + '"]').length) {
+                    // Si no existe, agrega la nueva opción
+                    let newOption = new Option(fullName, customerId, true, true);
+                    $('#customer-select').append(newOption);
+                }
+
+                // Selecciona la nueva opción
+                $('#customer-select').val(customerId).trigger('change');
+
                 $("#customer-select").select2({
                     theme: 'bootstrap4',
                 });

@@ -458,11 +458,6 @@ return [
             ],
         ],
         [
-            'text' => 'DOCENTES',
-            // 'route' => 'teachers',
-            'icon'    => 'fas fa-user',
-        ],
-        [
             'text'    => ' CUENTAS',
             'icon'    => 'fas fa-wallet',
             'submenu' => [
@@ -487,9 +482,14 @@ return [
             'route'         => 'students.index',
             'icon'        => 'fa fa-users',
             'active' => ['admin/students', 'admin/students*'],
-            'label'       => 'Nuevo',
             'label_color' => 'info',
         ],
+        [
+            'text' => 'DOCENTES',
+            'route' => 'teachers',
+            'icon'    => 'fas fa-user',
+        ],
+        ['header' => 'REPORTES Y EXPORTACIONES'],
         [
             'text'        => 'Reportes',
             'url'         => '#',

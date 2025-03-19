@@ -10,6 +10,7 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ApiConsultasController;
+use App\Models\Enrollment;
 use App\Models\Grade;
 use App\Models\SchoolYear;
 use App\Models\Student;
@@ -175,14 +176,6 @@ class StudentsComponent extends Component
                     'school_year_id' => $this->schoolYear->id,
                 ]
             ]);
-            DB::table('teacher_assignments')->insert([
-                [
-                    'teacher_id' => $this->teacher_id,
-                    'grade_id' => $this->grade_id,
-                    'section_id' => $this->section_id,
-                    'school_year_id' => $this->schoolYear->id,
-                ]
-            ]);
 
             if($tutor->is_client){
 
@@ -233,25 +226,49 @@ class StudentsComponent extends Component
         $this->address = $student->address;
         $this->is_active = $student->is_active;
         $this->photo = null;
+        $this->description = $student->description;
 
-        // dd($this->etapa);
+        $this->grade_id = $student->grade->id;
+
+        $tutor = $student->tutor;
+
+        if ($tutor) {
+            $this->tutor_first_name = $tutor->first_name;
+            $this->tutor_last_name = $tutor->last_name;
+            $this->tutor_email = $tutor->email;
+            $this->tutor_document_type = $tutor->document_type;
+            $this->tutor_document = $tutor->document;
+            $this->tutor_phone = $tutor->phone;
+            $this->tutor_address = $tutor->address;
+            $this->tutor_is_active = $tutor->is_active;
+            $this->tutor_description = $tutor->description;
+            $this->tutor_type = $tutor->type;
+
+            $this->teacher_id = $student->teacher_id;
+        }
 
         $this->emit('show-modal', 'mostrar modal');
     }
 
     public function update()
     {
-
-        if ($this->document_type == 0){
-
-            $this->full_name = $this->first_name . ' ' . $this->last_name;
-        }
-
         $rules = [
-            'full_name' => 'required',
+            'first_name' => 'required|min:3',
+            'last_name' => 'required|min:3',
             'document_type' => 'required',
-            'document' => "required|min:8|max:11|unique:partners,document,{$this->selected_id}",
+            'document' => "required|min:8|max:11|unique:students,document,{$this->selected_id}",
             'photo' => 'nullable|image|max:2048',
+            'description' => 'nullable',
+
+            'tutor_first_name' => 'required|min:3',
+            'tutor_last_name' => 'required|min:3',
+            'tutor_email' => 'nullable|min:3|max:100',
+            'tutor_document' => 'required|min:8|max:11',
+            'tutor_type' => 'required',
+            'tutor_description' => 'nullable',
+            'grade_id' => 'required',
+            'teacher_id' => 'required',
+
         ];
 
         $messages = [
@@ -261,34 +278,89 @@ class StudentsComponent extends Component
             'document.min' => 'El documento debe tener al menos 8 digitos',
             'document.max' => 'El documento debe tener como máximo 11 digitos',
             'document.unique' => 'El documento es ya esta registrado',
-            'etapa.required' => 'La etapa a la que pertenece el socio es requerido',
             'photo.max' => 'El archivo de foto debe ser menor a 2048 mb',
             'photo.image' => 'El archivo debe ser de tipo jpg o png',
         ];
 
 
-        try {
-            $this->validate($rules, $messages);
+        $this->validate($rules, $messages);
 
+        try {
             $student = Student::findOrFail($this->selected_id);
+            $tutor = StudentTutor::where('id', $student->student_tutor_id)->first();
 
             $imagenAntigua = $student->photo;
 
+            $student_tutor = StudentTutor::where('document', $this->tutor_document)->first();
+            $tutorEdit = null;
+            if ($tutor->document == $this->tutor_document) {
+
+                $tutor->update([
+                    'full_name' => $this->tutor_last_name . ' ' . $this->tutor_first_name,
+                    'first_name' => $this->tutor_first_name,
+                    'last_name' => $this->tutor_last_name,
+                    'email' => $this->tutor_email,
+                    'document_type' => $this->tutor_document_type,
+                    'document' => $this->tutor_document,
+                    'phone' => $this->tutor_phone,
+                    'address' => $this->tutor_address,
+                    'type' => $this->tutor_type,
+                    'is_ative' =>$this->tutor_is_active,
+                    'is_client' => true,
+                    'description' => $this->tutor_description,
+                ]);
+                $tutor->save();
+                $tutorEdit = $tutor;
+            } else {
+                if ($student_tutor) {
+                    $student_tutor->update([
+                        'full_name' => $this->tutor_last_name . ' ' . $this->tutor_first_name,
+                        'first_name' => $this->tutor_first_name,
+                        'last_name' => $this->tutor_last_name,
+                        'email' => $this->tutor_email,
+                        'document_type' => $this->tutor_document_type,
+                        'document' => $this->tutor_document,
+                        'phone' => $this->tutor_phone,
+                        'address' => $this->tutor_address,
+                        'type' => $this->tutor_type,
+                        'is_ative' =>$this->tutor_is_active,
+                        'is_client' => true,
+                        'description' => $this->tutor_description,
+                    ]);
+                    $student_tutor->save();
+                    $tutorEdit = $student_tutor;
+                } else {
+                    $tutorEdit = StudentTutor::create([
+                        'full_name' => $this->tutor_last_name . ' ' . $this->tutor_first_name,
+                        'first_name' => $this->tutor_first_name,
+                        'last_name' => $this->tutor_last_name,
+                        'email' => $this->tutor_email,
+                        'document_type' => $this->tutor_document_type,
+                        'document' => $this->tutor_document,
+                        'phone' => $this->tutor_phone,
+                        'address' => $this->tutor_address,
+                        'type' => $this->tutor_type,
+                        'is_ative' =>$this->tutor_is_active,
+                        'is_client' => true,
+                        'description' => $this->tutor_description,
+                    ]);
+                }
+            }
+
             $student->update([
-                'full_name' => $this->full_name,
-                'first_name'=> $this->first_name,
+                'full_name' => $this->last_name . ' ' . $this->first_name,
+                'first_name' => $this->first_name,
                 'last_name' => $this->last_name,
                 'email' => $this->email,
                 'document_type' => $this->document_type,
                 'document' => $this->document,
                 'phone' => $this->phone,
                 'address' => $this->address,
-                'is_active' =>boolval($this->is_active),
-                'is_client' => true,
+                'is_active' => true,
                 'description' => $this->description,
+                'student_tutor_id' => $tutorEdit->id,
+                'teacher_id' => $this->teacher_id,
             ]);
-
-            // dd($student);
 
             if($this->photo)
             {
@@ -308,43 +380,42 @@ class StudentsComponent extends Component
                 }
             }
 
-            $bitacora = Bitacora::create([
-                'type' => 'update',
-                'activity' => "El usuario ha actualizado la información del un student: $this->full_name, $this->document",
-                'activity_id' => $student->id,
-                'user_id' => Auth::user()->id,
+            $enrroll = Enrollment::where('id', '=', $student->id)->first();
+
+            $enrroll->update([
+                'grade_id' => $this->grade_id,
             ]);
-            /// esto actualiza la tabla de clientes y proveedores
 
-            if($this->is_client){
+            if($tutorEdit->is_client){
 
-                $customer = Customer::where('partner_id', $this->selected_id)->first();
+                $cliente = Customer::where('document',$tutorEdit->document)->first();
 
-                $customer->update([
-                    'full_name' => $this->full_name,
-                    'first_name'=> $this->first_name,
-                    'last_name' => $this->last_name,
-                    'email' => $this->email,
-                    'document_type' => $this->document_type,
-                    'document' => $this->document,
-                    'phone' => $this->phone,
-                    'address' => $this->address,
-                    'etapa' => 1,
-                    'is_ative' =>true,
-                    'is_client' => true,
-                    'is_suplier' => true,
-                ]);
+                if($cliente){
+                    $cliente->update([
+                        'student_tutor_id' => $tutorEdit->id
+                    ]);
+                }else{
+                    $customer = Customer::create([
+                        'full_name' => $tutorEdit->full_name,
+                        'first_name'=> $tutorEdit->first_name,
+                        'last_name' => $tutorEdit->last_name,
+                        'email' => $tutorEdit->email,
+                        'document_type' => $tutorEdit->document_type,
+                        'document' => $tutorEdit->document,
+                        'phone' => $tutorEdit->phone,
+                        'address' => $tutorEdit->address,
+                        'is_active' =>true,
+                        'is_tutor' => true,
+                        'student_tutor_id' => $tutorEdit->id,
+                    ]);
+
+                    $customer->save();
+                }
 
             }
-
+            $this->emit('socio_updated', 'los datos del estudiante han sido actualizados exitosamente');
             $this->resetUI();
-
-            $this->emit('socio_updated', 'El socio ha sido actualizado exitosamente');
-
         } catch (\Throwable $e) {
-
-            report($e);
-
             $this->emit('error', $e->getMessage());
         }
 

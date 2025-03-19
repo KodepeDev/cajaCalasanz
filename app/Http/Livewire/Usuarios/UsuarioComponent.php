@@ -281,9 +281,9 @@ class UsuarioComponent extends Component
 
             $this->dataApi = (new ApiConsultasController)->apiDni($dni = $this->document);
 
-            if(isset($this->dataApi->error)){
+            if(isset($this->dataApi['error'])){
 
-                $this->mensaje = $this->dataApi->error;
+                $this->mensaje = $this->dataApi['error'];
                 $this->emit('error', $this->mensaje);
                 return;
 
@@ -297,9 +297,9 @@ class UsuarioComponent extends Component
 
                 }else{
 
-                    $this->userFirstName = $this->dataApi->nombres;
-                    $this->userLastName = $this->dataApi->apellidoPaterno . ' '. $this->dataApi->apellidoMaterno;
-                    $this->document = $this->dataApi->numeroDocumento;
+                    $this->userFirstName = $this->dataApi['nombres'];
+                    $this->userLastName = $this->dataApi['apellidoPaterno'] . ' '. $this->dataApi['apellidoMaterno'];
+                    $this->document = $this->dataApi['numeroDocumento'];
 
                 }
             }

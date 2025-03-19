@@ -68,9 +68,23 @@
 
                             <hr>
 
-                            <strong><i class="far fa-file-alt mr-1"></i> Nombres</strong>
+                            <strong><i class="far fa-file-alt mr-1"></i> NOMBRE COMPLETO</strong>
 
                             <p class="text-muted">{{ $student->first_name }} {{ $student->last_name }}</p>
+
+                            <hr>
+                            <strong><i class="far fa-file-alt mr-1"></i>GRADO</strong>
+                            <p class="text-muted">{{ $student->grade->name }}
+                            </p>
+                            <hr>
+                            <hr>
+                            <strong><i class="far fa-file-alt mr-1"></i>{{ $student->tutor->type }}</strong>
+                            <p class="text-muted">{{ $student->tutor->first_name }} {{ $student->tutor->last_name }}
+                            </p>
+                            <hr>
+                            <strong><i class="far fa-file-alt mr-1"></i>DOCENTE - TUTOR</strong>
+                            <p class="text-muted">{{ $student->teacher ? $student->teacher->full_name : '' }}
+                            </p>
                         </div>
                         <!-- /.card-body -->
                     </div>

@@ -23,18 +23,16 @@ class DetailsProvisionExport implements FromQuery, ShouldAutoSize, WithCustomSta
 {
     use Exportable;
 
-    protected $tipo, $category, $startDate, $endDate, $etapa, $categoria_nombre, $etapa_nombre;
+    protected $tipo, $category, $startDate, $endDate, $categoria_nombre, $etapa_nombre;
 
-    public function __construct($tipo, $category, $mes, $etapa)
+    public function __construct($tipo, $category, $mes)
     {
         $this->tipo = $tipo;
         $this->category = $category;
 
         $cat = Category::whereKey($this->category)->first();
-        $etap = Stage::whereKey($etapa)->first();
 
         $this->categoria_nombre = $cat->name;
-        $this->etapa_nombre = $etap->name;
 
         $first_day = Carbon::parse($mes)->firstOfMonth();
         $last_day = Carbon::parse($mes)->endOfMonth();
@@ -42,21 +40,18 @@ class DetailsProvisionExport implements FromQuery, ShouldAutoSize, WithCustomSta
         $this->startDate = $first_day;
         $this->endDate = $last_day;
 
-        $this->etapa = $etapa;
-
         // dd($tipo, $this->category, $this->etapa);
     }
 
     public function query()
     {
-        return Detail::query()->join('stands', 'details.stand_id', '=', 'stands.id')
-                            ->orderBy('stands.name', 'ASC')
-                            ->where('stands.stage_id',$this->etapa)
-                            ->where('details.status',false)
-                            ->where('details.category_id',$this->category)
-                            ->whereBetween('details.date', [$this->startDate, $this->endDate])
-                            ->where('details.summary_type', 'add')
-                            ->select('details.id', 'details.date', 'details.description', 'details.category_id', 'stands.name', 'details.partner_id', 'details.amount');
+        $det = Detail::query()
+                    ->where('summary_type', 'add')
+                    ->where('type', $this->tipo)
+                    ->whereBetween('date', [$this->startDate, $this->endDate])
+                    ->where('category_id', $this->category)
+                    ->select('id', 'date', 'category_id', 'description', 'student_id', 'currency_id', 'amount');
+        return $det;
     }
 
     public function startCell(): string
@@ -70,8 +65,8 @@ class DetailsProvisionExport implements FromQuery, ShouldAutoSize, WithCustomSta
             Date::datetimeToExcel($detail->date),
             $detail->category->name,
             $detail->description,
-            $detail->name ? $detail->name : 'S/N',
-            $detail->partner ? $detail->partner->full_name : 'Varios',
+            $detail->student_id ? $detail->student->full_name : 'S/N',
+            $detail->currency_id ? $detail->currency->code : '',
             $detail->amount,
         ];
     }
@@ -89,8 +84,8 @@ class DetailsProvisionExport implements FromQuery, ShouldAutoSize, WithCustomSta
             'MES',
             'CATEGORÍA',
             'DESCRIPCION',
-            'STAND',
-            'CLIENTE/SOCIO',
+            'ESTUDIANTE',
+            'MONEDA',
             'MONTO',
         ];
     }
@@ -111,7 +106,7 @@ class DetailsProvisionExport implements FromQuery, ShouldAutoSize, WithCustomSta
             ]
         ]);
         $sheet->setCellValue('A3', $this->categoria_nombre." - PENDIENTES DE PAGO");
-        $sheet->setCellValue('A4', "".$this->etapa_nombre." - del mes " .Carbon::parse($this->startDate)->format('m/Y') . "");
+        $sheet->setCellValue('A4', "Del mes " .Carbon::parse($this->startDate)->format('m/Y') . "");
         $sheet->getStyle('A6:F6')->applyFromArray([
             'font' => [
                 'bold' => true,
@@ -156,7 +151,7 @@ class DetailsProvisionExport implements FromQuery, ShouldAutoSize, WithCustomSta
             ]
         ]);
 
-        $sheet->setCellValue('E'. $sheet->getHighestRow() + 2, "Suma Total");
+        $sheet->setCellValue('F'. $sheet->getHighestRow() + 2, "Suma Total");
         $sheet->setCellValue('F'. $sheet->getHighestRow(), '=SUM(F7:F'. ($sheet->getHighestRow()-2) .')');
 
 

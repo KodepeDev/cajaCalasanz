@@ -27,6 +27,7 @@ class MovimientoCliente extends Component
     public $date, $concept, $type, $status, $amount, $tax, $recipt_series,$puesto, $recipt_number, $future, $account_id, $category_id, $subcategoria_id, $payment_method, $numero_operacion, $paid_by, $observation, $user_id, $customer_id, $student_tutor_id;
 
     protected $dataApi=[];
+    public $cliente_id;
 
     protected $listeners = [
         'resetUI',
@@ -435,9 +436,11 @@ class MovimientoCliente extends Component
     public function ConsutasCustomer()
     {
         $cust = Customer::where('document', $this->documento)->first();
+        // dd($cust);
         // dd($cust->full_name);
-        if($cust != null){
+        if($cust){
             $this->customer_name = $cust->full_name;
+            $this->cliente_id = $cust->id;
         }else{
             $this->mensaje = 'No existe el Cliente o proveedor, SI ES SOCIO (CREARLO MEDIANTE EL MODULO DE SOCIOS)';
             $this->emit('error', $this->mensaje);
@@ -445,19 +448,22 @@ class MovimientoCliente extends Component
         }
 
         $this->paid_by = $this->customer_name;
+        $this->customers = Customer::pluck('id', 'full_name');
 
-        $this->emit('updateSelect', $cust->id ?? null);
+        $this->emit('updateSelect', $cust->id, $cust->full_name);
     }
 
     public function selectSearch()
     {
         $customer = Customer::find($this->customer_id);
+        // dd($customer, $this->customer_id);
         $this->documento = $customer->document ?? 99999999;
+        $this->customer_name = $customer->full_name;
         $this->provisions = [];
         $this->provisionsCobrar = [];
         $this->checkedProvision = [];
         $this->total_prov_cobrar = 0;
-        $this->paid_by = $customer->full_name ?? '';
+        $this->paid_by = $this->customer_name;
     }
 
     //crear nuevo cliente o proveedor
@@ -497,16 +503,13 @@ class MovimientoCliente extends Component
             'is_ative' =>true,
             'is_client' => true,
             'is_tutor' => false,
-            'student_tutor_id' => false,
+            'student_tutor_id' => null,
             'student_id' => null,
         ]);
 
         $this->emit('customer_added', 'Cliente o proveedor registrado exitosamente');
-        $this->customers = Customer::pluck('id', 'full_name');
         $this->documento = $customer->document;
-
-        $this->customer_name = $customer->full_name;
-        $this->emit('updateSelect', $customer->id ?? null);
+        $this->ConsutasCustomer();
 
         $this->resetUI();
 

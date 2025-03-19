@@ -19,8 +19,6 @@ class UsersSeeder extends Seeder
      */
     public function run()
     {
-        $role = Role::findOrFail(2);
-
         User::create([
             'first_name' => 'Kodepe',
             'last_name' => 'Admin',
@@ -29,7 +27,7 @@ class UsersSeeder extends Seeder
             'email' => 'adminsistemas@kodepe.com',
             'email_verified_at' => Carbon::now(),
             'password' => Hash::make('12345678')
-        ])->syncRoles($role->id);
+        ])->syncRoles(1);
 
         User::create([
             'first_name' => 'ADMIN',
@@ -39,7 +37,7 @@ class UsersSeeder extends Seeder
             'email' => 'admin@admin.com',
             'email_verified_at' => Carbon::now(),
             'password' => Hash::make('10101010')
-        ])->syncRoles($role->id);
+        ])->syncRoles(3);
 
         Setting::create([
             'name' => 'Soles',
