@@ -18,77 +18,84 @@ class PermisoSeeder extends Seeder
         // Dashboard/Admin permissions
         Permission::create(['name' => 'dashboard.access']);
         
+        // User Profile permissions
+        Permission::create(['name' => 'user.profile']);
+        Permission::create(['name' => 'user.settings']);
+        Permission::create(['name' => 'user.receipts']);
+        Permission::create(['name' => 'user.change_password']);
+
         // Saldos (Balances)
         Permission::create(['name' => 'saldos.index']);
         Permission::create(['name' => 'saldos.show']);
-        Permission::create(['name' => 'saldos.create']);
-        Permission::create(['name' => 'saldos.edit']);
-        Permission::create(['name' => 'saldos.delete']);
 
         // Categorías
         Permission::create(['name' => 'categorias.index']);
         Permission::create(['name' => 'categorias.show']);
-        Permission::create(['name' => 'categorias.create']);
         Permission::create(['name' => 'categorias.edit']);
         Permission::create(['name' => 'categorias.delete']);
 
         // Movimientos (Transactions)
         Permission::create(['name' => 'movimientos.index']);
         Permission::create(['name' => 'movimientos.show']);
-        Permission::create(['name' => 'movimientos.create']);
         Permission::create(['name' => 'movimientos.edit']);
-        Permission::create(['name' => 'movimientos.delete']);
-        Permission::create(['name' => 'movimientos.export']);
+        Permission::create(['name' => 'movimientos.futuros.index']);
 
         // Balance (Financial Reports)
         Permission::create(['name' => 'balance.index']);
-        Permission::create(['name' => 'balance.show']);
-        Permission::create(['name' => 'balance.export']);
+        Permission::create(['name' => 'balance.ingresos']);
+        Permission::create(['name' => 'balance.gastos']);
 
         // Cuentas (Accounts)
         Permission::create(['name' => 'cuentas.index']);
         Permission::create(['name' => 'cuentas.show']);
-        Permission::create(['name' => 'cuentas.create']);
         Permission::create(['name' => 'cuentas.edit']);
         Permission::create(['name' => 'cuentas.delete']);
 
-        // Estudiantes (Students)
-        Permission::create(['name' => 'estudiantes.index']);
-        Permission::create(['name' => 'estudiantes.show']);
-        Permission::create(['name' => 'estudiantes.create']);
-        Permission::create(['name' => 'estudiantes.edit']);
-        Permission::create(['name' => 'estudiantes.delete']);
+        // Socios/Students
+        Permission::create(['name' => 'socios.index']);
+        Permission::create(['name' => 'socios.show']);
+
+        // Docentes (Teachers)
+        Permission::create(['name' => 'docentes.index']);
 
         // Transferencias
         Permission::create(['name' => 'transferencia.index']);
-        Permission::create(['name' => 'transferencia.create']);
-        Permission::create(['name' => 'transferencia.show']);
 
         // Bitácora (Activity Log)
         Permission::create(['name' => 'bitacora.index']);
-        Permission::create(['name' => 'bitacora.show']);
-        Permission::create(['name' => 'bitacora.export']);
 
         // Usuarios (Users)
         Permission::create(['name' => 'usuarios.index']);
         Permission::create(['name' => 'usuarios.show']);
-        Permission::create(['name' => 'usuarios.create']);
         Permission::create(['name' => 'usuarios.edit']);
         Permission::create(['name' => 'usuarios.delete']);
 
         // Clientes (Clients)
         Permission::create(['name' => 'clientes.index']);
-        Permission::create(['name' => 'clientes.show']);
-        Permission::create(['name' => 'clientes.create']);
-        Permission::create(['name' => 'clientes.edit']);
-        Permission::create(['name' => 'clientes.delete']);
+
+        // Stands
+        Permission::create(['name' => 'stands.index']);
+
+        // Provisiones (Provisions)
+        Permission::create(['name' => 'provisiones.index']);
+
+        // Cierres (Closures)
+        Permission::create(['name' => 'cierres.index']);
+
+        // Importar (Import)
+        Permission::create(['name' => 'importar.index']);
+
+        // Reportes (Reports)
+        Permission::create(['name' => 'reportes.index']);
+
+        // Exportar (Export)
+        Permission::create(['name' => 'exportar.index']);
 
         // Recibos (Receipts)
         Permission::create(['name' => 'recibos.index']);
-        Permission::create(['name' => 'recibos.show']);
-        Permission::create(['name' => 'recibos.create']);
         Permission::create(['name' => 'recibos.edit']);
-        Permission::create(['name' => 'recibos.delete']);
-        Permission::create(['name' => 'recibos.print']);
+
+        // System Settings
+        Permission::create(['name' => 'configuracion.index']);
     }
 }
