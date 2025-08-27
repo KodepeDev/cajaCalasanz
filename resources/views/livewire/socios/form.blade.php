@@ -203,7 +203,7 @@
                             <span class="error">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="form-group col-md-6">
+                    <!-- <div class="form-group col-md-6">
                         <label for="">DOCENTE TUTOR</label>
                         <select class="custom-select" name="" id="" wire:model.defer='teacher_id'>
                             <option value="" selected>Seleccione un Docente</option>
@@ -214,7 +214,7 @@
                         @error('teacher_id')
                             <span class="error">{{ $message }}</span>
                         @enderror
-                    </div>
+                    </div> -->
                     <div class="form-group col-md-6">
                         <label for="">CELULAR</label>
                         <input type="tel" class="form-control" wire:model.defer='tutor_phone' id="phone"

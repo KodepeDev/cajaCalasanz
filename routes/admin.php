@@ -129,12 +129,12 @@ Route::middleware(['user_status'])->group(function () {
     });
 
     // Students Routes
-    Route::group(['middleware' => ['can:estudiantes.index']], function () {
+    Route::group(['middleware' => ['can:socios.index']], function () {
         Route::get('students', StudentsComponent::class)->name('students.index');
         Route::get('students/deudores', Deudores::class)->name('students.deudores');
     });
 
-    Route::group(['middleware' => ['can:estudiantes.show']], function () {
+    Route::group(['middleware' => ['can:socios.show']], function () {
         Route::get('students/detalle/{id}', StudentDetails::class)->name('students.detalle');
         Route::get('students/reportePDF', [ExportController::class, 'reportePdfSocio'])->name('socio.reportePDF');
     });

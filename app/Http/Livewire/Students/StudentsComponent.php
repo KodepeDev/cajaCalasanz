@@ -103,7 +103,7 @@ class StudentsComponent extends Component
             'tutor_type' => 'required',
             'tutor_description' => 'nullable',
             'grade_id' => 'required',
-            'teacher_id' => 'required',
+            'teacher_id' => 'nullable',
 
         ];
 
@@ -156,7 +156,7 @@ class StudentsComponent extends Component
                 'is_active' => true,
                 'description' => $this->description,
                 'student_tutor_id' => $tutor->id,
-                'teacher_id' => $this->teacher_id,
+                'teacher_id' => $this->teacher_id ?? null,
             ]);
 
             if($this->photo)

@@ -32,7 +32,7 @@
                                         <span class="badge badge-danger">INACTIVO</span>
                                     @endif
                                 </td>
-                                <td>{{ $teacher->grade->name }}</td>
+                                <td>{{ $teacher->grade ? $teacher->grade->name : '' }}</td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-primary" wire:click="edit({{ $teacher->id }})">
                                         <i class="fas fa-edit"></i>
