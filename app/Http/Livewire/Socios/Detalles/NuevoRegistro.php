@@ -123,7 +123,7 @@ class NuevoRegistro extends Component
 
             $this->validate($rules, $messages);
 
-            $this->unique_code = strval(Carbon::parse($this->date)->format('Y-m').$this->category_id.$this->student_id);
+            $this->unique_code = strval(Carbon::parse($this->date)->format('Y-m').str_pad($this->category_id, 4, "0", STR_PAD_LEFT).str_pad($this->student_id, 6, "0", STR_PAD_LEFT));
             $detail = Detail::where('unique_code', $this->unique_code)->first();
 
             if(!$detail)
@@ -229,7 +229,7 @@ class NuevoRegistro extends Component
 
             $this->validate($rules, $messages);
 
-            $this->unique_code = strval(Carbon::parse($this->date)->format('Y-m').$this->category_id.$this->student_id);
+            $this->unique_code = strval(Carbon::parse($this->date)->format('Y-m').str_pad($this->category_id, 4, "0", STR_PAD_LEFT).str_pad($this->student_id, 6, "0", STR_PAD_LEFT));
             $detail = Detail::where('id', '!=', $this->summary_id )->where('unique_code', $this->unique_code)->first();
 
             $summary = Detail::find($this->summary_id);

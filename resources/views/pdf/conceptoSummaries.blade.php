@@ -32,11 +32,11 @@
                 </td>
             </tr>
             <tr>
-                <td width="40%">
-                    <img src="{{ config('kodepe.logo') }}" alt="" class="invoice-logo">
+                <td width="30%">
+                    <img src="{{ config('kodepe.logo') }}" alt="" width="100px" class="invoice-logo">
                 </td>
 
-                <td width="60%" class="text-left text-company">
+                <td width="70%" class="text-left text-company">
                     <span style="font-size: 16px"><strong>Reporte por Conceptos de
                             @if (($tipo == 'add') | ($tipo == 'out'))
                                 {{ $tipo == 'add' ? 'INGRESOS' : 'GASTOS' }}
@@ -70,7 +70,7 @@
             <thead>
                 <tr>
                     <th width="10%">FECHA</th>
-                    <th width="10%">STAND</th>
+                    <th width="10%">PERIODO</th>
                     <th width="10%">TIPO</th>
                     <th width="30%">DESCRIPCIÓN</th>
                     <th width="30%">CLIENTE/PROVEEDOR</th>
@@ -83,16 +83,12 @@
                     @foreach ($item->details as $detail)
                         <tr class="{{ $item->type == 'out' ? 'text-red' : '' }}">
                             <td align="center">{{ $detail->date_paid->format('d/m/Y') }}</td>
-                            @if ($detail->stand)
-                                <td align="center">{{ $detail->stand->name }}</td>
-                            @else
-                                <td align="center">S/N</td>
-                            @endif
+                            <td align="center">{{ $detail->date_paid->format('m/Y') }}</td>
                             <td align="center">
                                 {{ $item->type == 'add' ? 'INGRESO' : 'GASTO' }}
                             </td>
-                            <td align="left">{{ $detail->category->name }}</td>
-                            <td align="left">{{ $item->customer->full_name }}</td>
+                            <td align="left">&nbsp;{{ $detail->category->name }}  <i> {{ $item->student ? '| ESTUDIANTE: ' . $detail->student->full_name : '' }}</i></td>
+                            <td align="left">&nbsp;{{ $item->customer->full_name }}</td>
                             <td align="center">
                                 @if ($detail->currency->id == 2)
                                     {{ number_format($detail->changed_amount, 2) }}

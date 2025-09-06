@@ -35,7 +35,7 @@
             text-align: center;
             width: 100%;
             font-size: .8rem;
-            border: 0.5px solid grey;
+            border: 0.5px solid rgb(184, 0, 70);
             border-spacing: 0;
             border-radius: 5px;
             overflow: hidden;
@@ -50,12 +50,12 @@
 
         .content th,
         .content td {
-            border: 0.5px solid grey;
+            border: 0.5px solid rgb(184, 0, 70);
             /* border-bottom: 0.5px solid grey; */
         }
 
         .thead {
-            background-color: whitesmoke;
+            background-color: rgb(196, 196, 196);
             padding: 0.5rem;
         }
 
@@ -141,8 +141,7 @@
         }
 
         .aditional {
-            color: rgba(128, 128, 128, 0.534);
-            ;
+            color: rgba(73, 73, 73, 0.534);
         }
 
         .footer {
@@ -155,7 +154,7 @@
             font-size: 0.5rem;
             margin: 20px;
             text-align: left;
-            border-top: 1px solid #1f1f1f;
+            border-top: 1px solid #000000;
         }
 
         .footer table {

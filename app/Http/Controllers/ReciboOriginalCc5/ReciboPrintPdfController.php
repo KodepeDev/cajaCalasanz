@@ -24,8 +24,8 @@ class ReciboPrintPdfController extends Controller
 
         $formatter = new NumeroALetras();
 
-        $textoTotal = $formatter->toInvoice($data->amount, 2, 'SOLES', 'CENTIMOS');
-
+        $textoTotal = $formatter->toInvoice($data->amount, 2, 'SOLES', 'CENTIMOS');   
+             
         if($company->receipt_type == 'pdf.recibo_cc5.pimente'){
             $pdf = PDF::loadView($company->receipt_type, compact('data', 'textoTotal', 'company'))->setPaper('a4', 'landscape');
         } else {

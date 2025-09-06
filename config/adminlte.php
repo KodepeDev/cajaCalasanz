@@ -316,15 +316,17 @@ return [
             'title' => 'asdasd',
             'icon'    => 'fas fa-plus-circle',
             'shift'   => 'ml-4',
-            'text' => 'Cobranza',
+            'text' => 'COBRANZA',
             'topnav' => true,
+            'classes' => 'btn btn-success',
         ],
         [
-            'text' => 'Pagos',
+            'text' => 'PAGOS',
             'route'  => 'movimientos.proveedor',
             'icon'    => 'fas fa-minus-circle',
             'shift'   => 'ml-4',
             'topnav' => true,
+            'classes' => 'btn btn-danger ml-2',
         ],
 
         // Sidebar items:

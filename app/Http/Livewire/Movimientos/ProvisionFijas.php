@@ -60,6 +60,8 @@ class ProvisionFijas extends Component
         $first_day = Carbon::parse($this->meses)->firstOfMonth();
         $last_day = Carbon::parse($this->meses)->endOfMonth();
 
+        $this->date = $this->meses;
+
         // Definir la consulta base con las condiciones comunes
         $baseQuery = Detail::whereHas('student', function ($query) {
             $query->where('full_name', 'like', '%'.$this->search.'%')
@@ -118,7 +120,7 @@ class ProvisionFijas extends Component
 
 
         foreach ($this->students as $name => $id) {
-            $this->unique_code = strval($this->date.$this->category_id.$id);
+            $this->unique_code = strval($this->date.str_pad($this->category_id, 4, "0", STR_PAD_LEFT).str_pad($id, 6, "0", STR_PAD_LEFT));
             $detail = Detail::where('unique_code', $this->unique_code)->first();
             $student_tutor = Student::find($id)->first()->id;
             if (!$detail)

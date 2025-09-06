@@ -175,7 +175,7 @@ class ReporteDetalles extends Component
     public function reporteExcelDetalles()
     {
 
-        return (new DetailsExport($this->tipo, $this->categoria_id, $this->start, $this->finish))->download('Detalle_de_Moviemientos_CC5.xlsx');
+        return (new DetailsExport($this->tipo, $this->categoria_id, $this->start, $this->finish))->download('Detalle_de_Moviemientos_'.now()->format('d-m-Y').'.xlsx');
         // return Excel::download(new DetailsExport($tipo, $categoria_id, $start, $finish), 'invoices.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
     }
 }

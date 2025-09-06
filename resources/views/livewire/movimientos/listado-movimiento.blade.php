@@ -102,7 +102,7 @@
                                 <tr>
                                     <th>RECIBO</th>
                                     <th>FECHA E.</th>
-                                    <th>TIPO</th>
+                                    <th>CLIENTE O PROVEEDOR</th>
                                     <th>CUENTA</th>
                                     <th>MONTO</th>
                                     <th width="15%">ACCIONES</th>
@@ -114,8 +114,18 @@
                                         <tr class="{{ $summarys->status == 'NULLED' ? 'table-danger' : '' }}">
                                             <td>{{ $summarys->recipt_series }} - {{ $summarys->recipt_number }}</td>
                                             <td>{{ $summarys->date->format('d-m-Y') }}</td>
-                                            @if ($summarys->type == 'add')
-                                                <td>Ingreso
+                                            <td>
+                                                @if ($summarys->type == 'add')
+                                                    {{$summarys->customer->full_name}}
+                                                @elseif($summarys->type == 'out')
+                                                    {{$summarys->customer->full_name}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                {{ $summarys->account->account_name }}
+                                                <br>
+                                                @if ($summarys->type == 'add')
+                                                    Ingreso
                                                     <small class="badge badge-success bordered float-right mt-1">
                                                         @if ($summarys->id_transfer != '')
                                                             <i class="fas fa-exchange-alt"></i>
@@ -123,9 +133,8 @@
                                                             <i class="fa fa-sort-up"></i>
                                                         @endif
                                                     </small>
-                                                </td>
-                                            @elseif($summarys->type == 'out')
-                                                <td>Gasto
+                                                @elseif($summarys->type == 'out')
+                                                    Gasto
                                                     <small class="badge badge-danger bordered float-right mt-1">
                                                         @if ($summarys->id_transfer != '')
                                                             <i class="fas fa-exchange-alt"></i>
@@ -133,9 +142,9 @@
                                                             <i class="fa fa-sort-down"></i>
                                                         @endif
                                                     </small>
-                                                </td>
-                                            @endif
-                                            <td>{{ $summarys->account->account_name }}</td>
+                                                @endif
+                                                
+                                            </td>
                                             <td>S/. {{ number_format($summarys->amount, 2, '.', ',') }}</td>
                                             <td class="text-center">
 
@@ -205,7 +214,7 @@
 
             </div>
 
-            {{-- <div class="col-md-4 col-sm-6 col-xs-12  float-right ">
+            <div class="col-md-4 col-sm-6 col-xs-12  float-right ">
                 <div class="info-box ">
                     <span class="info-box-icon"><i class="fa fa-credit-card"></i></span>
                     <div class="info-box-content">
@@ -247,7 +256,7 @@
                     class="btn btn-block btn-danger">
                     <i class="fa fa-file-pdf"></i> Reporte Detallado
                 </a>
-            </div> --}}
+            </div>
         </div>
     </div>
 

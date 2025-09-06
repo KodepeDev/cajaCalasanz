@@ -25,8 +25,7 @@
             <td><b>N° DOC: </b> {{ $data->customer->document }}</td>
             <td><b>NOMBRE: </b> {{ $data->customer->full_name }}</td>
             <td><b>DIRECCIÓN: </b> {{ $data->customer->address }}</td>
-            <td>{{ $data->date->format('d/m/Y') }}
-                {{ $data->created_at->format('h:i A') }}</td>
+            <td>{{ $data->date->format('d/m/Y') }}</td>
             <td><b>{{ $data->user->first_name }}</b></td>
         </tr>
     </thead>
@@ -37,9 +36,6 @@
             <th style="text-align: left" class="px-6 py-3">MES</th>
             <th style="text-align: left" class="px-6 py-3" width="40%">DESCRIPCIÓN</th>
             {{-- <th style="text-align: left" class="px-6 py-3">CATEGORIA</th> --}}
-            @if ($data->type == 'add')
-                <th class="px-6 py-3">STAND</th>
-            @endif
             <th style="text-align: right" class="px-6 py-3">MONTO</th>
         </tr>
     </thead>
@@ -55,13 +51,6 @@
                     <td style="text-align: left" scope="row">{{ $item->date->format('m-Y') }}</td>
                     <td style="text-align: left" scope="row">{{ $item->description }}</td>
                     {{-- <td style="text-align: left" scope="row">{{$item->category->name}}</td> --}}
-                    @if ($data->type == 'add')
-                        @if ($item->stand)
-                            <td style="text-align: left" scope="row">{{ $item->stand->name }}</td>
-                        @else
-                            <td>S/N</td>
-                        @endif
-                    @endif
                     <td style="text-align: right">
                         {{ number_format($item->currency_id == 1 ? $item->amount : $item->changed_amount, 2) }}</td>
                 </tr>
@@ -83,7 +72,7 @@
     <tfoot>
         <tr>
             @if ($data->type == 'add')
-                <td colspan="2"><i style="text-align: center">SON {{ $textoTotal }}</i></td>
+                <td colspan="1"><i style="text-align: center">SON {{ $textoTotal }}</i></td>
                 <td colspan="1" scope="row" style="text-align: right"><b>TOTAL S/.:</b></td>
             @else
                 <td><i style="text-align: center">SON {{ $textoTotal }}</i></td>

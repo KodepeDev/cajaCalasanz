@@ -170,6 +170,7 @@ class ExportController extends Controller
         $categoria_id = $request->categoria;
         $start = $request->start;
         $finish = $request->finish;
+        $company = Setting::first();
 
         $hoy = Carbon::now()->format('Y-m-d');
 
@@ -250,8 +251,6 @@ class ExportController extends Controller
         $sumaIngresos = $data->where('type','=', 'add')->sum('amount');
         $sumaEgresos = $data->where('type','=', 'out')->sum('amount');
 
-        $company = Setting::first();
-
         // dd($sumaIngresos, $sumaEgresos);
 
         $totalFinal = $sumaIngresos - $sumaEgresos;
@@ -261,6 +260,8 @@ class ExportController extends Controller
         $categoria = Category::where('id', $categoria_id)->select('name')->first();
         $fechaInicio = Carbon::parse($start)->format('d/m/Y');
         $fechaFin = Carbon::parse($finish)->format('d/m/Y');
+
+        // dd($company);
         // dd($data, $cuenta, $categoria, $fechaInicio, $fechaFin);
 
         $pdf = Pdf::loadView('pdf.conceptoSummaries', compact('data', 'tipo', 'cuenta', 'categoria', 'fechaInicio', 'fechaFin', 'sumaIngresos', 'sumaEgresos', 'totalFinal', 'company'));

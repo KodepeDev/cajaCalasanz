@@ -44,8 +44,8 @@ hr {
 }
 
 table.table-items {
-    border: 1px solid black;
-    border-radius: 10px;
+    /* border: 1px solid black; */
+    border-radius: 1px;
     overflow: hidden;
     margin-bottom: 10px;
 }
@@ -53,7 +53,7 @@ table.table-items {
 
 .table-items thead th {
     border: 1px solid black;
-    border-radius: 10px;
+    border-radius: 3px;
     overflow: hidden;
     margin-bottom: 10px;
     font-weight: bold;
@@ -67,7 +67,7 @@ table.table-items {
 .table-items tbody td {
     padding: 3px 2px;
     vertical-align: top;
-    /* border: 1px solid #eeeeee; */
+    border: 1px solid #eeeeee;
 }
 
 .table-items > tbody > tr:nth-child(odd) {

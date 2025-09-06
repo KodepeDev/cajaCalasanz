@@ -73,6 +73,8 @@ class ProvisionVariables extends Component
         $first_day = Carbon::parse($this->meses)->firstOfMonth();
         $last_day = Carbon::parse($this->meses)->endOfMonth();
 
+        $this->date = $this->meses;
+
         // Crear consulta base para las condiciones comunes
         $baseQuery = Detail::whereStatus(false)
         ->whereBetween('date', [$first_day, $last_day])
@@ -155,7 +157,7 @@ class ProvisionVariables extends Component
         $this->validate($rules, $messages);
 
         foreach ($this->students as $name => $id) {
-            $this->unique_code = strval($this->date.$this->category_id.$id);
+           $this->unique_code = strval($this->date.str_pad($this->category_id, 4, "0", STR_PAD_LEFT).str_pad($id, 6, "0", STR_PAD_LEFT));
             $detail = Detail::where('unique_code', $this->unique_code)->first();
             $student_tutor = Student::find($id)->first()->id;
             if(!$detail){

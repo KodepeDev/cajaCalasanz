@@ -12,6 +12,10 @@
         /* .header{
             position: fixed;
         } */
+
+        .color-red{
+            color: red;
+        }
     </style>
 </head>
 
@@ -77,16 +81,16 @@
             </thead>
             <tbody>
                 @foreach ($data as $item)
-                    <tr>
+                    <tr class="{{ $item->status == 'NULLED' ? 'color-red' : ''}}">
                         <td align="center">{{ $item->date->format('d/m/Y') }}</td>
-                        <td align="left">{{ $item->recipt_series }} - {{ $item->recipt_number }}</td>
+                        <td align="left">{{ $item->recipt_series }} - {{ str_pad($item->recipt_number, 8, '0', STR_PAD_LEFT) }}</td>
                         <td align="center">
-                            {{ $item->type == 'add' ? 'Ingreso' : 'Gasto' }}
+                            {{ $item->type == 'add' ? 'INGRESO' : 'GASTO' }}
                         </td>
                         @if ($item->customer)
-                            <td align="center">{{ $item->customer->full_name }}</td>
+                            <td align="left">&nbsp;{{ $item->customer->full_name }}</td>
                         @else
-                            <td align="center">Varios</td>
+                            <td align="center">- VARIOS -</td>
                         @endif
                         <td align="center">{{ number_format($item->amount, 2) }}</td>
                     </tr>
