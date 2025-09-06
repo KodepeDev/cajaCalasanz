@@ -62,6 +62,9 @@
                     <input type="text" class="form-control" wire:model.defer="paid_by" id="paid_bay" placeholder="">
                 </div>
                 <div class="form-group col-md-3">
+                    {{-- vacio --}}
+                </div>
+                <div class="form-group col-md-3">
                     <div class="">
                         <label for="date">FECHA</label>
                         <input maxlength="200" name="date" wire:model.defer="date" type="date" required

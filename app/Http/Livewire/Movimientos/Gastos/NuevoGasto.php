@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Movimientos\Gastos;
 use Carbon\Carbon;
 use App\Models\Detail;
 use App\Models\Account;
+use App\Services\LimitDateService;
 use App\Models\Partner;
 use App\Models\Student;
 use App\Models\Summary;
@@ -158,7 +159,7 @@ class NuevoGasto extends Component
     public function crearMovimiento()
     {
 
-        dd(Customer::find($this->customer_id));
+        // dd(Customer::find($this->customer_id));
         $hoy = Carbon::now();
 
         $this->validarFechas();
@@ -286,6 +287,10 @@ class NuevoGasto extends Component
     public function validarFechas()
     {
         $hoy = Carbon::now();
+        $limitDateService = new LimitDateService();
+        $numberDays = $limitDateService->getExpenseNumberDays();
+
+        // dd($numberDays);
 
         if($this->date > $hoy->format('Y-m-d')){
 
@@ -293,10 +298,10 @@ class NuevoGasto extends Component
             $this->emit('error_fecha', 'La fecha no debe ser mayor al día de hoy');
             $this->validezFecha = false;
 
-        }elseif($this->date < $hoy->subDays(3)){
+        }elseif($this->date < $hoy->subDays($numberDays)){
 
             $this->date = Carbon::now()->format('Y-m-d');
-            $this->emit('error_fecha', 'La fecha solo puede ser menor a 3 dias de la fecha de hoy');
+            $this->emit('error_fecha', 'La fecha solo puede ser menor a '.$numberDays.' dias de la fecha de hoy');
             $this->validezFecha = false;
         }else{
             $this->validezFecha = true;

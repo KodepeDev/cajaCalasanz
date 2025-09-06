@@ -10,6 +10,7 @@ use App\Models\Summary;
 use Livewire\Component;
 // use Barryvdh\DomPDF\Facade as PDF;
 use App\Models\Bitacora;
+use App\Services\LimitDateService;
 
 use App\Models\Category;
 use App\Models\Customer;
@@ -408,6 +409,9 @@ class CrearMovimiento extends Component
     {
         $hoy = Carbon::now();
 
+        $limitDateService = new LimitDateService();
+        $numberDays = $limitDateService->getIncomeNumberDays();
+
         if($this->date > $hoy->format('Y-m-d')){
 
             $this->date = Carbon::now()->format('Y-m-d');
@@ -416,12 +420,12 @@ class CrearMovimiento extends Component
             $this->emit('error_fecha', 'La fecha no debe ser mayor al día de hoy');
             $this->validezFecha = false;
 
-        }elseif($this->date < $hoy->subDays(3)){
+        }elseif($this->date < $hoy->subDays($numberDays)){
 
             $this->date = Carbon::now()->format('Y-m-d');
             $this->updatedDate();
             $this->updateTotal();
-            $this->emit('error_fecha', 'La fecha solo puede ser menor a 3 dias de la fecha de hoy');
+            $this->emit('error_fecha', 'La fecha solo puede ser menor a '.$numberDays.' dias de la fecha de hoy');
             $this->validezFecha = false;
         }else{
             $this->validezFecha = true;
