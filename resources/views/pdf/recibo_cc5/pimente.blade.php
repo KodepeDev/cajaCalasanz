@@ -24,7 +24,7 @@
         }
 
         body p {
-            font-size: , 8rem;
+            font-size: 8rem;
         }
 
         hr {

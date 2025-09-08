@@ -35,6 +35,16 @@ class ListadoMovimiento extends Component
 
     // public $summaries;
 
+     protected $queryString = [
+        'start1'  => ['except' => ''],
+        'finish1'  => ['except' => ''],
+        'categoria_id1'  => ['except' => ''],
+        'cuenta_id1'  => ['except' => ''],
+        'tipo1' => ['except' => ''],
+        'documento1' => ['except' => ''],
+        'page' => ['except' => 1, 'as' => 'p'],
+    ];
+
 
     public function mount()
     {
