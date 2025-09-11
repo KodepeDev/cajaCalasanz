@@ -657,7 +657,6 @@ return [
                     'label'       => 'Config...',
                     'shift'   => 'ml-3',
                     'label_color' => 'info',
-                    'can' => ['usuarios.delete'],
                 ],
             ],
         ],

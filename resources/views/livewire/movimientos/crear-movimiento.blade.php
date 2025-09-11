@@ -174,7 +174,7 @@
                                     <th width="90px" class="text-center">
                                         <div class="btn-group" role="group" aria-label="">
                                             <button type="button" wire:click='Add' class="btn btn-sm btn-warning"
-                                                {{ $total_prov_cobrar > 0 ? '' : 'disabled' }}><i
+                                                {{ $student_id ? '' : 'disabled' }}><i
                                                     class="fa fa-cart-plus" aria-hidden="true"></i> ADD</button>
                                             {{-- <button type="button" wire:click='Save' class="btn btn-sm btn-info" {{($documento != '99999999' || $provision_stand != null) ? '' : 'disabled'}} >Save</button> --}}
                                         </div>
@@ -182,27 +182,29 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if ($total_prov_cobrar + $total_new > 0)
-                                    @foreach ($provisionsCobrar as $item)
-                                        <tr>
-                                            <td scope="row">{{ $item->date->format('m-Y') }}</td>
-                                            <td>{{ $item->description }}</td>
-                                            <td>{{ $item->category->name }}</td>
-                                            <td class="text-center">
-                                                @if ($item->currency->id == 1 || $item->currency->id == null)
-                                                    S/. {{ number_format($item->amount, 2) }}
-                                                @else
-                                                    S/. {{ number_format($item->amount * $tc, 2) }}
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
-                                                @if ($item->currency->id == 2)
-                                                    $. {{ number_format($item->amount, 2) }}
-                                                @endif
-                                            </td>
-                                            <td class="text-center"></td>
-                                        </tr>
-                                    @endforeach
+                                @if ($student_id)
+                                    @if ($total_prov_cobrar > 0)
+                                        @foreach ($provisionsCobrar as $item)
+                                            <tr>
+                                                <td scope="row">{{ $item->date->format('m-Y') }}</td>
+                                                <td>{{ $item->description }}</td>
+                                                <td>{{ $item->category->name }}</td>
+                                                <td class="text-center">
+                                                    @if ($item->currency->id == 1 || $item->currency->id == null)
+                                                        S/. {{ number_format($item->amount, 2) }}
+                                                    @else
+                                                        S/. {{ number_format($item->amount * $tc, 2) }}
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    @if ($item->currency->id == 2)
+                                                        $. {{ number_format($item->amount, 2) }}
+                                                    @endif
+                                                </td>
+                                                <td class="text-center"></td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
 
                                     @foreach ($provisions as $key => $provision)
                                         <tr>

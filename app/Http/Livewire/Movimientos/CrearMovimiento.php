@@ -48,6 +48,7 @@ class CrearMovimiento extends Component
     public $provisionsCobrar = [];
     public $checkedProvision = [];
     public $det_selected;
+    public $student_tutor_id;
 
     public $document_type, $document, $full_name, $first_name, $last_name, $address, $email, $phone, $mensaje;
 
@@ -75,6 +76,9 @@ class CrearMovimiento extends Component
             $this->emit('error', 'No Existen Datos');
             return;
         }
+
+        $this->student_id = $student->id;
+
         $baseQuery = Detail::where('student_id', $student->id)->whereStatus(false)->orderBy('date', 'asc');
         // Obtener detalles del stand
         $student_details = (clone $baseQuery)->get();
@@ -122,6 +126,12 @@ class CrearMovimiento extends Component
 
             $this->paid_by = '';
         }
+
+        $this->documento = $student->tutor->document;
+        $this->customer_name = $student->tutor->full_name;
+        $this->student_name = $student->full_name;
+
+        $this->paid_by = $this->customer_name;
     }
 
     public function selectAll()
@@ -158,7 +168,7 @@ class CrearMovimiento extends Component
 
     public function Add()
     {
-        $student = Student::where('document', '=', $this->provision_code)->first();;
+        $student = Student::findOrFail($this->student_id);
         if($this->provision_code){
             if ($student) {
                 $this->provisions[] = [
@@ -189,7 +199,6 @@ class CrearMovimiento extends Component
                     'summary_id' => null,
                 ];
             } catch (\Throwable $th) {
-                //throw $th;
                 $this->emit('error', $th);
             }
         }
@@ -210,6 +219,7 @@ class CrearMovimiento extends Component
             'provisions.*.description' => 'required|min:5|max:200',
             'provisions.*.category_id' => 'required|not_in:Elegir',
             'provisions.*.amount' => 'required|numeric|min:0.01',
+            'provisions.*.student_id' => 'required',
         ];
 
         $validatedData = $this->validate($rules);
@@ -274,12 +284,12 @@ class CrearMovimiento extends Component
             $this->user_id = Auth::id();
 
             $cliente = Customer::where('document', $this->documento)->first();
-            $student = Student::where('document', $this->provision_code)->first();
-
+            $student = Student::findOrFail($this->student_id);
             // dd($student, $cliente);
             if($cliente != null || $student != null){
                 $this->customer_id = $cliente->id;
                 $this->student_id = $student->id;
+                $this->student_tutor_id = $student->tutor->id;
             }else{
                 $this->mensaje = 'No existe el Cliente o proveedor, SI ES ESTUDIANTE (CREARLO MEDIANTE EL MODULO DE ESTUDIENTES)';
                 $this->emit('error', $this->mensaje);
@@ -345,11 +355,10 @@ class CrearMovimiento extends Component
 
                     'customer_id' => $this->customer_id,
                     'student_id' => $this->student_id,
-                    'student_tutor_id' => $student->tutor->id,
+                    'student_tutor_id' => $this->student_tutor_id,
                     'payment_method_id' => $this->payment_method,
 
                 ]);
-
 
                 if($this->provisions)
                 {
@@ -364,7 +373,7 @@ class CrearMovimiento extends Component
                             'date_paid' => $summary->date,
                             'category_id' => $input['category_id'],
                             'student_id' => $this->student_id,
-                            'student_tutor_id' => $this->student->tutor->id,
+                            'student_tutor_id' => $this->student_tutor_id,
                             'amount' => $input['amount'],
                             'summary_id' => $summary->id,
                         ]);
