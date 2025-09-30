@@ -526,7 +526,7 @@ return [
                 ],
                 [
                     'text' => 'Rep. Concepto Deuda',
-                    // 'route'  => 'reportes.conceptos_deuda.view',
+                    'route'  => 'reportes.conceptos_deuda.view',
                     'shift'   => 'ml-3',
                     'icon'    => 'fas fa-download',
                 ],

@@ -81,9 +81,9 @@
                                     <tr>
                                         <th width="5%">#</th>
                                         <th width="10%">MES</th>
-                                        <th width="40%">DESCIPCION</th>
-                                        <th width="10%">STAND</th>
-                                        <th width="15%">SOCIO</th>
+                                        <th width="35%">DESCIPCION</th>
+                                        <th width="15%">ESTUDIANTE</th>
+                                        <th width="15%">PADRE/MADRE O TUTOR</th>
                                         <th width="10%">ESTADO</th>
                                         <th width="10%">TOTAL</th>
                                     </tr>
@@ -110,13 +110,13 @@
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td scope="row">{{ $item->date->format('m-Y') }}</td>
                                                 <td>{{ $item->description }}</td>
-                                                @if ($item->stand)
-                                                    <td>{{ $item->stand->name }}</td>
+                                                @if ($item->student)
+                                                    <td>{{ $item->student?->full_name }}</td>
                                                 @else
                                                     <td>S/N</td>
                                                 @endif
-                                                @if ($item->partner)
-                                                    <td>{{ $item->partner->full_name }}</td>
+                                                @if ($item->student)
+                                                    <td>{{ $item->student->tutor?->full_name }}</td>
                                                 @else
                                                     <td>S/N</td>
                                                 @endif

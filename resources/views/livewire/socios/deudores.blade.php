@@ -20,7 +20,8 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th width="10%">DOCUMENTO</th>
-                                <th width="50%">SOCIO</th>
+                                <th width="30%">ESTUDIANTE</th>
+                                <th width="30%">PADRE/MADRE O TUTOR</th>
                                 <th>SOLES</th>
                                 <th>DOLAR</th>
                                 <th class="text-center" width="10%">ACCIONES</th>
@@ -31,6 +32,7 @@
                                 <tr>
                                     <td>{{ $item->document }}</td>
                                     <td>{{ $item->full_name }}</td>
+                                    <td>{{ $item->tutor?->full_name }}</td>
                                     <td>S/.
                                         {{ number_format($item->details->where('currency_id', 1)->sum('amount'), 2, '.', ',') }}
                                     </td>

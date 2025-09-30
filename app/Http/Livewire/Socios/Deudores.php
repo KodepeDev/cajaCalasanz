@@ -8,6 +8,8 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Exports\DeudoresExport;
 use App\Exports\DeudorDataExport;
+use App\Models\Student;
+use App\Models\StudentTutor;
 
 class Deudores extends Component
 {
@@ -28,7 +30,7 @@ class Deudores extends Component
 
     public function render()
     {
-        $partnersQuery = Partner::where('is_active', 1)
+        $partnersQuery = Student::where('is_active', 1)
         ->whereHas('details', function($q) {
             $q->where('status', 0);
         })
@@ -51,7 +53,7 @@ class Deudores extends Component
             ->sum('amount');
 
         // Paginación de socios
-        $socios = $partnersQuery->paginate(15, ['id', 'document', 'full_name']);
+        $socios = $partnersQuery->paginate(15, ['id', 'document', 'full_name', 'student_tutor_id']);
 
         return view('livewire.socios.deudores', ['socios' => $socios, 'totalSoles' => $totalSoles, 'totalDolares' => $totalDolares])
             ->extends('adminlte::page');
@@ -60,8 +62,8 @@ class Deudores extends Component
     public function showModalDetail($id)
     {
         $this->selected_id = $id;
-        $this->socio_name = Partner::find($id)->full_name;
-        $this->detalles = Detail::whereStatus(0)->where('partner_id', $id)->get();
+        $this->socio_name = Student::find($id)->full_name;
+        $this->detalles = Detail::whereStatus(0)->where('student_id', $id)->get();
         $this->emit('showModalDetails', 'mostrar modal');
     }
 
@@ -79,6 +81,6 @@ class Deudores extends Component
 
     public function exportDatas()
     {
-        return (new DeudoresExport())->download('Detalle_deudores.xlsx');
+        return (new DeudoresExport())->download('Detalle_deudores_'.now().'.xlsx');
     }
 }

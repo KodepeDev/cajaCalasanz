@@ -19,17 +19,17 @@ class DeudorDataExport implements FromQuery, WithMapping, WithHeadings, WithStyl
 {
     use Exportable;
     public $id;
-    public $partner;
-    public function __construct($id, $partner)
+    public $student;
+    public function __construct($id, $student)
     {
-        // dd($id, $partner);
+        // dd($id, $student);
         $this->id = $id;
-        $this->partner = $partner;
+        $this->student = $student;
     }
 
     public function query()
     {
-        return Detail::query()->whereStatus(0)->where('partner_id', $this->id);
+        return Detail::query()->whereStatus(0)->where('student_id', $this->id);
     }
 
     public function startCell(): string
@@ -44,8 +44,7 @@ class DeudorDataExport implements FromQuery, WithMapping, WithHeadings, WithStyl
         return [
             Date::datetimeToExcel($detail->date),
             $detail->description,
-            $detail->stand ? $detail->stand->name." - ".$detail->stand->stage->name : 'S/N',
-            $detail->partner ? $detail->partner->full_name : 'Varios',
+            $detail->student?->tutor ? $detail->student->tutor->full_name : 'Varios',
             $total_soles,
             $total_dolares
         ];
@@ -55,8 +54,8 @@ class DeudorDataExport implements FromQuery, WithMapping, WithHeadings, WithStyl
     {
         return [
             'A' => 'mm/yyyy',
-            'E' => '0.00" PEN"',
-            'F' => '0.00" USD"',
+            'D' => '0.00" PEN"',
+            'E' => '0.00" USD"',
         ];
     }
 
@@ -65,8 +64,7 @@ class DeudorDataExport implements FromQuery, WithMapping, WithHeadings, WithStyl
         return [
             'FECHA',
             'DESCRIPCION',
-            'STAND',
-            'CLIENTE/SOCIO',
+            'PADRE/MADRE O TUTOR',
             'SOLES',
             'DOLAR',
         ];
@@ -75,18 +73,18 @@ class DeudorDataExport implements FromQuery, WithMapping, WithHeadings, WithStyl
     public function styles(Worksheet $sheet)
     {
         $sheet->setTitle('Deudas');
-        $sheet->mergeCells('A3:F4');
+        $sheet->mergeCells('A3:E4');
         $sheet->getRowDimension('3')->setRowHeight(30);
         $sheet->getRowDimension('6')->setRowHeight(30);
-        $sheet->getStyle('A3:F4')->applyFromArray([
+        $sheet->getStyle('A3:E4')->applyFromArray([
             'borders' => [
                 'outline' => [
                     'borderStyle' => 'thick',
                 ],
             ]
         ]);
-        $sheet->setCellValue('A3', "DETALLE DE DEUDAS ".$this->partner);
-        $sheet->getStyle('A6:F6')->applyFromArray([
+        $sheet->setCellValue('A3', "DETALLE DE DEUDAS ".$this->student);
+        $sheet->getStyle('A6:E6')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'name' => 'Arial',
@@ -103,7 +101,7 @@ class DeudorDataExport implements FromQuery, WithMapping, WithHeadings, WithStyl
                 ],
             ]
         ]);
-        $sheet->getStyle('A3:F4')->applyFromArray([
+        $sheet->getStyle('A3:E4')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'name' => 'Arial',
@@ -122,7 +120,7 @@ class DeudorDataExport implements FromQuery, WithMapping, WithHeadings, WithStyl
 
         // dd($sheet->getHighestRow() + 1);
 
-        $sheet->getStyle('A6:F'.$sheet->getHighestRow())->applyFromArray([
+        $sheet->getStyle('A6:E'.$sheet->getHighestRow())->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => 'thin',
@@ -131,8 +129,8 @@ class DeudorDataExport implements FromQuery, WithMapping, WithHeadings, WithStyl
         ]);
 
         $sheet->setCellValue('B'. $sheet->getHighestRow() + 2, "Suma Total");
+        $sheet->setCellValue('D'. $sheet->getHighestRow(), '=SUM(D7:D'. ($sheet->getHighestRow()-2) .')');
         $sheet->setCellValue('E'. $sheet->getHighestRow(), '=SUM(E7:E'. ($sheet->getHighestRow()-2) .')');
-        $sheet->setCellValue('F'. $sheet->getHighestRow(), '=SUM(F7:F'. ($sheet->getHighestRow()-2) .')');
 
 
         $sheet->getStyle('A7')->applyFromArray([

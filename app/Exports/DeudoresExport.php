@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Partner;
+use App\Models\Student;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -27,7 +28,7 @@ class DeudoresExport implements FromQuery, WithMapping, WithHeadings, WithStyles
 
     public function query()
     {
-        return Partner::query()->where('is_active', 1)
+        return Student::query()->where('is_active', 1)
                 ->whereHas('details', function($q) {
                     $q->where('status', 0);
                 })
@@ -41,13 +42,14 @@ class DeudoresExport implements FromQuery, WithMapping, WithHeadings, WithStyles
         return 'A6';
     }
 
-    public function map($partner) : array
+    public function map($student) : array
     {
-        $total_soles = $partner->details->where('currency_id', 1)->sum('amount');
-        $total_dolares = $partner->details->where('currency_id', 2)->sum('amount');
+        $total_soles = $student->details->where('currency_id', 1)->sum('amount');
+        $total_dolares = $student->details->where('currency_id', 2)->sum('amount');
         return [
-            $partner->document,
-            $partner->full_name,
+            $student->document,
+            $student->full_name,
+            $student->tutor ? $student->tutor->full_name : 'N/A',
             $total_soles,
             $total_dolares,
         ];
@@ -56,8 +58,8 @@ class DeudoresExport implements FromQuery, WithMapping, WithHeadings, WithStyles
     public function columnFormats(): array
     {
         return [
-            'C' => '0.00" PEN"',
-            'D' => '0.00" USD"',
+            'D' => '0.00" PEN"',
+            'E' => '0.00" USD"',
         ];
     }
 
@@ -66,6 +68,7 @@ class DeudoresExport implements FromQuery, WithMapping, WithHeadings, WithStyles
         return [
             'DOCUMENTO',
             'NOMBRE',
+            'PADRE/MADRE O TUTOR',
             'SOLES',
             'DOLAR',
         ];
@@ -74,10 +77,10 @@ class DeudoresExport implements FromQuery, WithMapping, WithHeadings, WithStyles
     public function styles(Worksheet $sheet)
     {
         $sheet->setTitle('Deudores');
-        $sheet->mergeCells('A3:D4');
+        $sheet->mergeCells('A3:E4');
         $sheet->getRowDimension('3')->setRowHeight(30);
         $sheet->getRowDimension('6')->setRowHeight(30);
-        $sheet->getStyle('A3:D4')->applyFromArray([
+        $sheet->getStyle('A3:E4')->applyFromArray([
             'borders' => [
                 'outline' => [
                     'borderStyle' => 'thick',
@@ -85,7 +88,7 @@ class DeudoresExport implements FromQuery, WithMapping, WithHeadings, WithStyles
             ]
         ]);
         $sheet->setCellValue('A3', "LISTADO DE DEUDORES");
-        $sheet->getStyle('A6:D6')->applyFromArray([
+        $sheet->getStyle('A6:E6')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'name' => 'Arial',
@@ -102,7 +105,7 @@ class DeudoresExport implements FromQuery, WithMapping, WithHeadings, WithStyles
                 ],
             ]
         ]);
-        $sheet->getStyle('A3:D4')->applyFromArray([
+        $sheet->getStyle('A3:E4')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'name' => 'Arial',
@@ -121,7 +124,7 @@ class DeudoresExport implements FromQuery, WithMapping, WithHeadings, WithStyles
 
         // dd($sheet->getHighestRow() + 1);
 
-        $sheet->getStyle('A6:D'.$sheet->getHighestRow())->applyFromArray([
+        $sheet->getStyle('A6:E'.$sheet->getHighestRow())->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => 'thin',
@@ -129,9 +132,9 @@ class DeudoresExport implements FromQuery, WithMapping, WithHeadings, WithStyles
             ]
         ]);
 
-        $sheet->setCellValue('B'. $sheet->getHighestRow() + 2, "Suma Total");
-        $sheet->setCellValue('C'. $sheet->getHighestRow(), '=SUM(C7:C'. ($sheet->getHighestRow()-2) .')');
+        $sheet->setCellValue('C'. $sheet->getHighestRow() + 2, "Suma Total");
         $sheet->setCellValue('D'. $sheet->getHighestRow(), '=SUM(D7:D'. ($sheet->getHighestRow()-2) .')');
+        $sheet->setCellValue('E'. $sheet->getHighestRow(), '=SUM(E7:E'. ($sheet->getHighestRow()-2) .')');
 
 
         $sheet->getStyle('A7')->applyFromArray([

@@ -77,7 +77,7 @@ class ExportDeudaConceptos extends Component
 
             $this->validate($rules, $messages);
 
-            return (new DetailsPendienteConceptosExport($this->status, $this->rangCheck, $this->startDate, $this->endDate, $this->category_id))->download('Detalle_de_Conceptos_Pendientes.xlsx');
+            return (new DetailsPendienteConceptosExport($this->status, $this->rangCheck, $this->startDate, $this->endDate, $this->category_id))->download('Detalle_de_Conceptos_Pendientes_'.$this->meses.'.xlsx');
         } catch (\Throwable $th) {
             $this->emit('error', $th->getMessage());
         }

@@ -52,15 +52,14 @@ class DetailsPendienteConceptosExport implements FromQuery, ShouldAutoSize, With
 
     public function query()
     {
-        return Detail::query()->with(['stand'])
+        return Detail::query()->with(['student'])
                     ->where('details.status',$this->status)
                     ->where('details.category_id',$this->category)
                     ->when($this->check, function($q){
                         $q->whereBetween('details.date', [$this->startDate, $this->endDate]);
                     })
                     ->where('details.summary_type', 'add')
-                    ->orderByRaw('(SELECT name FROM stands WHERE stands.id = details.stand_id)')
-                    ->select('details.id', 'details.date', 'details.date_paid', 'details.description', 'details.category_id', 'details.stand_id', 'details.partner_id', 'details.amount');
+                    ->select('details.id', 'details.date', 'details.date_paid', 'details.description', 'details.category_id', 'details.student_id', 'details.student_tutor_id', 'details.amount');
     }
 
     public function startCell(): string
@@ -70,12 +69,13 @@ class DetailsPendienteConceptosExport implements FromQuery, ShouldAutoSize, With
 
     public function map($detail) : array
     {
+        $student_tutor = $detail->student ? $detail->student->tutor?->full_name : 'N/A';
         return [
             Date::datetimeToExcel($detail->date),
             $detail->description,
             $detail->date_paid ? "Pagado el ".$detail->date_paid->format('d/m/Y')."" : 'Pendiente de pago',
-            $detail->stand ? $detail->stand->name." - ".$detail->stand->stage->name : 'S/N',
-            $detail->partner ? $detail->partner->full_name : 'Varios',
+            $detail->student ? $detail->student->full_name : 'N/A',
+            $student_tutor,
             $detail->amount,
         ];
     }
@@ -84,6 +84,7 @@ class DetailsPendienteConceptosExport implements FromQuery, ShouldAutoSize, With
     {
         return [
             'A' => 'mm/yyyy',
+            'F' => '0.00" PEN"',
         ];
     }
 
@@ -93,8 +94,8 @@ class DetailsPendienteConceptosExport implements FromQuery, ShouldAutoSize, With
             'MES',
             'DESCRIPCION',
             'ESTADO',
-            'STAND',
-            'CLIENTE/SOCIO',
+            'ESTUDIANTE',
+            'PADRE/MADRE O TUTOR',
             'MONTO',
         ];
     }
