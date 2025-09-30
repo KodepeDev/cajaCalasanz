@@ -33,11 +33,12 @@ class DetailsPendienteConceptosExport implements FromQuery, ShouldAutoSize, With
 
         $this->categoria_nombre = $cat->name;
 
-        $first_day = Carbon::parse($start_date)->firstOfMonth();
-        $last_day = Carbon::parse($end_date)->endOfMonth();
-
+        $first_day = Carbon::parse($start_date)->firstOfMonth()->format('Y-m-d');
+        $last_day = Carbon::parse($end_date)->endOfMonth()->format('Y-m-d');
+        
         $this->startDate = $first_day;
         $this->endDate = $last_day;
+
         // $detalle = Detail::with([
         //     'stand' => fn ($query) => $query->orderBy('name', 'asc')
         // ])
