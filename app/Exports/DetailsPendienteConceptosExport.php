@@ -23,11 +23,12 @@ class DetailsPendienteConceptosExport implements FromQuery, ShouldAutoSize, With
 
     protected $status, $category, $check, $startDate, $endDate, $etapa, $categoria_nombre;
 
-    public function __construct($status, $check, $start_date, $end_date, $category)
+    public function __construct($status, $checkRange, $start_date, $end_date, $category)
     {
         $this->status = $status;
         $this->category = $category;
-        $check = $check;
+
+        $this->check = $checkRange;
 
         $cat = Category::whereKey($this->category)->first();
 
@@ -53,7 +54,7 @@ class DetailsPendienteConceptosExport implements FromQuery, ShouldAutoSize, With
 
     public function query()
     {
-        return Detail::query()->with(['student'])
+        $detail  = Detail::query()->with(['student'])
                     ->where('details.status',$this->status)
                     ->where('details.category_id',$this->category)
                     ->when($this->check, function($q){
@@ -61,6 +62,8 @@ class DetailsPendienteConceptosExport implements FromQuery, ShouldAutoSize, With
                     })
                     ->where('details.summary_type', 'add')
                     ->select('details.id', 'details.date', 'details.date_paid', 'details.description', 'details.category_id', 'details.student_id', 'details.student_tutor_id', 'details.amount');
+                    
+        return $detail;
     }
 
     public function startCell(): string
