@@ -95,7 +95,7 @@ class DetailsExport implements FromQuery, WithCustomStartCell, WithMapping, With
             Date::datetimeToExcel($detail->summary->date),
             $detail->category->name,
             $detail->description,
-            $detail->stand ? $detail->stand->name : '',
+            $detail->student ? $detail->student->document.' - '.$detail->student->full_name : '',
             $detail->summary_type == 'add'
                 ? 'Ingreso ' . ($detail->stand ? strtoupper($detail->stand->stage->name) : '')
                 : 'Gasto ' . ($detail->summary->section_type == "AD" ? 'ADMINISTRACION' : ($detail->summary->section_type == "1E" ? 'AREA PRINCIPAL' : 'AREA SECUNDARIA')),
@@ -137,9 +137,9 @@ class DetailsExport implements FromQuery, WithCustomStartCell, WithMapping, With
             'FECHA',
             'CATEGORÍA',
             'DESCRIPCION',
-            'STAND',
+            'ESTUDIANTE',
             'TIPO',
-            'CLIENTE/PROVEEDOR',
+            'PADRE-MADRE O TUTOR',
             'SOLES',
             'DOLARES',
             'N° DE RECIBO',
