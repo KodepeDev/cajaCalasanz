@@ -99,7 +99,7 @@ class DetailsExport implements FromQuery, WithCustomStartCell, WithMapping, With
             $detail->summary_type == 'add'
                 ? 'Ingreso ' . ($detail->stand ? strtoupper($detail->stand->stage->name) : '')
                 : 'Gasto ' . ($detail->summary->section_type == "AD" ? 'ADMINISTRACION' : ($detail->summary->section_type == "1E" ? 'AREA PRINCIPAL' : 'AREA SECUNDARIA')),
-            $detail->summary->customer ? $detail->summary->customer->full_name : 'Varios',
+            $detail->summary->customer ? $detail->summary->customer->document.' - '.$detail->summary->customer->full_name : 'Varios',
 
             // G: Monto en soles
             $amountInSoles,

@@ -502,7 +502,7 @@ return [
             'submenu' => [
                 [
                     'text' => 'Reporte Detallados',
-                    // 'route'  => 'reportes.detalles',
+                    'route'  => 'reportes.detalles',
                     'shift'   => 'ml-3',
                     'icon'    => 'fas fa-file',
                 ],

@@ -168,11 +168,11 @@
                 class="btn btn-block btn-danger" {{$summaries->count() > 0 ? '' : 'disabled'}}>
                 <i class="fa fa-file-pdf" ></i> Reporte PDF
             </a> --}}
-            <button type="button" class="btn btn-block btn-danger" wire:loading.attr='disabled'
+            {{-- <button type="button" class="btn btn-block btn-danger" wire:loading.attr='disabled'
                 {{ $summaries->count() == 0 ? 'disabled' : '' }}
                 onclick="printJS({printable:'{{ url('admin/export/pdf/' . $url) }}', type:'pdf', showModal:true, modalMessage: 'Cargando Documento ...'})">
                 <i class="fa fa-file-pdf"></i> Imprimir PDF
-            </button>
+            </button> --}}
             <button wire:click="reporteExcelDetalles" wire:loading.attr='disabled' class="btn btn-block btn-success"
                 {{ $summaries->count() == 0 ? 'disabled' : '' }}>
                 <span class="spinner-grow spinner-grow-sm" wire:loading role="status" aria-hidden="true"></span>
