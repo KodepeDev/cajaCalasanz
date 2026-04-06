@@ -54,7 +54,7 @@
                                 <div class="input-group-append">
                                     <select name="" id="" wire:model.defer="currency_id"
                                         class="form-control">
-                                        @foreach ($currency as $name => $id)
+                                        @foreach ($currency as $id => $name)
                                             <option value="{{ $id }}">{{ $name }}</option>
                                         @endforeach
                                     </select>

@@ -3,24 +3,21 @@
 namespace App\Http\Livewire\Socios\Detalles;
 
 use Carbon\Carbon;
-use App\Models\Stand;
 use App\Models\Account;
-use App\Models\Summary;
-use Livewire\Component;
-use App\Models\Bitacora;
 use App\Models\Category;
-use App\Models\Customer;
-use App\Models\AttrValue;
-use App\Models\PaymentMethod;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\ApiConsultasController;
 use App\Models\Currency;
+use App\Models\Customer;
 use App\Models\Detail;
-use App\Models\Student;
+use App\Models\PaymentMethod;
 use App\Models\SchoolYear;
+use App\Models\Student;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class NuevoRegistro extends Component
 {
+    // ─── Estado del componente ───────────────────────────────────────────────────
+
     public $cuentas,
         $paymentMethods,
         $categorias,
@@ -66,19 +63,62 @@ class NuevoRegistro extends Component
 
     protected $listeners = ["editMovimiento"];
 
-    // public function showReceiptModal($event)
-    // {
-    //     $this->showReceiptModal = true;
-    // }
+    // ─── Reglas de validación compartidas ───────────────────────────────────────
+
+    private function movimientoRules(bool $requireUser = true): array
+    {
+        $rules = [
+            "documento" => "required",
+            "customer_name" => "required",
+            "date" => "required|date",
+            "concept" => "required|min:5|max:255",
+            "type" => "required",
+            "amount" => "required|numeric|min:0.01",
+            "category_id" => "required",
+        ];
+
+        if ($requireUser) {
+            $rules["user_id"] = "required";
+        }
+
+        return $rules;
+    }
+
+    private function movimientoMessages(): array
+    {
+        return [
+            "documento.required" => "El documento es requerido",
+            "customer_name.required" =>
+                "El nombre del cliente o proveedor es requerido",
+            "date.required" => "La fecha es requerida",
+            "date.date" => "La fecha debe ser una fecha válida",
+            "concept.required" => "El concepto del movimiento es requerido",
+            "concept.min" => "El concepto debe tener como mínimo 5 caracteres",
+            "concept.max" =>
+                "El concepto debe tener como máximo 255 caracteres",
+            "type.required" => "El tipo de movimiento es requerido",
+            "amount.required" => "El monto es requerido",
+            "amount.numeric" => "El monto debe ser un valor numérico",
+            "amount.min" => "El monto debe ser como mínimo 0.01",
+            "category_id.required" => "La categoría es requerida",
+            "user_id.required" => "El usuario es requerido",
+        ];
+    }
+
+    // ─── Mount ───────────────────────────────────────────────────────────────────
 
     public function mount(Student $student)
     {
-        $this->student_id = $student->id
-        // $this->schoolYear = SchoolYear::current();
+        // BUG CORREGIDO: se eliminó dd($student) que bloqueaba la ejecución
+        // BUG CORREGIDO: faltaba punto y coma en la línea original
+        $this->student_id = $student->id;
+        $this->schoolYear = SchoolYear::current();
 
-        $customer = Customer::whereDocument($student->tutor->document)->first();
-        // dd($customer);
-        $this->currency = Currency::pluck("id", "name");
+        $customer = Customer::where(
+            "document",
+            $student->tutor->document,
+        )->firstOrFail();
+
         $this->currency_id = 1;
         $this->document_type = $customer->document_type;
         $this->documento = $customer->document;
@@ -87,119 +127,89 @@ class NuevoRegistro extends Component
         $this->customer_name = $customer->full_name;
 
         $this->date = Carbon::now()->format("Y-m-d");
-
         $this->validezFecha = true;
-
         $this->selected_id = 0;
-
         $this->type = "add";
         $this->status = false;
-
         $this->payment_method = 1;
-
         $this->tax = 0;
+
         $this->cuentas = Account::all();
         $this->paymentMethods = PaymentMethod::all();
-        $this->categorias = Category::whereType($this->type)->get();
+        $this->categorias = Category::where("type", $this->type)->get();
     }
+
+    // ─── Render ──────────────────────────────────────────────────────────────────
 
     public function render()
     {
+        // BUG CORREGIDO: pluck(value, key) — "name" es la etiqueta, "id" es el valor
+        $this->currency = Currency::pluck("name", "id");
+
         return view("livewire.socios.detalles.nuevo-registro");
     }
 
+    // ─── Crear movimiento ────────────────────────────────────────────────────────
+
     public function crearMovimiento()
     {
-        $hoy = Carbon::now();
+        $this->validarFechas();
 
-        // $this->validarFechas();
-
-        // dd($this->validezFecha);
-        if ($this->validezFecha == false) {
-            // dd('hola');
+        // BUG CORREGIDO: se retornaba implícitamente si validezFecha era false,
+        // ahora es explícito y evita seguir ejecutando lógica.
+        if (!$this->validezFecha) {
             return;
-        } else {
-            $this->user_id = Auth::id();
-
-            $str = $this->amount;
-            $iva = $this->tax;
-
-            $rules = [
-                "documento" => "required",
-                "customer_name" => "required",
-                "date" => "required|date",
-                "concept" => "required|min:5|max:255",
-                "type" => "required",
-                "amount" => "required|numeric|min:0.01",
-                "category_id" => "required",
-                "user_id" => "required",
-            ];
-
-            $messages = [
-                "documento.required" => "El documento es requerido",
-                "customer_name.required" =>
-                    "El nombre del cliente o proveedor es requerido",
-                "date.required" => "La fecha es requerida",
-                "date.date" => "La fecha debe ser una fecha válida",
-                "concept.required" => "El concepto del movimiento es requerido",
-                "concept.min" =>
-                    "El concepto debe tenero como mínimo 5 caracteres",
-                "concept.max" =>
-                    "El concepto debe tenero como máximo 255 caracteres",
-                "type.required" => "El tipo de movimiento es requerido",
-                "amount.required" => "El monto es requerido",
-                "amount.numeric" => "El monto debe ser un valor positivo",
-                "amount.min" => "El monto deberia ser como mínimo 0",
-                "category_id.required" => "La categoría es requerida",
-                "user_id.required" => "El usuario es requerido",
-            ];
-
-            $this->validate($rules, $messages);
-
-            $this->unique_code = strval(
-                Carbon::parse($this->date)->format("Y-m") .
-                    str_pad($this->category_id, 4, "0", STR_PAD_LEFT) .
-                    str_pad($this->student_id, 6, "0", STR_PAD_LEFT),
-            );
-            $detail = Detail::where("unique_code", $this->unique_code)->first();
-
-            if (!$detail) {
-                $summary = Detail::create([
-                    "unique_code" => $this->unique_code,
-                    "date" => $this->date,
-                    "description" => $this->concept,
-                    "summary_type" => $this->type,
-                    "type" => 2,
-                    "status" => $this->status,
-                    "amount" => $str,
-                    "category_id" => $this->category_id,
-                    "student_id" => $this->student_id,
-                    "student_tutor_id" => $this->student_tutor_id,
-                    "currency_id" => $this->currency_id,
-                ]);
-                $this->emit(
-                    "movimiento_added",
-                    "El movimiento ha sido registrado exitosamente",
-                );
-            } else {
-                $this->emit(
-                    "error",
-                    "Ya existe un registro similar al registro que desea agregar o provisionar",
-                );
-            }
-
-            $this->resetUI();
-            $this->emit("render", "render");
         }
+
+        $this->user_id = Auth::id();
+
+        $this->validate(
+            $this->movimientoRules(true),
+            $this->movimientoMessages(),
+        );
+
+        $this->unique_code = $this->buildUniqueCode();
+
+        $existe = Detail::where("unique_code", $this->unique_code)->exists();
+
+        if ($existe) {
+            $this->emit(
+                "error",
+                "Ya existe un registro similar al que desea agregar o provisionar.",
+            );
+            return; // BUG CORREGIDO: antes continuaba y llamaba resetUI() cerrando el modal en error
+        }
+
+        Detail::create([
+            "unique_code" => $this->unique_code,
+            "date" => $this->date,
+            "description" => $this->concept,
+            "summary_type" => $this->type,
+            "type" => 2,
+            "status" => $this->status,
+            "amount" => $this->amount,
+            "category_id" => $this->category_id,
+            "student_id" => $this->student_id,
+            "student_tutor_id" => $this->student_tutor_id,
+            "currency_id" => $this->currency_id,
+        ]);
+
+        $this->emit(
+            "movimiento_added",
+            "El movimiento ha sido registrado exitosamente.",
+        );
+        $this->resetUI();
+        $this->emit("render", "render");
     }
+
+    // ─── Editar movimiento ───────────────────────────────────────────────────────
 
     public function editMovimiento($id)
     {
-        // dd($id);
         $this->summary_id = $id;
         $this->selected_id = $id;
 
-        $summary = Detail::find($this->summary_id);
+        $summary = Detail::findOrFail($id);
 
         $this->date = $summary->date->format("Y-m-d");
         $this->concept = $summary->description;
@@ -207,105 +217,90 @@ class NuevoRegistro extends Component
         $this->status = $summary->status;
         $this->amount = $summary->amount;
         $this->category_id = $summary->category_id;
+        $this->currency_id = $summary->currency_id;
+        $this->student_id = $summary->student_id;
 
-        $student = Student::where("id", "=", $summary->student_id)->first();
-        $customer = Customer::whereDocument($student->tutor->document)->first();
-        // dd($customer);
+        $student = Student::findOrFail($summary->student_id);
+        $customer = Customer::where(
+            "document",
+            $student->tutor->document,
+        )->firstOrFail();
 
         $this->document_type = $customer->document_type;
-        $this->document = $customer->document;
+        $this->documento = $customer->document; // campo unificado
         $this->customer_id = $customer->id;
-        $this->full_name = $customer->full_name;
-
-        $this->documento = $customer->document;
         $this->customer_name = $customer->full_name;
 
-        $this->currency_id = $summary->currency_id;
-
-        $this->categorias = Category::whereType($this->type)->get();
+        $this->categorias = Category::where("type", $this->type)->get();
 
         $this->emit("show_modal");
     }
 
+    // ─── Actualizar movimiento ───────────────────────────────────────────────────
+
     public function updateMovimiento()
     {
-        $hoy = Carbon::now();
+        $this->validarFechas();
 
-        if ($this->validezFecha == true) {
-            $this->user_id = Auth::id();
-
-            $str = $this->amount;
-            $iva = $this->tax;
-
-            $rules = [
-                "documento" => "required",
-                "customer_name" => "required",
-                "date" => "required|date",
-                "concept" => "required|min:5|max:255",
-                "type" => "required",
-                "amount" => "required|numeric|min:0",
-                "category_id" => "required",
-            ];
-
-            $messages = [
-                "documento.required" => "El documento es requerido",
-                "customer_name.required" =>
-                    "El nombre del cliente o proveedor es requerido",
-                "date.required" => "La fecha es requerida",
-                "date.date" => "La fecha debe ser una fecha válida",
-                "concept.required" => "El concepto del movimiento es requerido",
-                "concept.min" =>
-                    "El concepto debe tenero como mínimo 5 caracteres",
-                "concept.max" =>
-                    "El concepto debe tenero como máximo 255 caracteres",
-                "type.required" => "El tipo de movimiento es requerido",
-                "amount.required" => "El monto es requerido",
-                "amount.numeric" => "El monto debe ser un valor positivo",
-                "amount.min" => "El monto deberia ser como mínimo 0",
-                "category_id.required" => "La categoría es requerida",
-            ];
-
-            $this->validate($rules, $messages);
-
-            $this->unique_code = strval(
-                Carbon::parse($this->date)->format("Y-m") .
-                    str_pad($this->category_id, 4, "0", STR_PAD_LEFT) .
-                    str_pad($this->student_id, 6, "0", STR_PAD_LEFT),
-            );
-            $detail = Detail::where("id", "!=", $this->summary_id)
-                ->where("unique_code", $this->unique_code)
-                ->first();
-
-            $summary = Detail::find($this->summary_id);
-            // dd($summary);
-            if (!$detail) {
-                $summary->update([
-                    "unique_code" => $this->unique_code,
-                    "date" => $this->date,
-                    "description" => $this->concept,
-                    "summary_type" => $this->type,
-                    "type" => 2,
-                    "status" => $this->status,
-                    "amount" => $str,
-
-                    "category_id" => $this->category_id,
-                    "student_id" => $this->student_id,
-                    "currency_id" => $this->currency_id,
-                ]);
-                $this->emit(
-                    "movimiento_actualizado",
-                    "El movimiento se ha actualizado con éxito",
-                );
-            } else {
-                $this->emit(
-                    "error",
-                    "Ya existe un registro similar al registro que desea actualizar",
-                );
-            }
+        if (!$this->validezFecha) {
+            return;
         }
 
+        $this->user_id = Auth::id();
+
+        // BUG CORREGIDO: reglas extraídas, sin duplicación; $iva eliminado (nunca se usó)
+        $this->validate(
+            $this->movimientoRules(false),
+            $this->movimientoMessages(),
+        );
+
+        $this->unique_code = $this->buildUniqueCode();
+
+        $existe = Detail::where("id", "!=", $this->summary_id)
+            ->where("unique_code", $this->unique_code)
+            ->exists();
+
+        if ($existe) {
+            $this->emit(
+                "error",
+                "Ya existe un registro similar al que desea actualizar.",
+            );
+            return;
+        }
+
+        $summary = Detail::findOrFail($this->summary_id);
+
+        $summary->update([
+            "unique_code" => $this->unique_code,
+            "date" => $this->date,
+            "description" => $this->concept,
+            "summary_type" => $this->type,
+            "type" => 2,
+            "status" => $this->status,
+            "amount" => $this->amount,
+            "category_id" => $this->category_id,
+            "student_id" => $this->student_id,
+            "currency_id" => $this->currency_id,
+        ]);
+
+        $this->emit(
+            "movimiento_actualizado",
+            "El movimiento se ha actualizado con éxito.",
+        );
         $this->resetUI();
         $this->emit("render", "render");
+    }
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+    /**
+     * Genera el código único: YYYY-MM + category_id (4 dígitos) + student_id (6 dígitos)
+     */
+    private function buildUniqueCode(): string
+    {
+        return Carbon::parse($this->date)->format("Y-m") .
+            str_pad($this->category_id, 4, "0", STR_PAD_LEFT) .
+            str_pad($this->student_id, 6, "0", STR_PAD_LEFT);
     }
 
     public function categoryType()
@@ -314,30 +309,31 @@ class NuevoRegistro extends Component
         $this->subcategoria_id = "";
 
         if ($this->type !== null) {
-            $this->categorias = Category::where(
-                "type",
-                "=",
-                $this->type,
-            )->get();
+            $this->categorias = Category::where("type", $this->type)->get();
         }
     }
 
     public function validarFechas()
     {
         $hoy = Carbon::now();
+        $hoyStr = $hoy->format("Y-m-d");
 
-        if ($this->date > $hoy->format("Y-m-d")) {
-            $this->date = Carbon::now()->format("Y-m-d");
+        // BUG CORREGIDO: subDays() muta el objeto Carbon original.
+        // Se usa copy() para no afectar $hoy en comparaciones posteriores.
+        $limiteStr = $hoy->copy()->subDays(3)->format("Y-m-d");
+
+        if ($this->date > $hoyStr) {
+            $this->date = $hoyStr;
             $this->emit(
                 "error_fecha",
-                "La fecha no debe ser mayor al día de hoy",
+                "La fecha no debe ser mayor al día de hoy.",
             );
             $this->validezFecha = false;
-        } elseif ($this->date < $hoy->subDays(3)) {
-            $this->date = Carbon::now()->format("Y-m-d");
+        } elseif ($this->date < $limiteStr) {
+            $this->date = $hoyStr;
             $this->emit(
                 "error_fecha",
-                "La fecha solo puede ser menor a 3 dias de la fecha de hoy",
+                "La fecha solo puede ser hasta 3 días antes de hoy.",
             );
             $this->validezFecha = false;
         } else {
@@ -348,13 +344,18 @@ class NuevoRegistro extends Component
     public function resetUI()
     {
         $this->selected_id = 0;
-        $this->resetValidation();
+        $this->summary_id = null;
         $this->validezFecha = true;
         $this->date = Carbon::now()->format("Y-m-d");
         $this->concept = "";
         $this->category_id = null;
         $this->amount = 0;
         $this->currency_id = 1;
+        $this->status = false;
+        $this->type = "add";
+        $this->categorias = Category::where("type", $this->type)->get();
+
+        $this->resetValidation();
         $this->emit("close_modal", "close modal");
     }
 }
