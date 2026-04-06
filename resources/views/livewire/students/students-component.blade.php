@@ -3,6 +3,7 @@
         <div class="card-header">
             <h3 class="card-title">LISTA DE ESTUDIANTES</h3>
             <div class="card-tools">
+                @livewire('school-year.school-year-switcher')
                 <a type="button" href="{{ route('students.deudores') }}" class="btn btn-warning">Ver
                     Deudores</a>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#globalModal"><i

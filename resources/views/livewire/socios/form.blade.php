@@ -63,7 +63,7 @@
                         <label for="">GRADO</label>
                         <select class="custom-select" name="" id="" wire:model.defer='grade_id'>
                             <option value="" selected>Seleccione un Grado</option>
-                            @foreach ($grades as $name => $id)
+                            @foreach ($grades as $id => $name)
                                 <option value="{{ $id }}">{{ $name }}</option>
                             @endforeach
                         </select>
