@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Events\SummaryCreated;
+use App\Models\Scopes\SchoolYearScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -32,7 +33,7 @@ class Summary extends Model
         'student_id',
         'student_tutor_id',
         'payment_method_id',
-
+        'school_year_id',
     ];
 
     protected $casts = [
@@ -45,13 +46,19 @@ class Summary extends Model
         parent::boot();
 
         static::creating(function ($model) {
+            // Auto-assign the active school year from session when not explicitly provided
+            if (!$model->school_year_id) {
+                $model->school_year_id = session('current_school_year_id');
+            }
+
             $serie_ingreso = $model->account->add_serie;// Si el tipo de movimiento es 'add', asignar la serie 'RI01' y el siguiente número correlativo
             $serie_gasto = $model->account->out_serie;// Si el tipo de movimiento es 'out', asignar la serie 'RG01' y el siguiente número correlativo
             if($model->status == 'PAID'){
 
                 if ($model->type === 'add') {
 
-                    $lastIncomeSummary = Summary::where('type', '=', 'add')->where('recipt_series', $serie_ingreso)->max('recipt_number');
+                    // withoutGlobalScope ensures receipt numbers are sequential across ALL school years
+                    $lastIncomeSummary = Summary::withoutGlobalScope(SchoolYearScope::class)->where('type', '=', 'add')->where('recipt_series', $serie_ingreso)->max('recipt_number');
                     // dd($lastIncomeSummary);
                     $nextNumber = $lastIncomeSummary ? $lastIncomeSummary + 1 : 1;
                     $model->recipt_series = $serie_ingreso;
@@ -59,7 +66,7 @@ class Summary extends Model
 
                 } elseif ($model->type === 'out') {
 
-                    $lastExpenseSummary = Summary::where('type', '=', 'out')->where('recipt_series', $serie_gasto)->max('recipt_number');
+                    $lastExpenseSummary = Summary::withoutGlobalScope(SchoolYearScope::class)->where('type', '=', 'out')->where('recipt_series', $serie_gasto)->max('recipt_number');
                     $nextNumber = $lastExpenseSummary ? $lastExpenseSummary + 1 : 1;
                     $model->recipt_series = $serie_gasto;
                     $model->recipt_number = $nextNumber;
@@ -75,7 +82,7 @@ class Summary extends Model
             if($model->status == 'PAID' and $model->recipt_series == null and $model->recipt_num_series == null ){
 
                 if ($model->type === 'add') {
-                    $lastIncomeSummary = Summary::where('type', '=', 'add')->where('recipt_series', $serie_ingreso)->max('recipt_number');
+                    $lastIncomeSummary = Summary::withoutGlobalScope(SchoolYearScope::class)->where('type', '=', 'add')->where('recipt_series', $serie_ingreso)->max('recipt_number');
                     // dd($lastIncomeSummary);
                     $nextNumber = $lastIncomeSummary ? $lastIncomeSummary + 1 : 1;
                     $model->recipt_series = $serie_ingreso;
@@ -83,7 +90,7 @@ class Summary extends Model
                     // dd($nextNumber);
 
                 } elseif ($model->type === 'out') {
-                    $lastExpenseSummary = Summary::where('type', '=', 'out')->where('recipt_series', $serie_gasto)->max('recipt_number');
+                    $lastExpenseSummary = Summary::withoutGlobalScope(SchoolYearScope::class)->where('type', '=', 'out')->where('recipt_series', $serie_gasto)->max('recipt_number');
                     $nextNumber = $lastExpenseSummary ? $lastExpenseSummary + 1 : 1;
                     $model->recipt_series = $serie_gasto;
                     $model->recipt_number = $nextNumber;
@@ -95,6 +102,8 @@ class Summary extends Model
 
     protected static function booted()
     {
+        static::addGlobalScope(new SchoolYearScope());
+
         static::created(function ($model) {
 
             $serie_ingreso = $model->account->add_serie;
@@ -114,6 +123,11 @@ class Summary extends Model
     }
 
 
+
+    public function schoolYear()
+    {
+        return $this->belongsTo(SchoolYear::class);
+    }
 
     public function customer(){
         return $this->belongsTo(Customer::class);

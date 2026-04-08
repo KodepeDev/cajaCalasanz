@@ -48,6 +48,7 @@ class BalanceGlobal extends Component
         $this->mesTotals = Detail::join('summaries', 'details.summary_id', '=', 'summaries.id')
             ->where('details.status', 1)
             ->where('details.category_id', '!=', 1)
+            ->where('summaries.school_year_id', session('current_school_year_id'))
             ->selectRaw('
                 SUM(CASE WHEN MONTH(details.date_paid) = 1 THEN CASE WHEN(details.summary_type) = "add" THEN CASE WHEN details.currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE -CASE WHEN details.currency_id = 2 THEN details.changed_amount ELSE details.amount END END ELSE 0 END) AS total_mes01,
                 SUM(CASE WHEN MONTH(details.date_paid) = 2 THEN CASE WHEN(details.summary_type) = "add" THEN CASE WHEN details.currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE -CASE WHEN details.currency_id = 2 THEN details.changed_amount ELSE details.amount END END ELSE 0 END) AS total_mes02,
@@ -86,6 +87,7 @@ class BalanceGlobal extends Component
         $this->resumenTotals = Detail::join('summaries', 'details.summary_id', '=', 'summaries.id')
             ->where('details.status', 1)
             ->where('details.category_id', '!=', 1)
+            ->where('summaries.school_year_id', session('current_school_year_id'))
             ->selectRaw('category_id,
                 SUM(CASE WHEN MONTH(details.date_paid) = 1 THEN CASE WHEN(details.summary_type) = "add" THEN CASE WHEN details.currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE -CASE WHEN details.currency_id = 2 THEN details.changed_amount ELSE details.amount END END ELSE 0 END) AS total01,
                 SUM(CASE WHEN MONTH(details.date_paid) = 2 THEN CASE WHEN(details.summary_type) = "add" THEN CASE WHEN details.currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE -CASE WHEN details.currency_id = 2 THEN details.changed_amount ELSE details.amount END END ELSE 0 END) AS total02,

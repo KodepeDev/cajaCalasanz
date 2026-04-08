@@ -55,8 +55,9 @@ use App\Http\Livewire\Movimientos\ClaseMovimientos\MovimientoCliente;
 use App\Http\Livewire\Movimientos\Transferencias\TransferenciaComponent;
 use App\Http\Livewire\Movimientos\Provisiones\PorSocio\PorSocioComponent;
 use App\Http\Livewire\Teachers\TeacherComponent;
+use App\Http\Livewire\SchoolYear\SchoolYearManager;
 
-Route::middleware(['user_status'])->group(function () {
+Route::middleware(['user_status', 'set_school_year'])->group(function () {
 
     // Dashboard Route
     Route::group(['middleware' => ['can:dashboard.access']], function () {
@@ -72,6 +73,11 @@ Route::middleware(['user_status'])->group(function () {
         Route::post('user_profile/update_info/{id}', [UserProfileController::class, 'update'])->name('user.update_info');
         Route::post('user_profile/update_password', [UserProfileController::class, 'updatePassword'])->name('user.update_password');
     });
+
+    // School Year Management Routes
+    Route::get('school-years', function () {
+        return view('admin.school-years.index');
+    })->name('school-years.index');
 
     // Users Management Routes
     Route::group(['middleware' => ['can:usuarios.index']], function () {
