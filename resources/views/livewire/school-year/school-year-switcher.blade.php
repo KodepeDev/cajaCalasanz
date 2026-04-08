@@ -1,36 +1,38 @@
-<div>
-    <button class="btn btn-secondary mb-2" data-toggle="modal" data-target="#schoolYearModal">AÑO ESCOLAR: {{ $schoolYear->year }}</button>
-    <!-- Modal -->
-    <div class="modal fade" id="schoolYearModal" tabindex="-1" aria-labelledby="schoolYearModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="schoolYearModalLabel">Modal title</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
+<div class="dropdown">
+
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">
+        <i class="fas fa-calendar-alt mr-1"></i>
+        {{ $currentSchoolYear->year ?? '—' }}
+        @if($currentSchoolYear && !$currentSchoolYear->is_active)
+            <span class="badge badge-warning navbar-badge">Hist.</span>
+        @endif
+    </a>
+
+    <div class="dropdown-menu dropdown-menu-left">
+
+        <span class="dropdown-header">
+            <i class="fas fa-exchange-alt mr-1"></i> Cambiar año escolar
+        </span>
+
+        @foreach ($schoolYears as $sy)
+            <button type="button"
+                    wire:click="switchYear({{ $sy->id }})"
+                    class="dropdown-item {{ $sy->id == $currentSchoolYear->id ? 'active' : '' }}">
+                <i class="fas fa-calendar-check mr-2"></i>
+                {{ $sy->year }}
+                @if($sy->is_active)
+                    <span class="badge badge-success float-right">Activo</span>
+                @elseif($sy->id == $currentSchoolYear->id)
+                    <span class="badge badge-warning float-right">Viendo</span>
+                @endif
             </button>
-          </div>
-          <div class="modal-body">
-            <form>
-              <div class="form-group">
-                <label for="year">Año</label>
-                <input type="text" class="form-control" id="year" name="year" value="{{ $schoolYear->year }}">
-              </div>
-              <div class="form-group">
-                <label for="start_date">Fecha de inicio</label>
-                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ $schoolYear->start_date }}">
-              </div>
-              <div class="form-group">
-                <label for="end_date">Fecha de fin</label>
-                <input type="date" class="form-control" id="end_date" name="end_date" value="{{ $schoolYear->end_date }}">
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-          </div>
-        </div>
-      </div>
+        @endforeach
+
+        <div class="dropdown-divider"></div>
+
+        <a href="{{ route('school-years.index') }}" class="dropdown-item">
+            <i class="fas fa-cog mr-2"></i> Gestionar años escolares
+        </a>
+
     </div>
 </div>

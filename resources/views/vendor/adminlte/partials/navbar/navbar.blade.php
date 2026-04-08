@@ -10,6 +10,13 @@
         {{-- Left sidebar toggler link --}}
         @include('adminlte::partials.navbar.menu-item-left-sidebar-toggler')
 
+        {{-- School year global switcher --}}
+        @auth
+            <li class="nav-item d-flex align-items-center px-2">
+                @livewire('school-year.school-year-switcher')
+            </li>
+        @endauth
+
         {{-- Configured left links --}}
         @each('adminlte::partials.navbar.menu-item', $adminlte->menu('navbar-left'), 'item')
 
