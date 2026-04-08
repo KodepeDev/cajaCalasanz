@@ -8,6 +8,7 @@ use App\Models\Student;
 use App\Models\Summary;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\SchoolYear;
 
 class StudentDetails extends Component
 {
