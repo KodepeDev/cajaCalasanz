@@ -19,7 +19,7 @@ class HomeController extends Controller
 
         $schoolYear = SchoolYear::current();
 
-        $socios = Student::with("enrollments", function ($query) {
+        $socios = Student::whereHas("enrollments", function ($query) {
             $query->where("school_year_id", $schoolYear->id);
         })
             ->where("is_active", true)
