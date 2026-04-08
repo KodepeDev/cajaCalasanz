@@ -17,7 +17,7 @@ class StudentDetails extends Component
     public $student, $url;
     public $start1, $finish1, $start, $finish, $selected_id;
 
-    public $detalle;
+    public $detalle, $year;
 
     protected $listeners = ["render", "eliminarDetalle" => "delete"];
 
@@ -26,6 +26,9 @@ class StudentDetails extends Component
         $hoy = Carbon::now();
         $this->selected_id = $id;
         $this->student = Student::find($id);
+        $this->year =
+            SchoolYear::find(session("current_school_year_id"))->year ??
+            date("Y");
 
         $this->finish = $this->finish1 = $hoy->format("Y-m-d");
         $this->start = $this->start1 = $hoy->firstOfMonth()->format("Y-m-d");
@@ -40,28 +43,29 @@ class StudentDetails extends Component
             Summary::where("student_id", $this->selected_id)
                 ->whereStatus("PAID")
                 ->whereType("add")
-                ->whereYear("date", date("Y"))
+                ->whereYear("date", $this->year)
                 ->sum("amount") -
             Summary::where("student_id", $this->selected_id)
                 ->whereStatus("PAID")
                 ->whereType("out")
-                ->whereYear("date", date("Y"))
+                ->whereYear("date", $this->year)
                 ->sum("amount");
 
         $suma2022 =
             Summary::where("student_id", $this->selected_id)
                 ->whereStatus("PAID")
                 ->whereType("add")
-                ->whereYear("date", date("Y") - 1)
+                ->whereYear("date", $this->year - 1)
                 ->sum("amount") -
             Summary::where("student_id", $this->selected_id)
                 ->whereStatus("PAID")
                 ->whereType("out")
-                ->whereYear("date", date("Y") - 1)
+                ->whereYear("date", $this->year - 1)
                 ->sum("amount");
 
         // Suma de soles con status = 1
-        $sumaTotal = Detail::where("student_id", $this->selected_id)
+        $sumaTotal = Detail::whereYear("date", $this->year)
+            ->where("student_id", $this->selected_id)
             ->where(function ($query) {
                 $query
                     ->where("currency_id", "!=", 2)
@@ -75,7 +79,8 @@ class StudentDetails extends Component
             ->value("total");
 
         // Suma de dólares con status = 1
-        $sumaTotalDolar = Detail::where("student_id", $this->selected_id)
+        $sumaTotalDolar = Detail::whereYear("date", $this->year)
+            ->where("student_id", $this->selected_id)
             ->where("currency_id", 2)
             ->where("status", 1)
             ->whereBetween("date", [$start, $finish])
@@ -85,7 +90,8 @@ class StudentDetails extends Component
             ->value("total");
 
         // Suma de soles pendientes con status = 0
-        $sumaTotalPendiente = Detail::where("student_id", $this->selected_id)
+        $sumaTotalPendiente = Detail::whereYear("date", $this->year)
+            ->where("student_id", $this->selected_id)
             ->where(function ($query) {
                 $query
                     ->where("currency_id", "!=", 2)
@@ -99,10 +105,8 @@ class StudentDetails extends Component
             ->value("total");
 
         // Suma de dólares pendientes con status = 0
-        $sumaTotalPendienteDolar = Detail::where(
-            "student_id",
-            $this->selected_id,
-        )
+        $sumaTotalPendienteDolar = Detail::whereYear("date", $this->year)
+            ->where("student_id", $this->selected_id)
             ->where("currency_id", 2)
             ->where("status", 0)
             ->whereBetween("date", [$start, $finish])
@@ -111,7 +115,8 @@ class StudentDetails extends Component
             )
             ->value("total");
 
-        $movimientos = Detail::where("student_id", $this->selected_id)
+        $movimientos = Detail::whereYear("date", $this->year)
+            ->where("student_id", $this->selected_id)
             ->whereBetween("date", [$start, $finish])
             ->orderBy("date_paid", "desc")
             ->paginate(15);
@@ -125,7 +130,8 @@ class StudentDetails extends Component
                 $this->start1 .
                 "&finish=" .
                 $this->finish1 .
-                "";
+                "&year=" .
+                $this->year;
         } else {
             $this->url = null;
         }
