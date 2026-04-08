@@ -17,10 +17,12 @@ class HomeController extends Controller
         $currentYear = $now->format("Y");
         $lastMonth = $now->copy()->subMonth();
 
-        $schoolYear = SchoolYear::current();
+        $schoolYear = SchoolYear::find(session("current_school_year_id"))->id;
 
-        $socios = Student::whereHas("enrollments", function ($query) {
-            $query->where("school_year_id", $schoolYear->id);
+        $socios = Student::whereHas("enrollments", function ($query) use (
+            $schoolYear,
+        ) {
+            $query->where("school_year_id", $schoolYear);
         })
             ->where("is_active", true)
             ->count();

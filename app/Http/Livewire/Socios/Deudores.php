@@ -23,7 +23,7 @@ class Deudores extends Component
     public $detalles;
 
     protected $paginationTheme = "bootstrap";
-    public $year = now()->format("Y");
+    public $year;
 
     public function mount()
     {
@@ -94,16 +94,15 @@ class Deudores extends Component
 
     public function exportData()
     {
-        return new DeudorDataExport(
-            $this->selected_id,
-            $this->socio_name,
-        )->download("Detalle_deudas_" . $this->socio_name . ".xlsx");
+        $export = new DeudorExport($this->year);
+        return $export->download(
+            "Detalle_deudas_" . $this->socio_name . ".xlsx",
+        );
     }
 
     public function exportDatas()
     {
-        return new DeudoresExport()->download(
-            "Detalle_deudores_" . now() . ".xlsx",
-        );
+        $export = new DeudoresExport($this->year);
+        return $export->download("Detalle_deudores_" . $this->year . ".xlsx");
     }
 }
