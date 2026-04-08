@@ -11,6 +11,8 @@
                     <div class="btn-group" role="group" aria-label="">
                         <button type="button" wire:click="selectAll" class="btn btn-primary mr-2"><i
                                 class="fa fa-check-square" aria-hidden="true"></i> Sel. Todo</button>
+                        <button type="button" wire:click="searchStandProvision('all')" class="btn btn-primary mr-2"><i
+                                class="fa fa-check-square" aria-hidden="true"></i> Sel. Ant</button>
                         <button type="button" wire:click="selectNow" class="btn btn-info mr-2"><i class="fa fa-check"
                                 aria-hidden="true"></i>
                             Solo {{ now()->format('m/Y') }}</button>
