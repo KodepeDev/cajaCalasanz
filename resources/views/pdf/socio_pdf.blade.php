@@ -11,7 +11,7 @@
 
     <style>
         .foto_socio {
-            background-image: url("{{ asset('storage/students/' . $student->foto) }}");
+            background-image: url("{{ asset($student->foto) }}");
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center center;

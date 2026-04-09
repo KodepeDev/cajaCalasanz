@@ -27,7 +27,9 @@ class Deudores extends Component
 
     public function mount()
     {
-        $this->year = SchoolYear::current()->year ?? now()->format("Y");
+        $this->year =
+            SchoolYear::find(session("current_school_year_id"))->year ??
+            now()->format("Y");
     }
 
     public function render()
