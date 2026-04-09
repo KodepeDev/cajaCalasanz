@@ -1,157 +1,154 @@
-<div class="container-fluid spark-screen pt-4">
-    <div class="card card-maroon">
-        <div class="card-header">
-            <h3 class="card-title">LISTA DE ESTUDIANTES</h3>
-            <div class="card-tools">
-                @livewire('school-year.school-year-switcher')
-                <a type="button" href="{{ route('students.deudores') }}" class="btn btn-warning">Ver
-                    Deudores</a>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#globalModal"><i
-                        class="fa fa-plus-circle" aria-hidden="true"></i> NUEVO</button>
-            </div>
-            <!-- /.card-tools -->
-        </div>
-        <!-- /.card-header -->
-        <div class="card-body">
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <input type="search" class="form-control" wire:model="search"
-                        placeholder="Buscar por N° de documento o Nombre o Stand">
+<div class="container-fluid pt-3">
 
+    <div class="card card-primary card-outline">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-user-graduate mr-1"></i> Estudiantes
+                @if($schoolYear)
+                    <span class="badge badge-primary ml-1">{{ $schoolYear->year }}</span>
+                @endif
+            </h3>
+            <div class="card-tools d-flex align-items-center">
+                @can('socios.deudores')
+                    <a href="{{ route('students.deudores') }}" class="btn btn-warning btn-sm ml-2">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> Deudores
+                    </a>
+                @endcan
+                <button type="button"
+                        class="btn btn-primary btn-sm ml-2"
+                        data-toggle="modal" data-target="#globalModal">
+                    <i class="fas fa-plus mr-1"></i> Nuevo
+                </button>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="input-group input-group-sm">
+                        <input type="search"
+                               wire:model="search"
+                               class="form-control"
+                               placeholder="Buscar por documento o nombre...">
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="table-responsive">
-                <table id="students" class="table table-bordered">
-                    <thead class="bg-primary text-center">
+                <table class="table table-bordered table-hover table-sm mb-0">
+                    <thead class="thead-light">
                         <tr>
-                            <th scope="col">DOCUMENTO</th>
-                            <th scope="col">APELLIDOS Y NOMBRES</th>
-                            <th scope="col">FOTO</th>
-                            <th scope="col" width="15%" class="text-center">Acciones</th>
+                            <th>Documento</th>
+                            <th>Apellidos y Nombres</th>
+                            <th class="text-center" style="width:70px">Foto</th>
+                            <th class="text-center" style="width:130px">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if ($students->count() > 0)
-                            @foreach ($students as $student)
-                                <tr>
-                                    <th scope="row">
-
-                                        @switch($student->document_type)
-                                            @case(1)
-                                                DNI
-                                            @break
-
-                                            @case(6)
-                                                RUC
-                                            @break
-
-                                            @default
-                                                OTRO
-                                        @endswitch
-                                        -{{ $student->document }}
-                                    </th>
-
-                                    <td>{{ $student->full_name }}</td>
-                                    <td class="text-center">
-                                        <span>
-                                            <img src="{{ asset('storage/students/' . $student->Foto) }}"
-                                                alt="imagen de ejemplo" height="30" width="30" class="rounded">
-                                        </span>
-                                    </td>
-
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-primary text-center"
-                                            wire:click='edit({{ $student->id }})'><i class="fa fa-pen"></i></button>
-                                        <a href="{{ route('students.detalle', $student->id) }}"
-                                            class="btn btn-sm btn-info text-center"><i class="fa fa-eye"></i></a>
-                                        <button type="button" class="btn btn-sm btn-danger text-center"
-                                            onclick="anularStudent({{ $student->id }})"><i
-                                                class="fa fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @else
+                        @forelse($students as $student)
                             <tr>
-                                <td colspan="5" class="text-center">No se encontró ningun registro</td>
+                                <td class="align-middle">
+                                    <span class="badge badge-secondary mr-1">
+                                        @switch($student->document_type)
+                                            @case(1) DNI @break
+                                            @case(6) RUC @break
+                                            @default  OTRO
+                                        @endswitch
+                                    </span>
+                                    {{ $student->document }}
+                                </td>
+                                <td class="align-middle">{{ $student->full_name }}</td>
+                                <td class="text-center align-middle">
+                                    <img src="{{ asset($student->Foto) }}"
+                                         alt="{{ $student->full_name }}"
+                                         height="32" width="32"
+                                         class="img-circle elevation-1">
+                                </td>
+                                <td class="text-center align-middle">
+                                    <div class="btn-group btn-group-sm">
+                                        <button wire:click="edit({{ $student->id }})"
+                                                class="btn btn-primary btn-sm"
+                                                title="Editar">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                        <a href="{{ route('students.detalle', $student->id) }}"
+                                           class="btn btn-info btn-sm"
+                                           title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button onclick="anularStudent({{ $student->id }})"
+                                                class="btn btn-danger btn-sm"
+                                                title="Anular">
+                                            <i class="fas fa-ban"></i>
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
-                        @endif
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center text-muted p-4">
+                                    <i class="fas fa-inbox fa-2x d-block mb-2"></i>
+                                    No se encontró ningún estudiante.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
-        <!-- /.card-body -->
-        <div class="card-footer">
+
+        <div class="card-footer clearfix">
             {{ $students->links() }}
         </div>
-        <!-- /.card-footer -->
     </div>
-    <!-- /.card -->
-    @if ($selected_id == 0)
-        @include('livewire.socios.form')
-    @endif
-    @if ($selected_id != 0)
-        @include('livewire.socios.form-edit')
-    @endif
+
+    @include('livewire.socios.form')
+
 </div>
 
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-
-        // $('#socios').DataTable();
+    document.addEventListener('DOMContentLoaded', function () {
 
         window.livewire.on('error', msg => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: msg,
-            });
+            Swal.fire({ icon: 'error', title: 'Oops...', text: msg });
         });
 
         window.livewire.on('socio_added', msg => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Buen trabajo!',
-                text: msg,
-            });
-
+            Swal.fire({ icon: 'success', title: '¡Registrado!', text: msg });
             $('#globalModal').modal('hide');
-
             livewire.emit('resetUI');
         });
+
         window.livewire.on('socio_updated', msg => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Buen trabajo!',
-                text: msg,
-            });
-
+            Swal.fire({ icon: 'success', title: '¡Actualizado!', text: msg });
             $('#globalModal').modal('hide');
-
             livewire.emit('resetUI');
         });
 
-        window.livewire.on('show-modal', msg => {
+        window.livewire.on('show-modal', () => {
             $('#globalModal').modal('show');
         });
 
     });
 
-    function anularSocio(id) {
+    function anularStudent(id) {
         Swal.fire({
-            title: 'Estas seguro de anular este socio?',
-            // text: "Recuerde que ya no podrá ser recuperado!",
+            title: '¿Anular este estudiante?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, Anular!'
-        }).then((result) => {
+            confirmButtonText: 'Sí, anular',
+            cancelButtonText: 'Cancelar',
+        }).then(result => {
             if (result.isConfirmed) {
                 livewire.emit('anularSocio', id);
-
             }
-        })
+        });
     }
 </script>

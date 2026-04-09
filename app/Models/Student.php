@@ -25,6 +25,10 @@ class Student extends Model
         "teacher_id",
     ];
 
+    protected $casts = [
+        "teacher_id" => "integer", // o 'integer'
+    ];
+
     public function summaries()
     {
         return $this->hasMany(Summary::class);
@@ -99,14 +103,14 @@ class Student extends Model
         $this->attributes["last_name"] = strtoupper($value);
     }
 
-    public function getFotoAttribute()
+    public function getFotoAttribute(): string
     {
-        if ($this->photo != null) {
-            return file_exists("storage/students/" . $this->photo)
-                ? $this->photo
-                : "../profile-default.png";
-        } else {
-            return "../profile-default.png";
+        if (
+            $this->photo &&
+            file_exists(public_path("storage/students/{$this->photo}"))
+        ) {
+            return "storage/students/{$this->photo}";
         }
+        return "imagenes/profile-default.png";
     }
 }

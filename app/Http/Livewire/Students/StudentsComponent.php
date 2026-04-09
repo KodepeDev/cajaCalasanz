@@ -152,7 +152,7 @@ class StudentsComponent extends Component
             "id",
         );
         $this->grades = Grade::pluck("name", "id");
-        $this->schoolYear = SchoolYear::current();
+        $this->schoolYear = SchoolYear::find(session("current_school_year_id"));
     }
 
     // ─── Render ──────────────────────────────────────────────────────────────────
@@ -208,7 +208,7 @@ class StudentsComponent extends Component
                     "is_active" => $this->is_active ?? true,
                     "description" => $this->description,
                     "student_tutor_id" => $tutor->id,
-                    "teacher_id" => $this->teacher_id ?? null,
+                    "teacher_id" => $this->teacher_id,
                 ]);
             }
 
@@ -275,6 +275,8 @@ class StudentsComponent extends Component
 
     public function update()
     {
+        $teacher_id = $this->teacher_id == "" ? null : $this->teacher_id;
+
         $this->validate($this->commonRules(true), $this->commonMessages());
 
         try {
@@ -295,7 +297,7 @@ class StudentsComponent extends Component
                 "is_active" => $this->is_active ?? true,
                 "description" => $this->description,
                 "student_tutor_id" => $tutorEdit->id,
-                "teacher_id" => $this->teacher_id,
+                "teacher_id" => $teacher_id,
             ]);
 
             $this->storePhoto($student, $imagenAntigua);
