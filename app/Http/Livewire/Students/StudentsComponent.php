@@ -343,6 +343,7 @@ class StudentsComponent extends Component
                 "phone" => $this->tutor_phone,
                 "address" => $this->tutor_address,
                 "type" => $this->tutor_type,
+                "is_active" => $this->tutor_is_active ?? true, // BUG CORREGIDO: era "is_ative"
                 "is_client" => true,
                 "description" => $this->tutor_description,
             ],
@@ -366,6 +367,7 @@ class StudentsComponent extends Component
             "phone" => $this->tutor_phone,
             "address" => $this->tutor_address,
             "type" => $this->tutor_type,
+            "is_active" => $this->tutor_is_active ?? true, // BUG CORREGIDO: era "is_ative"
             "is_client" => true,
             "description" => $this->tutor_description,
         ];

@@ -296,7 +296,7 @@
                     <thead class="thead-light">
                         <tr>
                             <th>Fecha</th>
-                            <th>Concepto</th>
+                            <th>Recibo</th>
                             <th>Tipo</th>
                             <th>Estudiante / Proveedor</th>
                             <th>Registrado por</th>
@@ -312,9 +312,6 @@
                                 <small class="text-muted">{{ \Carbon\Carbon::parse($mov->date)->diffForHumans() }}</small>
                             </td>
                             <td class="align-middle">
-                                <span title="{{ $mov->concept }}" style="display:block;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                                    {{ $mov->concept ?? '—' }}
-                                </span>
                                 @if($mov->recipt_series && $mov->recipt_number)
                                     <small class="text-muted">{{ $mov->recipt_series }}-{{ str_pad($mov->recipt_number, 4, '0', STR_PAD_LEFT) }}</small>
                                 @endif
@@ -332,24 +329,29 @@
                             </td>
                             <td class="align-middle">
                                 @if($mov->student)
-                                    {{ $mov->student->first_name ?? '' }} {{ $mov->student->last_name ?? '' }}
+                                    {{ $mov->student->full_name ?? '' }}
                                 @else
-                                    <span class="text-muted">—</span>
+                                    {{ $mov->customer->full_name ?? '' }}
                                 @endif
                             </td>
                             <td class="align-middle">
-                                <small>{{ $mov->user->name ?? '—' }}</small>
+                                <small>{{ $mov->user->first_name ?? '—' }}</small>
                             </td>
                             <td class="align-middle text-right">
                                 <span class="font-weight-bold {{ $mov->type === 'add' ? 'text-success' : 'text-danger' }}">
                                     {{ $mov->type === 'add' ? '+' : '-' }}S/. {{ number_format($mov->amount, 2) }}
                                 </span>
                             </td>
-                            <td class="align-middle text-center">
+                            <td class="align-middle text-right">
                                 <a href="{{ route('movimientos.ver', $mov->id) }}"
-                                   class="btn btn-sm btn-default"
+                                   class="btn btn-sm btn-info"
                                    title="Ver detalle">
                                     <i class="fas fa-eye"></i>
+                                </a>
+                                <a target="_blank" href="{{ route('movimientos.a4.recibo', $mov->id) }}"
+                                class="btn btn-sm btn-danger"
+                                title="PDF">
+                                    <i class="fas fa-file-pdf"></i>
                                 </a>
                             </td>
                         </tr>

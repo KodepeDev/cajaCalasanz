@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Title
@@ -14,9 +13,9 @@ return [
     |
     */
 
-    'title' => 'CALASANZ SCHOOL',
-    'title_prefix' => 'APP | ',
-    'title_postfix' => '',
+    "title" => "CALASANZ SCHOOL",
+    "title_prefix" => "APP | ",
+    "title_postfix" => "",
 
     /*
     |--------------------------------------------------------------------------
@@ -30,8 +29,8 @@ return [
     |
     */
 
-    'use_ico_only' => false,
-    'use_full_favicon' => false,
+    "use_ico_only" => false,
+    "use_full_favicon" => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -47,8 +46,8 @@ return [
     |
     */
 
-    'google_fonts' => [
-        'allowed' => true,
+    "google_fonts" => [
+        "allowed" => true,
     ],
 
     /*
@@ -63,12 +62,12 @@ return [
     |
     */
 
-    'logo' => '<b>CALASANZ </b>SCHOOL',
-    'logo_img' => 'imagenes/logo.webp',
-    'logo_img_class' => 'brand-image img-circle elevation-3',
-    'logo_img_xl' => null,
-    'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'Admin Logo',
+    "logo" => "<b>CALASANZ </b>SCHOOL",
+    "logo_img" => "imagenes/logo.webp",
+    "logo_img_class" => "brand-image img-circle elevation-3",
+    "logo_img_xl" => null,
+    "logo_img_xl_class" => "brand-image-xs",
+    "logo_img_alt" => "Admin Logo",
 
     /*
     |--------------------------------------------------------------------------
@@ -83,14 +82,14 @@ return [
     |
     */
 
-    'auth_logo' => [
-        'enabled' => false,
-        'img' => [
-            'path' => 'imagenes/logo.webp',
-            'alt' => 'Auth Logo',
-            'class' => '',
-            'width' => 50,
-            'height' => 50,
+    "auth_logo" => [
+        "enabled" => false,
+        "img" => [
+            "path" => "imagenes/logo.webp",
+            "alt" => "Auth Logo",
+            "class" => "",
+            "width" => 50,
+            "height" => 50,
         ],
     ],
 
@@ -109,15 +108,15 @@ return [
     |
     */
 
-    'preloader' => [
-        'enabled' => true,
-        'mode' => 'fullscreen',
-        'img' => [
-            'path' => 'imagenes/logo.webp',
-            'alt' => 'AdminLTE Preloader Image',
-            'effect' => 'animation__shake',
-            'width' => 60,
-            'height' => 60,
+    "preloader" => [
+        "enabled" => true,
+        "mode" => "fullscreen",
+        "img" => [
+            "path" => "imagenes/logo.webp",
+            "alt" => "AdminLTE Preloader Image",
+            "effect" => "animation__shake",
+            "width" => 60,
+            "height" => 60,
         ],
     ],
 
@@ -133,12 +132,12 @@ return [
     |
     */
 
-    'usermenu_enabled' => true,
-    'usermenu_header' => true,
-    'usermenu_header_class' => 'bg-maroon',
-    'usermenu_image' => false,
-    'usermenu_desc' => true,
-    'usermenu_profile_url' => true,
+    "usermenu_enabled" => true,
+    "usermenu_header" => true,
+    "usermenu_header_class" => "bg-maroon",
+    "usermenu_image" => false,
+    "usermenu_desc" => true,
+    "usermenu_profile_url" => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -152,12 +151,12 @@ return [
     |
     */
 
-    'layout_topnav' => null,
-    'layout_boxed' => null,
-    'layout_fixed_sidebar' => null,
-    'layout_fixed_navbar' => true,
-    'layout_fixed_footer' => true,
-    'layout_dark_mode' => null,
+    "layout_topnav" => null,
+    "layout_boxed" => null,
+    "layout_fixed_sidebar" => true,
+    "layout_fixed_navbar" => true,
+    "layout_fixed_footer" => true,
+    "layout_dark_mode" => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -171,12 +170,12 @@ return [
     |
     */
 
-    'classes_auth_card' => 'card-outline card-maroon',
-    'classes_auth_header' => '',
-    'classes_auth_body' => '',
-    'classes_auth_footer' => '',
-    'classes_auth_icon' => '',
-    'classes_auth_btn' => 'btn-flat btn-primary',
+    "classes_auth_card" => "card-outline card-maroon",
+    "classes_auth_header" => "",
+    "classes_auth_body" => "",
+    "classes_auth_footer" => "",
+    "classes_auth_icon" => "",
+    "classes_auth_btn" => "btn-flat btn-primary",
 
     /*
     |--------------------------------------------------------------------------
@@ -190,17 +189,17 @@ return [
     |
     */
 
-    'classes_body' => '',
-    'classes_brand' => '',
-    'classes_brand_text' => '',
-    'classes_content_wrapper' => '',
-    'classes_content_header' => '',
-    'classes_content' => '',
-    'classes_sidebar' => 'sidebar-dark-maroon elevation-4',
-    'classes_sidebar_nav' => '',
-    'classes_topnav' => 'navbar-dark navbar-dark',
-    'classes_topnav_nav' => 'navbar-expand',
-    'classes_topnav_container' => 'container',
+    "classes_body" => "",
+    "classes_brand" => "",
+    "classes_brand_text" => "",
+    "classes_content_wrapper" => "",
+    "classes_content_header" => "",
+    "classes_content" => "",
+    "classes_sidebar" => "sidebar-dark-maroon elevation-4",
+    "classes_sidebar_nav" => "",
+    "classes_topnav" => "navbar-dark navbar-dark",
+    "classes_topnav_nav" => "navbar-expand",
+    "classes_topnav_container" => "container",
 
     /*
     |--------------------------------------------------------------------------
@@ -214,15 +213,15 @@ return [
     |
     */
 
-    'sidebar_mini' => 'lg',
-    'sidebar_collapse' => false,
-    'sidebar_collapse_auto_size' => false,
-    'sidebar_collapse_remember' => false,
-    'sidebar_collapse_remember_no_transition' => true,
-    'sidebar_scrollbar_theme' => 'os-theme-light',
-    'sidebar_scrollbar_auto_hide' => 'l',
-    'sidebar_nav_accordion' => true,
-    'sidebar_nav_animation_speed' => 300,
+    "sidebar_mini" => "lg",
+    "sidebar_collapse" => false,
+    "sidebar_collapse_auto_size" => false,
+    "sidebar_collapse_remember" => false,
+    "sidebar_collapse_remember_no_transition" => true,
+    "sidebar_scrollbar_theme" => "os-theme-light",
+    "sidebar_scrollbar_auto_hide" => "",
+    "sidebar_nav_accordion" => true,
+    "sidebar_nav_animation_speed" => 300,
 
     /*
     |--------------------------------------------------------------------------
@@ -236,13 +235,13 @@ return [
     |
     */
 
-    'right_sidebar' => false,
-    'right_sidebar_icon' => 'fas fa-cogs',
-    'right_sidebar_theme' => 'indigo',
-    'right_sidebar_slide' => true,
-    'right_sidebar_push' => true,
-    'right_sidebar_scrollbar_theme' => 'os-theme-light',
-    'right_sidebar_scrollbar_auto_hide' => 'l',
+    "right_sidebar" => false,
+    "right_sidebar_icon" => "fas fa-cogs",
+    "right_sidebar_theme" => "indigo",
+    "right_sidebar_slide" => true,
+    "right_sidebar_push" => true,
+    "right_sidebar_scrollbar_theme" => "os-theme-light",
+    "right_sidebar_scrollbar_auto_hide" => "l",
 
     /*
     |--------------------------------------------------------------------------
@@ -256,15 +255,15 @@ return [
     |
     */
 
-    'use_route_url' => false,
-    'dashboard_url' => 'admin',
-    'logout_url' => 'logout',
-    'login_url' => 'login',
-    'register_url' => false,
-    'password_reset_url' => false, //'password/reset'
-    'password_email_url' => 'password/email',
-    'profile_url' => false,
-    'disable_darkmode_routes' => false,
+    "use_route_url" => false,
+    "dashboard_url" => "admin",
+    "logout_url" => "logout",
+    "login_url" => "login",
+    "register_url" => false,
+    "password_reset_url" => false, //'password/reset'
+    "password_email_url" => "password/email",
+    "profile_url" => false,
+    "disable_darkmode_routes" => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -282,11 +281,11 @@ return [
     |
     */
 
-    'laravel_asset_bundling' => false, //estaba en false
+    "laravel_asset_bundling" => false, //estaba en false
     // 'laravel_css_path' => 'css/app.css',
     // 'laravel_js_path' => 'js/app.js',
-    'laravel_css_path' => 'resources/css/app.css',
-    'laravel_js_path' => 'resources/js/app.js',
+    "laravel_css_path" => "resources/css/app.css",
+    "laravel_js_path" => "resources/js/app.js",
 
     /*
     |--------------------------------------------------------------------------
@@ -300,33 +299,33 @@ return [
     |
     */
 
-    'menu' => [
+    "menu" => [
         [
-            'type'         => 'fullscreen-widget',
-            'topnav_right' => true,
+            "type" => "fullscreen-widget",
+            "topnav_right" => true,
         ],
 
         [
-            'type'         => 'darkmode-widget',
-            'topnav_right' => true, // Or "topnav => true" to place on the left.
+            "type" => "darkmode-widget",
+            "topnav_right" => true, // Or "topnav => true" to place on the left.
         ],
 
         [
-            'route'  => 'movimientos.crear',
-            'title' => 'asdasd',
-            'icon'    => 'fas fa-plus-circle',
-            'shift'   => 'ml-4',
-            'text' => 'COBRANZA',
-            'topnav' => true,
-            'classes' => 'btn btn-success',
+            "route" => "movimientos.crear",
+            "title" => "asdasd",
+            "icon" => "fas fa-plus-circle",
+            "shift" => "ml-4",
+            "text" => "COBRANZA",
+            "topnav" => true,
+            "classes" => "btn btn-success",
         ],
         [
-            'text' => 'PAGOS',
-            'route'  => 'movimientos.proveedor',
-            'icon'    => 'fas fa-minus-circle',
-            'shift'   => 'ml-4',
-            'topnav' => true,
-            'classes' => 'btn btn-danger ml-2',
+            "text" => "PAGOS",
+            "route" => "movimientos.proveedor",
+            "icon" => "fas fa-minus-circle",
+            "shift" => "ml-4",
+            "topnav" => true,
+            "classes" => "btn btn-danger ml-2",
         ],
 
         // Sidebar items:
@@ -335,76 +334,81 @@ return [
         //     'text' => 'buscar',
         // ],
         [
-            'text' => 'INICIO',
-            'route' => 'home',
-            'icon' => 'fa fa-home'
+            "text" => "INICIO",
+            "route" => "home",
+            "icon" => "fa fa-home",
         ],
         [
-            'text' => 'SALDOS',
-            'route'  => 'montos.index',
-            'icon' => 'fas fa-piggy-bank',
+            "text" => "SALDOS",
+            "route" => "montos.index",
+            "icon" => "fas fa-piggy-bank",
         ],
 
         [
-            'text'    => 'MOVIMIENTOS',
-            'icon'    => 'fas fa-dollar-sign',
-            'active' => ['admin/movimientos', 'admin/movimientos/crear_gasto_proveedor', 'admin/movimientos/crear', 'admin/movimientos/crear_por_cliente'],
-            'label_color' => 'info',
-            'submenu' => [
+            "text" => "MOVIMIENTOS",
+            "icon" => "fas fa-dollar-sign",
+            "active" => [
+                "admin/movimientos",
+                "admin/movimientos/crear_gasto_proveedor",
+                "admin/movimientos/crear",
+                "admin/movimientos/crear_por_cliente",
+            ],
+            "label_color" => "info",
+            "submenu" => [
                 [
-                    'text' => 'LISTADO',
-                    'route'  => 'movimientos.listado',
-                    'icon'    => 'fas fa-dollar-sign',
-                    'shift'   => 'ml-3',
+                    "text" => "LISTADO",
+                    "route" => "movimientos.listado",
+                    "icon" => "fas fa-dollar-sign",
+                    "shift" => "ml-3",
                 ],
 
                 [
-                    'text' => 'COBRANZA',
-                    'url'  => '#',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-dollar-sign',
-                    'submenu'    => [
+                    "text" => "COBRANZA",
+                    "url" => "#",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-dollar-sign",
+                    "submenu" => [
                         [
-                            'text' => 'X PROVISION',
-                            'route'  => 'movimientos.crear',
-                            'icon'    => 'fas fa-plus-circle',
-                            'shift'   => 'ml-4',
+                            "text" => "X PROVISION",
+                            "route" => "movimientos.crear",
+                            "icon" => "fas fa-plus-circle",
+                            "shift" => "ml-4",
                         ],
                         [
-                            'text' => 'X CLIENTE',
-                            'route'  => 'movimientos.cliente',
-                            'icon'    => 'fas fa-plus-circle',
-                            'shift'   => 'ml-4',
+                            "text" => "X CLIENTE",
+                            "route" => "movimientos.cliente",
+                            "icon" => "fas fa-plus-circle",
+                            "shift" => "ml-4",
                         ],
                     ],
                 ],
                 [
-                    'text' => 'GASTOS',
+                    "text" => "GASTOS",
                     // 'active' => ['admin/movimientos/provision_fija'],
-                    'icon'    => 'fas fa-minus-circle',
-                    'shift'   => 'ml-3',
-                    'route'  => 'movimientos.proveedor',
+                    "icon" => "fas fa-minus-circle",
+                    "shift" => "ml-3",
+                    "route" => "movimientos.proveedor",
                 ],
             ],
         ],
         [
-            'text' => 'PROVISIONES',
-            'url'  => '#',
-            'label'       => 'new',
-            'label_color' => 'secondary',
-            'icon'    => 'fas fa-dollar-sign',
-            'submenu' => [
+            "text" => "PROVISIONES",
+            "url" => "#",
+            "label" => "new",
+            "label_color" => "secondary",
+            "icon" => "fas fa-dollar-sign",
+            "submenu" => [
                 [
-                    'text' => 'PROV. FIJA',
-                    'route'  => 'provision.fija',
-                    'icon'    => 'fas fa-plus-circle',
-                    'shift'   => 'ml-3',
+                    "text" => "PROV. FIJA",
+                    "route" => "provision.fija",
+                    "icon" => "fas fa-plus-circle",
+                    "shift" => "ml-3",
                 ],
                 [
-                    'text' => 'PROV. VARIABLE',
-                    'route'  => 'provision.variable',
-                    'icon'    => 'fas fa-plus-circle',
-                    'shift'   => 'ml-3',
+                    "text" => "PROV. VARIABLE",
+                    "route" => "provision.variable",
+                    "icon" => "fas fa-plus-circle",
+                    "shift" => "ml-3",
                 ],
                 // [
                 //     'text' => 'Provision x Socio',
@@ -439,137 +443,136 @@ return [
         //     ],
         // ],
 
-        ['header' => 'CONGIGURACIÓN DE ENTORNO'],
+        ["header" => "CONGIGURACIÓN DE ENTORNO"],
         [
-            'text'    => ' CATEGORÍAS',
-            'icon'    => 'fas fa-paperclip',
-            'submenu' => [
+            "text" => " CATEGORÍAS",
+            "icon" => "fas fa-paperclip",
+            "submenu" => [
                 [
-                    'text' => 'LISTADO',
-                    'url'  => 'admin/categories',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-cog',
+                    "text" => "LISTADO",
+                    "url" => "admin/categories",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-cog",
                 ],
                 [
-                    'text' => 'NUEVA CAT.',
-                    'url'  => 'admin/categories/create',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-cog',
-
-                ],
-            ],
-        ],
-        [
-            'text'    => ' CUENTAS',
-            'icon'    => 'fas fa-wallet',
-            'submenu' => [
-                [
-                    'text' => 'LISTADO',
-                    'url'  => 'admin/cuentas',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-check',
-                ],
-                [
-                    'text' => 'NUEVA CUENTA',
-                    'url'  => 'admin/account/create',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-plus',
+                    "text" => "NUEVA CAT.",
+                    "url" => "admin/categories/create",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-cog",
                 ],
             ],
         ],
+        [
+            "text" => " CUENTAS",
+            "icon" => "fas fa-wallet",
+            "submenu" => [
+                [
+                    "text" => "LISTADO",
+                    "url" => "admin/cuentas",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-check",
+                ],
+                [
+                    "text" => "NUEVA CUENTA",
+                    "url" => "admin/account/create",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-plus",
+                ],
+            ],
+        ],
 
-        ['header' => 'DATOS GENERALES'],
+        ["header" => "DATOS GENERALES"],
         [
-            'text'        => 'ESTUDIANTES',
-            'route'         => 'students.index',
-            'icon'        => 'fa fa-users',
-            'active' => ['admin/students', 'admin/students*'],
-            'label_color' => 'info',
+            "text" => "ESTUDIANTES",
+            "route" => "students.index",
+            "icon" => "fa fa-users",
+            "active" => ["admin/students", "admin/students*"],
+            "label_color" => "info",
         ],
         [
-            'text' => 'DOCENTES',
-            'route' => 'teachers',
-            'icon'    => 'fas fa-user',
+            "text" => "DOCENTES",
+            "route" => "teachers",
+            "icon" => "fas fa-user",
         ],
-        ['header' => 'REPORTES Y EXPORTACIONES'],
+        ["header" => "REPORTES Y EXPORTACIONES"],
         [
-            'text'        => 'Reportes',
-            'url'         => '#',
-            'icon'        => 'fa fa-file',
+            "text" => "Reportes",
+            "url" => "#",
+            "icon" => "fa fa-file",
             // 'active' => ['admin/socios', 'admin/socios*'],
-            'label'       => 'pdf, excel',
-            'label_color' => 'primary',
-            'submenu' => [
+            "label" => "pdf, excel",
+            "label_color" => "primary",
+            "submenu" => [
                 [
-                    'text' => 'Reporte Detallados',
-                    'route'  => 'reportes.detalles',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-file',
+                    "text" => "Reporte Detallados",
+                    "route" => "reportes.detalles",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-file",
                 ],
-                    // [
-                    //     'text' => 'Reporte General',
-                    //     'route'  => 'reportes.general',
-                    //     'shift'   => 'ml-3',
-                    //     'icon'    => 'fas fa-file',
-                    // ],
+                // [
+                //     'text' => 'Reporte General',
+                //     'route'  => 'reportes.general',
+                //     'shift'   => 'ml-3',
+                //     'icon'    => 'fas fa-file',
+                // ],
                 [
-                    'text' => 'Reporte Multiples',
+                    "text" => "Reporte Multiples",
                     // 'route'  => 'reportes.multiples',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-file',
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-file",
                 ],
                 [
-                    'text' => 'Rep. Conceptos',
+                    "text" => "Rep. Conceptos",
                     // 'route'  => 'reportes.conceptos.view',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-file',
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-file",
                 ],
                 [
-                    'text' => 'Rep. Concepto Deuda',
-                    'route'  => 'reportes.conceptos_deuda.view',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-download',
+                    "text" => "Rep. Concepto Deuda",
+                    "route" => "reportes.conceptos_deuda.view",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-download",
                 ],
                 [
-                    'text' => 'Reporte Ingreso x Día',
+                    "text" => "Reporte Ingreso x Día",
                     // 'route'  => 'reportes.detalles',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-file',
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-file",
                 ],
                 [
-                    'text' => 'Reporte Gasto x Día',
+                    "text" => "Reporte Gasto x Día",
                     // 'route'  => 'reportes.detalles',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-file',
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-file",
                 ],
             ],
         ],
 
         [
-            'text'        => 'RECIBOS',
-            'url'         => '#',
-            'icon'        => 'fa fa-file',
-            'active' => ['reporte', 'reporte/cc5/*'],
-            'label'       => 'nuevo',
-            'label_color' => 'primary',
-            'submenu' => [
+            "text" => "RECIBOS",
+            "url" => "#",
+            "icon" => "fa fa-file",
+            "active" => ["reporte", "reporte/cc5/*"],
+            "label" => "nuevo",
+            "label_color" => "primary",
+            "submenu" => [
                 [
-                    'text' => 'Ingresos PDF',
+                    "text" => "Ingresos PDF",
                     // 'route'  => 'reporte.ingreso.gasto',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-file',
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-file",
                 ],
                 [
-                    'text' => 'Reporte PDF detalle',
+                    "text" => "Reporte PDF detalle",
                     // 'route'  => 'reporte.ingreso.pdf-detallado',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-file',
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-file",
                 ],
                 [
-                    'text' => 'Buscar Recibo',
-                    'route'  => 'reporte.ingreso.buscar-recibo',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-file',
+                    "text" => "Buscar Recibo",
+                    "route" => "reporte.ingreso.buscar-recibo",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-file",
                 ],
                 // [
                 //     'text' => 'Recibos Masivos',
@@ -603,60 +606,60 @@ return [
         //     'icon'        => 'fas fa-caret-down',
         //     'label_color' => 'success',
         // ],
-        ['header' => 'CONFIGURACIÓN DEL SISTEMA'],
+        ["header" => "CONFIGURACIÓN DEL SISTEMA"],
         [
-            'text'    => 'SISTEMA',
-            'icon'    => 'fas fa-cogs',
-            'submenu' => [
+            "text" => "SISTEMA",
+            "icon" => "fas fa-cogs",
+            "submenu" => [
                 [
-                    'text' => 'Clientes - proveedores',
-                    'url'  => 'admin/cliente-proveedor',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-users-cog',
+                    "text" => "Clientes - proveedores",
+                    "url" => "admin/cliente-proveedor",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-users-cog",
                 ],
                 [
-                    'text' => 'Import - Socios',
+                    "text" => "Import - Socios",
                     // 'route'  => 'import.socios',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-users-cog',
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-users-cog",
                 ],
                 [
-                    'text' => 'Import - Stands',
+                    "text" => "Import - Stands",
                     // 'route'  => 'import.stands',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-users-cog',
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-users-cog",
                 ],
                 [
-                    'text' => 'Import - Provisions',
+                    "text" => "Import - Provisions",
                     // 'route'  => 'import.details',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-users-cog',
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-users-cog",
                 ],
                 [
-                    'text' => 'Configuracion Cliente',
-                    'route'  => 'company.settings',
-                    'shift'   => 'ml-3',
-                    'icon'    => 'fas fa-users-cog',
+                    "text" => "Configuracion Cliente",
+                    "route" => "company.settings",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-users-cog",
                 ],
             ],
         ],
         [
-            'text'    => 'Usuarios',
-            'icon'    => 'fas fa-users',
-            'submenu' => [
+            "text" => "Usuarios",
+            "icon" => "fas fa-users",
+            "submenu" => [
                 [
-                    'text' => 'Listado de usuarios',
-                    'route'  => 'usuarios',
-                    'icon'    => 'fas fa-users-cog',
-                    'shift'   => 'ml-3',
+                    "text" => "Listado de usuarios",
+                    "route" => "usuarios",
+                    "icon" => "fas fa-users-cog",
+                    "shift" => "ml-3",
                 ],
                 [
-                    'text' => 'Permiso/Rol',
-                    'route'  => 'asignar.permiso',
-                    'icon'    => 'fas fa-key',
-                    'label'       => 'Config...',
-                    'shift'   => 'ml-3',
-                    'label_color' => 'info',
+                    "text" => "Permiso/Rol",
+                    "route" => "asignar.permiso",
+                    "icon" => "fas fa-key",
+                    "label" => "Config...",
+                    "shift" => "ml-3",
+                    "label_color" => "info",
                 ],
             ],
         ],
@@ -679,7 +682,7 @@ return [
     |
     */
 
-    'filters' => [
+    "filters" => [
         JeroenNoten\LaravelAdminLte\Menu\Filters\GateFilter::class,
         JeroenNoten\LaravelAdminLte\Menu\Filters\HrefFilter::class,
         JeroenNoten\LaravelAdminLte\Menu\Filters\SearchFilter::class,
@@ -701,79 +704,86 @@ return [
     |
     */
 
-    'plugins' => [
-        'Datatables' => [
-            'active' => false,
-            'files' => [
+    "plugins" => [
+        "Datatables" => [
+            "active" => false,
+            "files" => [
                 [
-                    'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js',
+                    "type" => "js",
+                    "asset" => false,
+                    "location" =>
+                        "//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js",
                 ],
                 [
-                    'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js',
+                    "type" => "js",
+                    "asset" => false,
+                    "location" =>
+                        "//cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js",
                 ],
                 [
-                    'type' => 'css',
-                    'asset' => false,
-                    'location' => '//cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css',
-                ],
-            ],
-        ],
-        'Select2' => [
-            'active' => true,
-            'files' => [
-                [
-                    'type' => 'js',
-                    'asset' => true,
-                    'location' => 'vendor/select2/js/select2.full.min.js',
-                ],
-                [
-                    'type' => 'css',
-                    'asset' => true,
-                    'location' => 'vendor/select2/css/select2.min.css',
-                ],
-                [
-                    'type' => 'css',
-                    'asset' => true,
-                    'location' => 'vendor/select2-bootstrap4-theme/select2-bootstrap4.min.css',
+                    "type" => "css",
+                    "asset" => false,
+                    "location" =>
+                        "//cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css",
                 ],
             ],
         ],
-        'Chartjs' => [
-            'active' => false,
-            'files' => [
+        "Select2" => [
+            "active" => true,
+            "files" => [
                 [
-                    'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js',
+                    "type" => "js",
+                    "asset" => true,
+                    "location" => "vendor/select2/js/select2.full.min.js",
+                ],
+                [
+                    "type" => "css",
+                    "asset" => true,
+                    "location" => "vendor/select2/css/select2.min.css",
+                ],
+                [
+                    "type" => "css",
+                    "asset" => true,
+                    "location" =>
+                        "vendor/select2-bootstrap4-theme/select2-bootstrap4.min.css",
                 ],
             ],
         ],
-        'Sweetalert2' => [
-            'active' => true,
-            'files' => [
+        "Chartjs" => [
+            "active" => false,
+            "files" => [
                 [
-                    'type' => 'js',
-                    'asset' => false,
-                    'location' => 'https://cdn.jsdelivr.net/npm/sweetalert2@11',
+                    "type" => "js",
+                    "asset" => false,
+                    "location" =>
+                        "//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js",
                 ],
             ],
         ],
-        'Pace' => [
-            'active' => false,
-            'files' => [
+        "Sweetalert2" => [
+            "active" => true,
+            "files" => [
                 [
-                    'type' => 'css',
-                    'asset' => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-center-radar.min.css',
+                    "type" => "js",
+                    "asset" => false,
+                    "location" => "https://cdn.jsdelivr.net/npm/sweetalert2@11",
+                ],
+            ],
+        ],
+        "Pace" => [
+            "active" => false,
+            "files" => [
+                [
+                    "type" => "css",
+                    "asset" => false,
+                    "location" =>
+                        "//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-center-radar.min.css",
                 ],
                 [
-                    'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js',
+                    "type" => "js",
+                    "asset" => false,
+                    "location" =>
+                        "//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js",
                 ],
             ],
         ],
@@ -792,23 +802,23 @@ return [
     |
     */
 
-    'iframe' => [
-        'default_tab' => [
-            'url' => null,
-            'title' => null,
+    "iframe" => [
+        "default_tab" => [
+            "url" => null,
+            "title" => null,
         ],
-        'buttons' => [
-            'close' => true,
-            'close_all' => true,
-            'close_all_other' => true,
-            'scroll_left' => true,
-            'scroll_right' => true,
-            'fullscreen' => true,
+        "buttons" => [
+            "close" => true,
+            "close_all" => true,
+            "close_all_other" => true,
+            "scroll_left" => true,
+            "scroll_right" => true,
+            "fullscreen" => true,
         ],
-        'options' => [
-            'loading_screen' => 1000,
-            'auto_show_new_tab' => true,
-            'use_navbar_items' => true,
+        "options" => [
+            "loading_screen" => 1000,
+            "auto_show_new_tab" => true,
+            "use_navbar_items" => true,
         ],
     ],
 
@@ -824,5 +834,5 @@ return [
     |
     */
 
-    'livewire' => true,
+    "livewire" => true,
 ];
