@@ -21,20 +21,13 @@ class DeudoresExport implements FromQuery, WithMapping, WithHeadings, WithStyles
 {
     use Exportable;
 
-    public function __construct()
-    {
-
-    }
+    public function __construct(private int $year) {}
 
     public function query()
     {
         return Student::query()->where('is_active', 1)
-                ->whereHas('details', function($q) {
-                    $q->where('status', 0);
-                })
-                ->with(['details' => function($q) {
-                    $q->where('status', 0);
-                }]);
+            ->whereHas('details', fn($q) => $q->whereYear('date', $this->year)->where('status', 0))
+            ->with(['details' => fn($q) => $q->whereYear('date', $this->year)->where('status', 0)]);
     }
 
     public function startCell(): string

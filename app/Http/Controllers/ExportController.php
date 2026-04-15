@@ -68,6 +68,36 @@ class ExportController extends Controller
         return $pdf->stream("ReciboA4.pdf");
     }
 
+    public function printReceiptA5($id)
+    {
+        $data = Summary::find($id);
+
+        $formatter = new NumeroALetras();
+
+        $textoTotal = $formatter->toInvoice(
+            $data->amount,
+            2,
+            "SOLES",
+            "CENTIMOS",
+        );
+
+        // dd($data->student->grade); // Verifica si obtiene el grado
+
+        if ($data->type == "add" && $data->student_id) {
+            $pdf = PDF::loadView(
+                "pdf.reciboA5",
+                compact("data", "textoTotal"),
+            )->setPaper("a5", "landscape");
+        } else {
+            $pdf = PDF::loadView(
+                "pdf.reciboA5",
+                compact("data", "textoTotal"),
+            )->setPaper("a5", "portrait");
+        }
+
+        return $pdf->stream("ReciboA5.pdf");
+    }
+
     public function reportePdfMovimiento(Request $request)
     {
         // dd($request->all());

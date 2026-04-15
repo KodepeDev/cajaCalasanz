@@ -579,6 +579,12 @@ Route::middleware(["user_status", "set_school_year"])->group(function () {
                 "printReceiptA4",
             ])->name("movimientos.a4.recibo");
         });
+        Route::group(["middleware" => ["can:recibos.a4"]], function () {
+            Route::get("movimientos/a5/{id}", [
+                ExportController::class,
+                "printReceiptA5",
+            ])->name("movimientos.a5.recibo");
+        });
 
         Route::group(["middleware" => ["can:recibos.masivos"]], function () {
             Route::get("movimientos/rpts/masivosPdf", [

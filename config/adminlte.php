@@ -418,30 +418,30 @@ return [
                 // ],
             ],
         ],
-        // [
-        //     'text'    => 'Balance',
-        //     'icon'    => 'fas fa-calculator',
-        //     'submenu' => [
-        //         [
-        //             'text' => 'Balance Total',
-        //             'route'  => 'balance.index',
-        //             'shift'   => 'ml-3',
-        //             'icon'    => 'fas fa-calculator',
-        //         ],
-        //         [
-        //             'text' => 'Balance de Ingresos',
-        //             'route'  => 'balance.ingresos',
-        //             'shift'   => 'ml-3',
-        //             'icon'    => 'fas fa-calculator',
-        //         ],
-        //         [
-        //             'text' => 'Balance de Gastos',
-        //             'route'  => 'balance.gastos',
-        //             'shift'   => 'ml-3',
-        //             'icon'    => 'fas fa-calculator',
-        //         ],
-        //     ],
-        // ],
+        [
+            "text" => "Balance",
+            "icon" => "fas fa-calculator",
+            "submenu" => [
+                [
+                    "text" => "Balance Total",
+                    "route" => "balance.index",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-calculator",
+                ],
+                [
+                    "text" => "Balance de Ingresos",
+                    "route" => "balance.ingresos",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-calculator",
+                ],
+                [
+                    "text" => "Balance de Gastos",
+                    "route" => "balance.gastos",
+                    "shift" => "ml-3",
+                    "icon" => "fas fa-calculator",
+                ],
+            ],
+        ],
 
         ["header" => "CONGIGURACIÓN DE ENTORNO"],
         [
