@@ -3,253 +3,214 @@
 namespace App\Http\Livewire\Movimientos;
 
 use Carbon\Carbon;
-use App\Models\Stage;
-use App\Models\Stand;
 use App\Models\Detail;
-use App\Models\Partner;
-use Livewire\Component;
+use App\Models\Student;
 use App\Models\Category;
 use App\Models\Currency;
+use App\Models\SchoolYear;
+use Livewire\Component;
 use Livewire\WithPagination;
 use App\Exports\DetailsProvisionExport;
-use App\Models\Student;
-use App\Models\StudentTutor;
-use App\Models\SchoolYear;
 
 class ProvisionFijas extends Component
 {
     use WithPagination;
 
-    protected $paginationTheme = "bootstrap";
+    protected $paginationTheme = 'bootstrap';
 
-    public $unique_code, $currency, $currency_id;
+    // Form fields
+    public $unique_code;
+    public $currency;
+    public int $currency_id = 1;
+    public $amount;
+    public $date;
+    public $description;
+    public $date_paid;
+    public $category_id;
 
-    public $status,
-        $summary_type,
-        $type,
-        $amount,
-        $date,
-        $description,
-        $date_paid,
-        $category_id,
-        $stand_id,
-        $stage_id;
+    // Filters / UI state
+    public string $search = '';
+    public $student_id;
+    public $meses;
+    public $categorias;
+    public $students;
+    public $schoolYear;
 
-    public $categorias, $meses, $students, $search, $student_id, $schoolYear;
+    protected $listeners = ['resetUI'];
 
-    protected $listeners = ["resetUI"];
+    // ─────────────────────────────────────────────────────────────
+    // Lifecycle
+    // ─────────────────────────────────────────────────────────────
 
-    public function limpiar()
+    public function mount(): void
     {
-        $this->search = "";
-        $this->student_id = null;
-        $this->currency_id = 1;
-        $this->meses = Carbon::now()->format("Y-m");
+        $this->schoolYear = SchoolYear::current();
+        $this->meses      = Carbon::now()->format('Y-m');
+        $this->date       = $this->meses;
+        $this->categorias = Category::where('id', '!=', 1)->whereType('add')->pluck('id', 'name');
+        $this->currency   = Currency::pluck('id', 'name');
+        $this->students   = Student::whereHas(
+            'enrollments',
+            fn($q) => $q->where('school_year_id', $this->schoolYear->id),
+        )->where('is_active', true)->pluck('id', 'full_name');
+    }
+
+    public function render()
+    {
+        $firstDay = Carbon::parse($this->meses)->startOfMonth();
+        $lastDay  = Carbon::parse($this->meses)->endOfMonth();
+
+        // JOIN with students to allow filtering and ordering by name
+        $baseQuery = Detail::with(['student', 'category', 'currency'])
+            ->join('students', 'details.student_id', '=', 'students.id')
+            ->whereStatus(false)
+            ->whereBetween('details.date', [$firstDay, $lastDay])
+            ->whereType(1)
+            ->whereSummaryType('add')
+            ->when($this->student_id, fn($q) => $q->where('details.student_id', $this->student_id))
+            ->when($this->search, fn($q) => $q->where('students.full_name', 'like', "%{$this->search}%"))
+            ->orderBy('students.full_name')
+            ->select('details.*');
+
+        $detalles   = (clone $baseQuery)->paginate(20);
+        $total      = (clone $baseQuery)
+            ->where(fn($q) => $q->where('details.currency_id', '!=', 2)->orWhereNull('details.currency_id'))
+            ->sum('details.amount');
+        $totalDolar = (clone $baseQuery)->where('details.currency_id', 2)->sum('details.amount');
+
+        return view('livewire.movimientos.provisiones.fijas.provision-fijas', compact('detalles', 'total', 'totalDolar'))
+            ->extends('adminlte::page');
+    }
+
+    // Sync $date when the month filter changes (avoid setting state inside render)
+    public function updatedMeses(): void
+    {
+        $this->date = $this->meses;
         $this->resetPage();
     }
 
-    public function mount()
+    // ─────────────────────────────────────────────────────────────
+    // Actions
+    // ─────────────────────────────────────────────────────────────
+
+    public function limpiar(): void
     {
-        $this->status = false;
-        $this->schoolYear = SchoolYear::current();
-        $this->type = 1;
-        $this->summary_type = "add";
-        $this->search = "";
-        $this->date = Carbon::now()->format("Y-m");
-        $this->meses = Carbon::now()->format("Y-m");
-        $this->categorias = Category::where("id", "!=", 1)
-            ->whereType("add")
-            ->pluck("id", "name");
-        $this->students = Student::whereHas(
-            "enrollments",
-            fn($q) => $q->where("school_year_id", $this->schoolYear->id),
-        )
-            ->where("is_active", true)
-            ->pluck("id", "full_name");
-
-        $this->currency = Currency::pluck("id", "name");
-    }
-    public function render()
-    {
-        $first_day = Carbon::parse($this->meses)->firstOfMonth();
-        $last_day = Carbon::parse($this->meses)->endOfMonth();
-
-        $this->date = $this->meses;
-
-        // Definir la consulta base con las condiciones comunes
-        $baseQuery = Detail::whereHas("student", function ($query) {
-            $query
-                ->where("full_name", "like", "%" . $this->search . "%")
-                ->orderBy("full_name", "asc");
-        })
-            ->whereStatus(false)
-            ->whereBetween("date", [$first_day, $last_day])
-            ->whereType(1)
-            ->whereSummaryType("add");
-
-        // Agregar condición extra si `$partner_id` está definido
-        if ($this->student_id) {
-            $baseQuery->whereHas("student", function ($query) {
-                $query->where("student_id", $this->student_id);
-            });
-        }
-        // Obtener los detalles con paginación
-        $detalles = (clone $baseQuery)->paginate(20);
-
-        // Calcular `$total`, excluyendo `currency_id` igual a 2
-        $total = (clone $baseQuery)
-            ->where(function ($query) {
-                $query
-                    ->where("currency_id", "!=", 2)
-                    ->orWhereNull("currency_id"); // Incluir registros con currency_id NULL
-            })
-            ->sum("amount");
-
-        // Calcular `$totalDolar`, solo con `currency_id` igual a 2
-        $totalDolar = (clone $baseQuery)
-            ->where("currency_id", 2)
-            ->sum("amount");
-
-        // dd($total, $totalDolar, $detalles);
-
-        return view(
-            "livewire.movimientos.provisiones.fijas.provision-fijas",
-            compact("detalles", "total", "totalDolar"),
-        )->extends("adminlte::page");
+        $this->search      = '';
+        $this->student_id  = null;
+        $this->currency_id = 1;
+        $this->meses       = Carbon::now()->format('Y-m');
+        $this->date        = $this->meses;
+        $this->resetPage();
     }
 
-    public function generate()
+    public function generate(): void
     {
-        $rules = [
-            "date" => "required|date",
-            "category_id" => "required",
-            "description" => "required",
-            "amount" => "required|numeric|min:1",
-        ];
-
-        $messages = [
-            "date.required" => "El mes a generar es requerido",
-            "date.date" => "Debe elegir un mes válido",
-            "category_id.required" => "La categoria es requerido",
-            "description.required" => "La descripción es requerido",
-            "amount.required" => "El monto es requerido",
-            "amount.numeric" => "El monto debe ser un número válido",
-            "amount.min" => "El monto debe ser mayor a 0",
-        ];
-
-        $this->validate($rules, $messages);
-
-        foreach ($this->students as $name => $id) {
-            $this->unique_code = strval(
-                $this->date .
-                    str_pad($this->category_id, 4, "0", STR_PAD_LEFT) .
-                    str_pad($id, 6, "0", STR_PAD_LEFT),
-            );
-            $detail = Detail::where("unique_code", $this->unique_code)->first();
-            $student_tutor = Student::find($id)->first()->id;
-            if (!$detail) {
-                Detail::create([
-                    "unique_code" => $this->unique_code,
-                    "status" => $this->status,
-                    "description" => $this->description,
-                    "summary_type" => $this->summary_type,
-                    "type" => $this->type,
-                    "amount" => $this->amount,
-                    "date" => $this->date,
-                    "date_paid" => $this->date_paid,
-                    "category_id" => $this->category_id,
-                    "student_id" => $id,
-                    "student_tutor_id" => $student_tutor,
-                    "currency_id" => $this->currency_id,
-                ]);
-            }
-        }
-
-        $this->emit(
-            "provision_agregado",
-            "Se registraron todas las provisiones para el mes seleccionado",
+        $this->validate(
+            [
+                'date'        => 'required|date',
+                'category_id' => 'required',
+                'description' => 'required',
+                'amount'      => 'required|numeric|min:1',
+            ],
+            [
+                'date.required'        => 'El mes a generar es requerido.',
+                'date.date'            => 'Debe elegir un mes válido.',
+                'category_id.required' => 'La categoría es requerida.',
+                'description.required' => 'La descripción es requerida.',
+                'amount.required'      => 'El monto es requerido.',
+                'amount.numeric'       => 'El monto debe ser un número válido.',
+                'amount.min'           => 'El monto debe ser mayor a 0.',
+            ],
         );
+
+        // Load all students with their tutors in one query to avoid N+1
+        $studentIds  = array_values(collect($this->students)->toArray());
+        $studentsMap = Student::with('tutor')
+            ->whereIn('id', $studentIds)
+            ->get()
+            ->keyBy('id');
+
+        foreach ($studentIds as $id) {
+            $uniqueCode = $this->date
+                . str_pad($this->category_id, 4, '0', STR_PAD_LEFT)
+                . str_pad($id, 6, '0', STR_PAD_LEFT);
+
+            if (Detail::where('unique_code', $uniqueCode)->exists()) {
+                continue;
+            }
+
+            Detail::create([
+                'unique_code'      => $uniqueCode,
+                'status'           => false,
+                'description'      => $this->description,
+                'summary_type'     => 'add',
+                'type'             => 1,
+                'amount'           => $this->amount,
+                'date'             => $this->date,
+                'date_paid'        => $this->date_paid,
+                'category_id'      => $this->category_id,
+                'student_id'       => $id,
+                'student_tutor_id' => $studentsMap->get($id)?->tutor?->id,
+                'currency_id'      => $this->currency_id,
+            ]);
+        }
+
+        $this->emit('provision_agregado', 'Se registraron todas las provisiones para el mes seleccionado.');
         $this->resetUI();
     }
 
-    public function EliminarMes()
+    public function EliminarMes(): void
     {
-        $rules = [
-            "date" => "required|date",
-            "category_id" => "required",
-        ];
-
-        $messages = [
-            "date.required" => "El mes a generar es requerido",
-            "date.date" => "Debe elegir un mes válido",
-            "category_id.required" => "La categoria es requerido",
-        ];
-
-        $this->validate($rules, $messages);
-
-        $detalles = Detail::whereStatus(false)
-            ->whereType(1)
-            ->whereSummaryType("add")
-            ->where("date", "=", Carbon::parse($this->date))
-            ->where("category_id", $this->category_id);
-
-        foreach ($this->students as $name => $id) {
-            // dd($categoria->name);
-            $detalles = Detail::whereStatus(false)
-                ->whereType(1)
-                ->whereSummaryType("add")
-                ->where("date", "=", Carbon::parse($this->date))
-                ->where("category_id", $this->category_id)
-                ->where("description", "=", $this->description)
-                ->where("student_id", $id);
-            // dd($detalles->get());
-            $detalles->delete();
-        }
-
-        // dd($detalles);
-        // $detalles->delete();
-
-        $this->emit(
-            "provision_eliminado",
-            "Se eliminaron todas las provisiones",
+        $this->validate(
+            [
+                'date'        => 'required|date',
+                'category_id' => 'required',
+            ],
+            [
+                'date.required'        => 'El mes a generar es requerido.',
+                'date.date'            => 'Debe elegir un mes válido.',
+                'category_id.required' => 'La categoría es requerida.',
+            ],
         );
 
+        $studentIds = array_values(collect($this->students)->toArray());
+
+        // Single DELETE query instead of N individual deletes
+        Detail::whereStatus(false)
+            ->whereType(1)
+            ->whereSummaryType('add')
+            ->whereDate('date', Carbon::parse($this->date))
+            ->where('category_id', $this->category_id)
+            ->where('description', $this->description)
+            ->whereIn('student_id', $studentIds)
+            ->delete();
+
+        $this->emit('provision_eliminado', 'Se eliminaron todas las provisiones.');
         $this->resetUI();
         $this->resetPage();
     }
 
     public function exportVariableExcel()
     {
-        $rules = [
-            "date" => "required|date",
-            "category_id" => "required",
-        ];
-
-        $messages = [
-            "date.required" => "El mes a generar es requerido",
-            "date.date" => "Debe elegir un mes válido",
-            "category_id.required" => "La categoria es requerido",
-        ];
-
-        $this->validate($rules, $messages);
-
-        $export = new DetailsProvisionExport(
-            $this->type,
-            $this->category_id,
-            $this->meses,
+        $this->validate(
+            ['date' => 'required|date', 'category_id' => 'required'],
+            ['date.required' => 'El mes a generar es requerido.', 'category_id.required' => 'La categoría es requerida.'],
         );
-        return $export->download("Detalle_Prov_Variable.xlsx");
+
+        return (new DetailsProvisionExport(1, $this->category_id, $this->meses))
+            ->download('Detalle_Prov_Fija.xlsx');
     }
 
-    public function resetUI()
+    // ─────────────────────────────────────────────────────────────
+    // Reset
+    // ─────────────────────────────────────────────────────────────
+
+    public function resetUI(): void
     {
-        $this->status = false;
-        $this->summary_type = "add";
-        $this->type = 1;
-        $this->amount = 0;
+        $this->amount      = 0;
         $this->currency_id = 1;
         $this->category_id = null;
-        $this->date = Carbon::now()->format("Y-m");
+        $this->date        = Carbon::now()->format('Y-m');
         $this->resetValidation();
     }
 }

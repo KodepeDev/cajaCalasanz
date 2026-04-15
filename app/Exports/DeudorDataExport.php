@@ -22,7 +22,6 @@ class DeudorDataExport implements FromQuery, WithMapping, WithHeadings, WithStyl
     public $student;
     public function __construct($id, $student)
     {
-        // dd($id, $student);
         $this->id = $id;
         $this->student = $student;
     }

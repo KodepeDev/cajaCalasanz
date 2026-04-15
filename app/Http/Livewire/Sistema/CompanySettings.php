@@ -12,39 +12,58 @@ class CompanySettings extends Component
 {
     use WithFileUploads;
 
-    public $currencies, $defaultCurrency, $companyName, $companyRuc, $companyEmail, $companyPhone, $activeBackDateOnAdd, $daysOnAdd, $activeBackDateOut, $daysOut, $reportType, $receiptType;
-    public $logo, $logoActual, $logoId;
+    // Company info
+    public string $companyName    = '';
+    public string $companyRuc     = '';
+    public string $companyEmail   = '';
+    public string $companyPhone   = '';
+    public string $companyAddress = '';
+    public string $companyWebsite = '';
 
-    public function mount()
+    // Logo
+    public $logo;
+    public string $logoActual = '';
+
+    // Financial config
+    public $defaultCurrency;
+    public $currencies;
+    public string $receiptType = '';
+    public string $reportType  = '';
+
+    // Date config
+    public bool $activeBackDateOnAdd = false;
+    public int  $daysOnAdd          = 0;
+    public bool $activeBackDateOut  = false;
+    public int  $daysOut            = 0;
+
+    public function mount(): void
     {
         $this->currencies = Currency::pluck('id', 'code');
         $company = Setting::first();
-        $this->defaultCurrency = $company->default_currency;
-        $this->activeBackDateOnAdd = $company->before_date_add;
-        $this->daysOnAdd = $company->number_of_days_add;
-        $this->activeBackDateOut = $company->before_date_out;
-        $this->daysOut = $company->number_of_days_out;
-        $this->reportType = $company->report_type;
-        $this->receiptType = $company->receipt_type;
-        $this->companyName = $company->company_name;
-        $this->companyRuc = $company->company_ruc;
-        $this->companyEmail = $company->email;
-        $this->companyPhone = $company->phone;
-        $this->logoActual = $company->foto;
-        Config::set('kodepe.logo', 'storage/system/'.$company->logo);
 
-        // dd(config('kodepe.logo'));
-        // dd($this->logoActual);
+        $this->companyName    = $company->company_name    ?? '';
+        $this->companyRuc     = $company->company_ruc     ?? '';
+        $this->companyEmail   = $company->email           ?? '';
+        $this->companyPhone   = $company->phone           ?? '';
+        $this->companyAddress = $company->address         ?? '';
+        $this->companyWebsite = $company->website         ?? '';
+        $this->logoActual     = $company->foto;
 
-        $this->logoId = rand(10, 12);
+        $this->defaultCurrency    = $company->default_currency;
+        $this->receiptType        = $company->receipt_type    ?? '';
+        $this->reportType         = $company->report_type     ?? '';
+
+        $this->activeBackDateOnAdd = (bool) $company->before_date_add;
+        $this->daysOnAdd           = (int) $company->number_of_days_add;
+        $this->activeBackDateOut   = (bool) $company->before_date_out;
+        $this->daysOut             = (int) $company->number_of_days_out;
     }
 
-    public function updatedLogo()
+    public function updatedLogo(): void
     {
-        $this->validate([
-            'logo' => 'image|max:1024',
+        $this->validateOnly('logo', [
+            'logo' => 'image|mimes:jpg,jpeg,png,webp|max:1024',
         ]);
-        // $this->logoId = rand(10, 12);
     }
 
     public function render()
@@ -52,64 +71,62 @@ class CompanySettings extends Component
         return view('livewire.sistema.company-settings')->extends('adminlte::page');
     }
 
-    public function save()
+    public function save(): void
     {
-        $rules = [
-            'companyName' => 'required|max:120|min:5',
-            'companyRuc' => 'required|max:11|min:8',
-            'companyEmail' => 'nullable|email',
-            'companyPhone' => 'nullable|max:20',
-            'activeBackDateOnAdd' => 'nullable',
-            'daysOnAdd' => 'nullable',
-            'activeBackDateOut' => 'nullable',
-            'daysOut' => 'nullable',
-            'reportType' => 'nullable',
-            'receiptType' => 'nullable',
-            'defaultCurrency' => 'nullable',
-        ];
-
-        $this->validate($rules);
-
-        $data = [
-            'company_name' => $this->companyName,
-            'company_ruc' => $this->companyRuc,
-            'email' => $this->companyEmail,
-            'phone' => $this->companyPhone,
-            'before_date_add' => $this->activeBackDateOnAdd,
-            'number_of_days_add' => $this->daysOnAdd ? $this->daysOnAdd : 0,
-            'before_date_out' => $this->activeBackDateOut,
-            'number_of_days_out' => $this->daysOut ? $this->daysOut : 0,
-            'report_type' => $this->reportType,
-            'receipt_type' => $this->receiptType,
-            'default_currency' => $this->defaultCurrency,
-        ];
-
-        // dd($data);
+        $this->validate([
+            'companyName'        => 'required|min:5|max:120',
+            'companyRuc'         => 'required|min:8|max:11',
+            'companyEmail'       => 'nullable|email|max:100',
+            'companyPhone'       => 'nullable|max:20',
+            'companyAddress'     => 'nullable|max:255',
+            'companyWebsite'     => 'nullable|url|max:255',
+            'activeBackDateOnAdd' => 'boolean',
+            'daysOnAdd'          => 'integer|min:0|max:365',
+            'activeBackDateOut'  => 'boolean',
+            'daysOut'            => 'integer|min:0|max:365',
+            'reportType'         => 'nullable|max:50',
+            'receiptType'        => 'nullable|max:50',
+            'defaultCurrency'    => 'nullable|exists:currencies,id',
+            'logo'               => 'nullable|image|mimes:jpg,jpeg,png,webp|max:1024',
+        ]);
 
         $company = Setting::first();
 
-        $imagenAntigua = $company->foto;
+        $company->update([
+            'company_name'       => $this->companyName,
+            'company_ruc'        => $this->companyRuc,
+            'email'              => $this->companyEmail,
+            'phone'              => $this->companyPhone,
+            'address'            => $this->companyAddress,
+            'website'            => $this->companyWebsite,
+            'before_date_add'    => $this->activeBackDateOnAdd,
+            'number_of_days_add' => $this->daysOnAdd,
+            'before_date_out'    => $this->activeBackDateOut,
+            'number_of_days_out' => $this->daysOut,
+            'report_type'        => $this->reportType,
+            'receipt_type'       => $this->receiptType,
+            'default_currency'   => $this->defaultCurrency,
+        ]);
 
-        $company->update($data);
+        if ($this->logo) {
+            $oldFile = $company->logo;
 
-        if($this->logo)
-        {
-            $customFileName = uniqid(). '_.' .$this->logo->extension();
-            $this->logo->storeAs('public/system/', $customFileName);
+            $filename = uniqid() . '_.' . $this->logo->extension();
+            $this->logo->storeAs('public/system/', $filename);
 
-            $company->logo = $customFileName;
+            $company->logo = $filename;
             $company->save();
 
-            if ($imagenAntigua != null) {
-
-                if (file_exists('storage/system/' .$imagenAntigua)) {
-
-                    unlink('storage/system/' .$imagenAntigua);
-                }
+            if ($oldFile && file_exists(public_path("storage/system/{$oldFile}"))) {
+                @unlink(public_path("storage/system/{$oldFile}"));
             }
+
+            Config::set('kodepe.logo', "storage/system/{$filename}");
+            $this->logoActual = $company->fresh()->foto;
+            $this->logo = null;
+            $this->dispatchBrowserEvent('reset-file-input');
         }
 
-        $this->emit('companyUpdated', 'Los datos han sido actualizados de forma exitosa');
+        $this->emit('companyUpdated', 'Configuración actualizada correctamente.');
     }
-
 }

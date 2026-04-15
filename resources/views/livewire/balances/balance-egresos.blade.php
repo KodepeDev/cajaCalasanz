@@ -1,122 +1,119 @@
-<div class="pt-4">
-    <div class="card">
+@php
+    $categoryIds   = collect($resumenTotals)->pluck('category_id')->filter()->unique()->values();
+    $categoryNames = \App\Models\Category::whereIn('id', $categoryIds)->pluck('name', 'id');
 
-        <div wire:loading.class='overlay' class="d-none dark" wire:loading.class.remove='d-none'>
-            <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+    $suma = $mesTotals[0] ?? [];
+    $keys = ['total01','total02','total03','total04','total05','total06',
+             'total07','total08','total09','total10','total11','total12'];
+    $totalAnio = array_sum(array_map(fn($k) => $suma[$k] ?? 0, $keys));
+
+    $meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO',
+              'JULIO','AGOSTO','SETIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+
+    // BalanceEgresos uses dic_total (not dec_total) for December
+    $cols = ['jan_total','feb_total','mar_total','apr_total','may_total','jun_total',
+             'jul_total','ago_total','sep_total','oct_total','nov_total','dic_total'];
+@endphp
+
+<div class="pt-3">
+
+    {{-- Loading overlay --}}
+    <div wire:loading.flex class="position-fixed w-100 h-100 justify-content-center align-items-center"
+        style="top:0;left:0;z-index:9999;background:rgba(0,0,0,.35);">
+        <div class="text-white text-center">
+            <i class="fas fa-3x fa-circle-notch fa-spin"></i>
+            <div class="mt-2 font-weight-bold">Cargando...</div>
         </div>
+    </div>
 
-        <div class="card-header">
-            <h3 class="card-title">Balance de Gastos por Categorías {{ $year }}</h3>
-            <div class="card-tools">
-                <div class="form-group form-inline">
-                    <button class="btn btn-info" id="btn_print_balance" wire:click='exportExcelData'><i
-                            class="fas fa-print"></i></button>
-                    <label for="date"></label>
-                    <select class="form-control" wire:model='year' name="date" id="date">
-                        @foreach ($ultimosCincoAnios as $anio)
-                            <option value="{{ $anio }}">{{ $anio }}</option>
-                        @endforeach
-                    </select>
-                </div>
+    <div class="card card-danger">
+
+        <div class="card-header d-flex align-items-center">
+            <i class="fas fa-arrow-alt-circle-down mr-2 text-white"></i>
+            <h3 class="card-title mb-0">Balance de Gastos por Categorías — {{ $year }}</h3>
+            <div class="card-tools ml-auto d-flex align-items-center" style="gap:.5rem;">
+                <button class="btn btn-sm btn-light" wire:click="exportExcelData"
+                    wire:loading.attr="disabled" title="Exportar Excel">
+                    <span wire:loading.remove wire:target="exportExcelData">
+                        <i class="fas fa-file-excel mr-1"></i> Excel
+                    </span>
+                    <span wire:loading wire:target="exportExcelData">
+                        <i class="fas fa-spinner fa-spin mr-1"></i> Exportando...
+                    </span>
+                </button>
+                <select class="form-control form-control-sm" wire:model="year" style="width:90px;">
+                    @foreach ($ultimosCincoAnios as $anio)
+                        <option value="{{ $anio }}">{{ $anio }}</option>
+                    @endforeach
+                </select>
             </div>
         </div>
-        <div class="card-body">
 
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="thead-dark">
+                <table class="table table-bordered table-hover table-sm mb-0" style="font-size:.82rem;">
+                    <thead style="position:sticky;top:0;z-index:5;background:#dc3545;color:#fff;">
                         <tr>
-                            <th scope="col"><i class="fas fa-arrow-alt-circle-down text-danger"></i> Categorías</th>
-                            <th scope="col">ENERO</th>
-                            <th scope="col">FEBRERO</th>
-                            <th scope="col">MARZO</th>
-                            <th scope="col">ABRIL</th>
-                            <th scope="col">MAYO</th>
-                            <th scope="col">JUNIO</th>
-                            <th scope="col">JULIO</th>
-                            <th scope="col">AGOSTO</th>
-                            <th scope="col">SETIEMBRE</th>
-                            <th scope="col">OCTUBRE</th>
-                            <th scope="col">NOVIEMBRE</th>
-                            <th scope="col">DICIEMBRE</th>
-                            <th scope="col">TOTAL</th>
+                            <th style="min-width:140px;">
+                                <i class="fas fa-tags mr-1"></i> Categoría
+                            </th>
+                            @foreach ($meses as $mes)
+                                <th class="text-right" style="min-width:80px;">{{ $mes }}</th>
+                            @endforeach
+                            <th class="text-right" style="min-width:90px;background:#b02a37;">TOTAL</th>
                         </tr>
                     </thead>
                     <tbody>
-
-                        @if (count($resumenTotals) > 0)
-                            @foreach ($resumenTotals as $item)
-                                <tr>
-                                    <th scope="row">
-                                        {{ \App\Models\Category::find($item['category_id'])->name }}
-                                    </th>
-                                    <td>{{ number_format($item['jan_total'], 2) }}</td>
-                                    <td>{{ number_format($item['feb_total'], 2) }}</td>
-                                    <td>{{ number_format($item['mar_total'], 2) }}</td>
-                                    <td>{{ number_format($item['apr_total'], 2) }}</td>
-                                    <td>{{ number_format($item['may_total'], 2) }}</td>
-                                    <td>{{ number_format($item['jun_total'], 2) }}</td>
-                                    <td>{{ number_format($item['jul_total'], 2) }}</td>
-                                    <td>{{ number_format($item['ago_total'], 2) }}</td>
-                                    <td>{{ number_format($item['sep_total'], 2) }}</td>
-                                    <td>{{ number_format($item['oct_total'], 2) }}</td>
-                                    <td>{{ number_format($item['nov_total'], 2) }}</td>
-                                    <td>{{ number_format($item['dic_total'], 2) }}</td>
-                                    <td class="bg-warning">
-                                        {{-- {{ number_format($item->where('status', 1)->where('category_id', $item->category->id)->whereYear('date_paid', $year)->where('summary_type', 'out')->sum('amount'),2) }} --}}
-                                        {{ number_format($item['jan_total'] + $item['feb_total'] + $item['mar_total'] + $item['apr_total'] + $item['may_total'] + $item['jun_total'] + $item['jul_total'] + $item['ago_total'] + $item['sep_total'] + $item['oct_total'] + $item['nov_total'] + $item['dic_total'], 2) }}
+                        @forelse ($resumenTotals as $item)
+                            @php
+                                $rowTotal = array_sum(array_map(fn($c) => $item[$c] ?? 0, $cols));
+                            @endphp
+                            <tr>
+                                <td class="font-weight-bold align-middle">
+                                    {{ $categoryNames[$item['category_id']] ?? '—' }}
+                                </td>
+                                @foreach ($cols as $col)
+                                    <td class="text-right align-middle">
+                                        {{ number_format($item[$col] ?? 0, 2) }}
                                     </td>
-                                </tr>
-                            @endforeach
-                        @else
-                            <td colspan="14" class="text-center">No existen registros para el año {{ $year }}
-                            </td>
-                        @endif
-
+                                @endforeach
+                                <td class="text-right align-middle font-weight-bold text-danger"
+                                    style="background:#fff5f5;">
+                                    {{ number_format($rowTotal, 2) }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="14" class="text-center py-5" style="background:#fafafa;">
+                                    <i class="fas fa-chart-bar fa-2x d-block mb-2 text-muted" style="opacity:.35;"></i>
+                                    <span class="text-muted">No hay registros de gastos para {{ $year }}.</span>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
-
-                    <tfoot>
-                        <tr class="bg-warning">
-                            <th scope="row">TOTAL</th>
-                            @foreach ($mesTotals as $suma)
-                                <td>{{ number_format($suma['total01'], 2) }}</td>
-                                <td>{{ number_format($suma['total02'], 2) }}</td>
-                                <td>{{ number_format($suma['total03'], 2) }}</td>
-                                <td>{{ number_format($suma['total04'], 2) }}</td>
-                                <td>{{ number_format($suma['total05'], 2) }}</td>
-                                <td>{{ number_format($suma['total06'], 2) }}</td>
-                                <td>{{ number_format($suma['total07'], 2) }}</td>
-                                <td>{{ number_format($suma['total08'], 2) }}</td>
-                                <td>{{ number_format($suma['total09'], 2) }}</td>
-                                <td>{{ number_format($suma['total10'], 2) }}</td>
-                                <td>{{ number_format($suma['total11'], 2) }}</td>
-                                <td>{{ number_format($suma['total12'], 2) }}</td>
-                                @php
-                                    $total_anio =
-                                        $suma['total01'] +
-                                        $suma['total02'] +
-                                        $suma['total03'] +
-                                        $suma['total04'] +
-                                        $suma['total05'] +
-                                        $suma['total06'] +
-                                        $suma['total07'] +
-                                        $suma['total08'] +
-                                        $suma['total09'] +
-                                        $suma['total10'] +
-                                        $suma['total11'] +
-                                        $suma['total12'];
-                                @endphp
-                            @endforeach
-                            <td class="bg-warning">{{ number_format($total_anio, 2) }}</td>
-                        </tr>
-                    </tfoot>
-
+                    @if (count($resumenTotals) > 0)
+                        <tfoot>
+                            <tr style="background:#f8d7da;font-weight:bold;">
+                                <td>TOTAL</td>
+                                @foreach ($keys as $key)
+                                    <td class="text-right">{{ number_format($suma[$key] ?? 0, 2) }}</td>
+                                @endforeach
+                                <td class="text-right text-danger" style="background:#f1b0b7;">
+                                    {{ number_format($totalAnio, 2) }}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    @endif
                 </table>
             </div>
+        </div>
 
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Año {{ $year }}</span>
+            <span class="font-weight-bold text-danger">
+                Gastos totales: S/. {{ number_format($totalAnio, 2) }}
+            </span>
         </div>
-        <div class="card-footer">
-            Gastos totales: {{ number_format($total_anio, 2) }} Soles
-        </div>
+
     </div>
 </div>

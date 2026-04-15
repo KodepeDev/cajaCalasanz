@@ -5,76 +5,100 @@ namespace App\Http\Livewire\Balances;
 use Carbon\Carbon;
 use App\Models\Detail;
 use App\Models\Summary;
-use Livewire\Component;
-use App\Models\Category;
 use App\Exports\BalanceExport;
-use Illuminate\Support\Collection;
+use Livewire\Component;
 use Maatwebsite\Excel\Facades\Excel;
 
 class BalanceEgresos extends Component
 {
+    public int $year;
+    public $ultimosCincoAnios;
 
-    public $years = [];
-    public $year, $totalYear,$ultimosCincoAnios ;
-    public $mesTotals, $resumenTotals;
+    public array $mesTotals    = [];
+    public array $resumenTotals = [];
+    public float $totalYear    = 0;
 
-    public function mount()
+    public function mount(): void
     {
-        $this->year = Carbon::now()->format('Y');
-
-        for ($i = 0; $i < 5; $i++) {
-            $this->years[$this->year - $i] = $this->year - $i;
-        }
-
+        $this->year              = (int) Carbon::now()->format('Y');
         $this->ultimosCincoAnios = collect(range(date('Y'), date('Y') - 4));
     }
 
     public function render()
     {
-        $this->totalYear = Summary::whereStatus('PAID')->where('type', 'out')->whereYear('date', '=', $this->year)->sum('amount');
-
-        $this->resumenTotals = Detail::whereStatus(1)->where('summary_type', 'out')->where('category_id', '!=', 1)->selectRaw('category_id,
-                    SUM(CASE WHEN MONTH(date_paid) = 1 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS jan_total,
-                    SUM(CASE WHEN MONTH(date_paid) = 2 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS feb_total,
-                    SUM(CASE WHEN MONTH(date_paid) = 3 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS mar_total,
-                    SUM(CASE WHEN MONTH(date_paid) = 4 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS apr_total,
-                    SUM(CASE WHEN MONTH(date_paid) = 5 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS may_total,
-                    SUM(CASE WHEN MONTH(date_paid) = 6 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS jun_total,
-                    SUM(CASE WHEN MONTH(date_paid) = 7 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS jul_total,
-                    SUM(CASE WHEN MONTH(date_paid) = 8 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS ago_total,
-                    SUM(CASE WHEN MONTH(date_paid) = 9 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS sep_total,
-                    SUM(CASE WHEN MONTH(date_paid) = 10 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS oct_total,
-                    SUM(CASE WHEN MONTH(date_paid) = 11 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS nov_total,
-                    SUM(CASE WHEN MONTH(date_paid) = 12 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS dic_total'
-                )
-                ->whereYear('date_paid', '=', $this->year)
-                ->groupBy('category_id')
-                ->get()
-                ->toArray();
-        $this->mesTotals = Detail::whereStatus(1)->where('summary_type', 'out')->where('category_id', '!=', 1)->selectRaw('
-                    SUM(CASE WHEN MONTH(date_paid) = 1 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS total01,
-                    SUM(CASE WHEN MONTH(date_paid) = 2 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS total02,
-                    SUM(CASE WHEN MONTH(date_paid) = 3 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS total03,
-                    SUM(CASE WHEN MONTH(date_paid) = 4 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS total04,
-                    SUM(CASE WHEN MONTH(date_paid) = 5 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS total05,
-                    SUM(CASE WHEN MONTH(date_paid) = 6 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS total06,
-                    SUM(CASE WHEN MONTH(date_paid) = 7 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS total07,
-                    SUM(CASE WHEN MONTH(date_paid) = 8 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS total08,
-                    SUM(CASE WHEN MONTH(date_paid) = 9 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS total09,
-                    SUM(CASE WHEN MONTH(date_paid) = 10 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS total10,
-                    SUM(CASE WHEN MONTH(date_paid) = 11 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS total11,
-                    SUM(CASE WHEN MONTH(date_paid) = 12 THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END ELSE 0 END) AS total12'
-                )
-                ->whereYear('date_paid', '=', $this->year)
-                ->get()
-                ->toArray();
+        $this->totalYear     = Summary::whereStatus('PAID')->where('type', 'out')->whereYear('date', $this->year)->sum('amount');
+        $this->resumenTotals = $this->buildResumenTotals();
+        $this->mesTotals     = $this->buildMesTotals();
 
         return view('livewire.balances.balance-egresos')->extends('adminlte::page');
     }
 
     public function exportExcelData()
     {
-        // dd($this->mesTotals, $this->resumenTotals);
-        return Excel::download(new BalanceExport($this->mesTotals, $this->resumenTotals, 'livewire.balances.balance-egresos', $this->year, $this->totalYear, $this->ultimosCincoAnios), 'BalanceGastos.xlsx');
+        $totalYear     = Summary::whereStatus('PAID')->where('type', 'out')->whereYear('date', $this->year)->sum('amount');
+        $resumenTotals = $this->buildResumenTotals();
+        $mesTotals     = $this->buildMesTotals();
+
+        return Excel::download(
+            new BalanceExport($mesTotals, $resumenTotals, 'livewire.balances.balance-egresos', $this->year, $totalYear, $this->ultimosCincoAnios),
+            'BalanceGastos.xlsx',
+        );
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Private query builders
+    // ─────────────────────────────────────────────────────────────
+
+    private function buildResumenTotals(): array
+    {
+        return Detail::whereStatus(1)
+            ->where('summary_type', 'out')
+            ->where('category_id', '!=', 1)
+            ->whereYear('date_paid', $this->year)
+            ->groupBy('category_id')
+            ->selectRaw("category_id, {$this->monthlyPivotSql()}")
+            ->get()
+            ->toArray();
+    }
+
+    private function buildMesTotals(): array
+    {
+        return Detail::whereStatus(1)
+            ->where('summary_type', 'out')
+            ->where('category_id', '!=', 1)
+            ->whereYear('date_paid', $this->year)
+            ->selectRaw($this->monthlyTotalSql())
+            ->get()
+            ->toArray();
+    }
+
+    /**
+     * Generates 12 per-month SUM expressions aliased as jan_total … dic_total.
+     * December alias kept as "dic_total" to match the existing view and export.
+     */
+    private function monthlyPivotSql(): string
+    {
+        $aliases = ['jan_total','feb_total','mar_total','apr_total','may_total','jun_total',
+                    'jul_total','ago_total','sep_total','oct_total','nov_total','dic_total'];
+
+        return implode(",\n", array_map(
+            fn(int $m, string $alias) =>
+                "SUM(CASE WHEN MONTH(date_paid) = {$m} " .
+                "THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END " .
+                "ELSE 0 END) AS {$alias}",
+            range(1, 12),
+            $aliases,
+        ));
+    }
+
+    private function monthlyTotalSql(): string
+    {
+        return implode(",\n", array_map(
+            fn(int $m) =>
+                "SUM(CASE WHEN MONTH(date_paid) = {$m} " .
+                "THEN CASE WHEN currency_id = 2 THEN details.changed_amount ELSE details.amount END " .
+                "ELSE 0 END) AS total" . str_pad($m, 2, '0', STR_PAD_LEFT),
+            range(1, 12),
+        ));
     }
 }

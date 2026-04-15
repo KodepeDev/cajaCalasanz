@@ -15,6 +15,7 @@ use App\Models\Student;
 use App\Services\LimitDateService;
 use App\Services\TipoCambioService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\ApiConsultasController;
 use App\Models\SchoolYear;
 
@@ -25,24 +26,19 @@ class CrearMovimiento extends Component
     public $paymentMethods;
     public $categorias;
     public $subcategorias;
-    public $componentName;
     public $selected_id;
-    public $validezFecha;
-    public $showReceiptModal;
+    public $showReceiptModal = false;
     public $receipt;
     public $summary_id;
 
     // Movement fields
     public $date;
-    public $concept;
     public $type;
     public $status;
     public $amount;
     public $tax;
     public $recipt_series;
-    public $puesto;
     public $recipt_number;
-    public $future;
     public $account_id;
     public $category_id;
     public $subcategoria_id;
@@ -53,12 +49,8 @@ class CrearMovimiento extends Component
     public $paid_by;
     public $observation;
 
-    // Exchange rate
+    // Exchange rate (public so the view can display it)
     public $tc;
-    private $tipoCambio;
-    protected $schoolYear;
-
-    protected $dataApi = [];
 
     protected $listeners = [
         "resetUI",
@@ -75,17 +67,15 @@ class CrearMovimiento extends Component
 
     // Provisions
     public $provision_detalles;
-    public $total_prov;
-    public $total_prov_dolar;
-    public $total_prov_cobrar;
-    public $nuevos_detalles;
-    public $total_new;
-    public $students;
+    public float $total_prov = 0;
+    public float $total_prov_dolar = 0;
+    public float $total_prov_cobrar = 0;
+    public float $total_new = 0;
     public $student_id;
     public $student_name;
-    public $provisions = [];
+    public array $provisions = [];
     public $provisionsCobrar = [];
-    public $checkedProvision = [];
+    public array $checkedProvision = [];
     public $det_selected;
     public $student_tutor_id;
 
@@ -98,20 +88,17 @@ class CrearMovimiento extends Component
     public $address;
     public $email;
     public $phone;
-    public $mensaje;
 
     // ─────────────────────────────────────────────────────────────
     // Lifecycle
     // ─────────────────────────────────────────────────────────────
 
-    public function mount()
+    public function mount(): void
     {
-        $this->componentName = "Cliente/proveedor";
         $this->document_type = 1;
         $this->documento = 99999999;
         $this->customer_name = "Clientes/Proveedores Varios";
-        $this->date = Carbon::now()->format("Y-m-d");
-        $this->validezFecha = true;
+        $this->date = Carbon::now()->toDateString();
         $this->selected_id = 0;
         $this->type = "add";
         $this->status = "PAID";
@@ -120,16 +107,12 @@ class CrearMovimiento extends Component
         $this->cuentas = Account::all();
         $this->account_id = $this->cuentas->first()->id;
         $this->paymentMethods = PaymentMethod::all();
-        $this->categorias = Category::where("id", "!=", 1)
-            ->where("type", $this->type)
-            ->pluck("id", "name");
-        $this->tipoCambio = new TipoCambioService();
-        $this->tc = $this->tipoCambio->getValue($this->date);
+        $this->categorias = $this->getCategoriasForType($this->type);
+        $this->tc = $this->fetchTipoCambio($this->date);
     }
 
     public function render()
     {
-        $this->updateTotal();
         return view("livewire.movimientos.crear-movimiento")->extends(
             "adminlte::page",
         );
@@ -139,23 +122,27 @@ class CrearMovimiento extends Component
     // Date & totals
     // ─────────────────────────────────────────────────────────────
 
-    public function updatedDate()
+    public function updatedDate(): void
     {
-        $this->tipoCambio = new TipoCambioService();
-        $this->tc = $this->tipoCambio->getValue($this->date);
-        $this->SelectedProvisions();
+        $this->tc = $this->fetchTipoCambio($this->date);
+        $this->selectedProvisions();
     }
 
-    public function updateTotal()
+    public function updateTotal(): void
     {
         $this->total_new = collect($this->provisions)->sum("amount");
+    }
+
+    public function updatedProvisions(): void
+    {
+        $this->updateTotal();
     }
 
     // ─────────────────────────────────────────────────────────────
     // Receipt modal
     // ─────────────────────────────────────────────────────────────
 
-    public function showReceiptModal($event)
+    public function showReceiptModal($event = null): void
     {
         $this->showReceiptModal = true;
     }
@@ -169,40 +156,36 @@ class CrearMovimiento extends Component
     // Provision search & selection
     // ─────────────────────────────────────────────────────────────
 
-    public function searchStandProvision($filterBy = "all")
+    public function searchStandProvision(): void
     {
-        $filterBy = SchoolYear::current()->year ?? now()->format("Y");
         $this->resetValidation();
         $this->validate(["provision_code" => "required"]);
 
-        $student = Student::where("document", $this->provision_code)->first();
+        $student = Student::with("tutor")
+            ->where("document", $this->provision_code)
+            ->first();
 
         if (!$student) {
-            $this->emit("error", "No Existen Datos");
+            $this->emit("error", "No se encontraron datos para ese código.");
             return;
         }
 
         $this->student_id = $student->id;
+        $filterYear = SchoolYear::current()->year ?? now()->year;
 
-        $baseQuery = Detail::when($filterBy !== "all", function ($query) use (
-            $filterBy,
-        ) {
-            $query->whereYear("date", $filterBy);
-        })
+        $baseQuery = Detail::whereYear("date", $filterYear)
             ->where("student_id", $student->id)
             ->whereStatus(false)
-            ->orderBy("date", "asc");
+            ->orderBy("date");
 
-        $student_details = (clone $baseQuery)->get();
-
-        $suma = (clone $baseQuery)
-            ->where(function ($query) {
-                $query
+        $details = (clone $baseQuery)->with(["currency", "category"])->get();
+        $sumaSoles = (clone $baseQuery)
+            ->where(
+                fn($q) => $q
                     ->where("currency_id", "!=", 2)
-                    ->orWhereNull("currency_id");
-            })
+                    ->orWhereNull("currency_id"),
+            )
             ->sum("amount");
-
         $sumaDolar = (clone $baseQuery)->where("currency_id", 2)->sum("amount");
 
         $this->documento = $student->tutor->document;
@@ -210,64 +193,63 @@ class CrearMovimiento extends Component
         $this->student_name = $student->full_name;
         $this->paid_by = $this->customer_name;
 
-        if ($student_details->count() > 0) {
-            $this->provision_detalles = $student_details;
+        if ($details->isNotEmpty()) {
+            $this->provision_detalles = $details;
             $this->provisionsCobrar = [];
             $this->checkedProvision = [];
             $this->total_prov_cobrar = 0;
-            $this->total_prov = $suma;
+            $this->total_prov = $sumaSoles;
             $this->total_prov_dolar = $sumaDolar;
-            $this->emit("mostrarModalProvision", "mostrar modal");
+            $this->emit("mostrarModalProvision");
         } else {
-            $this->documento = 99999999;
-            $this->customer_name = "Clientes/Proveedores Varios";
+            // Keep tutor data already set above (documento, customer_name, student_name, paid_by)
             $this->provision_detalles = [];
             $this->provisionsCobrar = [];
             $this->checkedProvision = [];
             $this->total_prov_cobrar = 0;
             $this->total_prov = 0;
             $this->total_prov_dolar = 0;
-            $this->paid_by = "";
             $this->emit(
                 "error",
-                "No existe el Stand o no existe provisiones actuales para dicho Stand",
+                "No existen provisiones pendientes para este alumno.",
             );
         }
     }
 
-    public function selectAll()
+    public function selectAll(): void
     {
-        $this->checkedProvision = $this->provision_detalles->pluck("id");
-    }
-
-    public function selectNow()
-    {
-        $date = Carbon::now();
-        $start = $date->startOfMonth()->format("Y-m-d H:i:s");
-        $end = $date->endOfMonth()->format("Y-m-d H:i:s");
-
         $this->checkedProvision = $this->provision_detalles
-            ->whereBetween("date", [$start, $end])
-            ->pluck("id");
+            ->pluck("id")
+            ->toArray();
     }
 
-    public function SelectedProvisions()
+    public function selectNow(): void
+    {
+        $this->checkedProvision = $this->provision_detalles
+            ->whereBetween("date", [
+                now()->startOfMonth()->format("Y-m-d H:i:s"),
+                now()->endOfMonth()->format("Y-m-d H:i:s"),
+            ])
+            ->pluck("id")
+            ->toArray();
+    }
+
+    public function selectedProvisions(): void
     {
         $this->total_prov_cobrar = 0;
         $this->provisionsCobrar = Detail::whereKey(
             $this->checkedProvision,
         )->get();
 
-        foreach ($this->provisionsCobrar as $cobrarItem) {
-            if ($cobrarItem->currency->id != 2) {
-                $this->total_prov_cobrar += $cobrarItem->amount;
-            } else {
-                $this->total_prov_cobrar += $cobrarItem->amount * $this->tc;
-            }
+        foreach ($this->provisionsCobrar as $item) {
+            $this->total_prov_cobrar +=
+                $item->currency->id === 2
+                    ? $item->amount * $this->tc
+                    : $item->amount;
         }
     }
 
-    public function validarSeleccionados()
+    public function validarSeleccionados(): void
     {
         $this->det_selected = count($this->checkedProvision);
     }
@@ -276,54 +258,30 @@ class CrearMovimiento extends Component
     // Provision rows (nuevos detalles)
     // ─────────────────────────────────────────────────────────────
 
-    public function Add()
+    public function add(): void
     {
-        $student = Student::findOrFail($this->student_id);
+        Student::findOrFail($this->student_id);
 
-        if ($this->provision_code) {
-            if ($student) {
-                $this->provisions[] = [
-                    "status" => "false",
-                    "description" => "",
-                    "type" => 2,
-                    "date" => Carbon::now()->format("Y-m"),
-                    "date_paid" => Carbon::now(),
-                    "amount" => null,
-                    "category_id" => "Elegir",
-                    "student_id" => $student->id,
-                    "summary_id" => null,
-                ];
-            } else {
-                $this->emit(
-                    "error",
-                    "Estudiante no encontrado o código errado",
-                );
-            }
-        } else {
-            try {
-                $this->provisions[] = [
-                    "status" => "false",
-                    "description" => null,
-                    "type" => 2,
-                    "date" => Carbon::now()->format("Y-m"),
-                    "amount" => null,
-                    "category_id" => "Elegir",
-                    "student_id" => $student->id,
-                    "summary_id" => null,
-                ];
-            } catch (\Throwable $th) {
-                $this->emit("error", $th);
-            }
-        }
+        $this->provisions[] = [
+            "status" => false,
+            "description" => null,
+            "type" => 2,
+            "date" => Carbon::now()->format("Y-m"),
+            "date_paid" => Carbon::now()->toDateString(),
+            "amount" => null,
+            "category_id" => "Elegir",
+            "student_id" => $this->student_id,
+            "summary_id" => null,
+        ];
     }
 
-    public function removeProvision($key)
+    public function removeProvision(int $key): void
     {
         array_splice($this->provisions, $key, 1);
         $this->updateTotal();
     }
 
-    public function validarProvisions()
+    public function validarProvisions(): void
     {
         $this->validate([
             "provisions.*.date" => "required|date",
@@ -334,40 +292,32 @@ class CrearMovimiento extends Component
         ]);
     }
 
-    public function Save()
-    {
-        $this->validarProvisions();
-        dd($this->provisions);
-    }
-
     // ─────────────────────────────────────────────────────────────
     // Save movement
     // ─────────────────────────────────────────────────────────────
 
-    public function crearMovimiento()
+    public function crearMovimiento(): void
     {
-        $this->validarFechas();
-
-        if ($this->validezFecha == false) {
+        if (!$this->validarFechas()) {
             return;
         }
 
         $this->user_id = Auth::id();
 
         $cliente = Customer::where("document", $this->documento)->first();
-        $student = Student::findOrFail($this->student_id);
+        $student = Student::with("tutor")->findOrFail($this->student_id);
 
-        if ($cliente != null || $student != null) {
-            $this->customer_id = $cliente->id;
-            $this->student_id = $student->id;
-            $this->student_tutor_id = $student->tutor->id;
-        } else {
-            $this->mensaje =
-                "No existe el Cliente o proveedor, SI ES ESTUDIANTE (CREARLO MEDIANTE EL MODULO DE ESTUDIENTES)";
-            $this->emit("error", $this->mensaje);
+        if ($cliente === null) {
+            $this->emit(
+                "error",
+                "No existe el cliente/proveedor. Si es un estudiante, créelo mediante el módulo de Estudiantes.",
+            );
             return;
         }
 
+        $this->customer_id = $cliente->id;
+        $this->student_id = $student->id;
+        $this->student_tutor_id = $student->tutor->id;
         $this->amount = $this->total_prov_cobrar + $this->total_new;
 
         $this->validate(
@@ -378,74 +328,77 @@ class CrearMovimiento extends Component
         try {
             $this->validarProvisions();
 
-            $summary = Summary::create([
-                "date" => $this->date,
-                "type" => $this->type,
-                "status" => $this->status,
-                "amount" => $this->amount,
-                "tipo_cambio" => $this->tc,
-                "tax" => $this->tax,
-                "recipt_series" => $this->recipt_series,
-                "recipt_number" => $this->recipt_number,
-                "account_id" => $this->account_id,
-                "user_id" => $this->user_id,
-                "future" => 1,
-                "operation_number" => $this->numero_operacion,
-                "paid_by" => $this->paid_by,
-                "observation" => $this->observation,
-                "customer_id" => $this->customer_id,
-                "student_id" => $this->student_id,
-                "student_tutor_id" => $this->student_tutor_id,
-                "payment_method_id" => $this->payment_method,
-            ]);
-
-            foreach ($this->provisions as $input) {
-                $unique_code =
-                    Carbon::parse($input["date"])->format("Y-m") .
-                    $input["category_id"] .
-                    $this->student_id .
-                    $summary->id;
-
-                Detail::create([
-                    "unique_code" => $unique_code,
-                    "status" => true,
-                    "summary_type" => $summary->type,
-                    "date" => $input["date"],
-                    "description" => $input["description"],
-                    "date_paid" => $summary->date,
-                    "category_id" => $input["category_id"],
+            DB::transaction(function () {
+                $summary = Summary::create([
+                    "date" => $this->date,
+                    "type" => $this->type,
+                    "status" => $this->status,
+                    "amount" => $this->amount,
+                    "tipo_cambio" => $this->tc,
+                    "tax" => $this->tax,
+                    "recipt_series" => $this->recipt_series,
+                    "recipt_number" => $this->recipt_number,
+                    "account_id" => $this->account_id,
+                    "user_id" => $this->user_id,
+                    "future" => 1,
+                    "operation_number" => $this->numero_operacion,
+                    "paid_by" => $this->paid_by,
+                    "observation" => $this->observation,
+                    "customer_id" => $this->customer_id,
                     "student_id" => $this->student_id,
                     "student_tutor_id" => $this->student_tutor_id,
-                    "amount" => $input["amount"],
-                    "summary_id" => $summary->id,
+                    "payment_method_id" => $this->payment_method,
                 ]);
-            }
 
-            foreach ($this->provisionsCobrar as $data) {
-                $data->update([
-                    "status" => true,
-                    "summary_type" => $summary->type,
-                    "date_paid" => $summary->date,
-                    "changed_amount" =>
-                        $data->currency->id == 2
-                            ? round($data->amount * $this->tc, 2)
-                            : 0,
-                    "summary_id" => $summary->id,
-                ]);
-            }
+                foreach ($this->provisions as $input) {
+                    $unique_code =
+                        Carbon::parse($input["date"])->format("Y-m") .
+                        $input["category_id"] .
+                        $this->student_id .
+                        $summary->id;
 
-            $this->summary_id = $summary->id;
-            $this->recipt_series = $summary->recipt_series;
-            $this->recipt_number = $summary->recipt_number;
-            $this->receipt =
-                $summary->recipt_series .
-                "-" .
-                str_pad($summary->recipt_number, 8, "0", STR_PAD_LEFT);
-            $this->showReceiptModal = true;
+                    Detail::create([
+                        "unique_code" => $unique_code,
+                        "status" => true,
+                        "summary_type" => $summary->type,
+                        "date" => $input["date"],
+                        "description" => $input["description"],
+                        "date_paid" => $summary->date,
+                        "category_id" => $input["category_id"],
+                        "student_id" => $this->student_id,
+                        "student_tutor_id" => $this->student_tutor_id,
+                        "amount" => $input["amount"],
+                        "summary_id" => $summary->id,
+                    ]);
+                }
 
+                foreach ($this->provisionsCobrar as $provision) {
+                    $provision->update([
+                        "status" => true,
+                        "summary_type" => $summary->type,
+                        "date_paid" => $summary->date,
+                        "changed_amount" =>
+                            $provision->currency->id === 2
+                                ? round($provision->amount * $this->tc, 2)
+                                : 0,
+                        "summary_id" => $summary->id,
+                    ]);
+                }
+
+                $this->summary_id = $summary->id;
+                $this->recipt_series = $summary->recipt_series;
+                $this->recipt_number = $summary->recipt_number;
+                $this->receipt =
+                    $summary->recipt_series .
+                    "-" .
+                    str_pad($summary->recipt_number, 8, "0", STR_PAD_LEFT);
+                $this->showReceiptModal = true;
+            });
+
+            $this->dispatchBrowserEvent("show-receipt-modal");
             $this->emit(
                 "movimiento_added",
-                "El movimiento ha sido registrado exitosamente",
+                "El movimiento ha sido registrado exitosamente.",
             );
         } catch (\Throwable $th) {
             $this->emit("error", $th->getMessage());
@@ -456,50 +409,50 @@ class CrearMovimiento extends Component
     // Date validation
     // ─────────────────────────────────────────────────────────────
 
-    public function validarFechas()
+    private function validarFechas(): bool
     {
         $hoy = Carbon::now();
-        $limitDateService = new LimitDateService();
-        $numberDays = $limitDateService->getIncomeNumberDays();
+        $limitDate = new LimitDateService();
+        $numberDays = $limitDate->getIncomeNumberDays();
 
-        if ($this->date > $hoy->format("Y-m-d")) {
-            $this->date = Carbon::now()->format("Y-m-d");
+        if ($this->date > $hoy->toDateString()) {
+            $this->date = $hoy->toDateString();
             $this->updatedDate();
-            $this->updateTotal();
             $this->emit(
                 "error_fecha",
-                "La fecha no debe ser mayor al día de hoy",
+                "La fecha no debe ser mayor al día de hoy.",
             );
-            $this->validezFecha = false;
-        } elseif ($this->date < $hoy->subDays($numberDays)) {
-            $this->date = Carbon::now()->format("Y-m-d");
-            $this->updatedDate();
-            $this->updateTotal();
-            $this->emit(
-                "error_fecha",
-                "La fecha solo puede ser menor a {$numberDays} dias de la fecha de hoy",
-            );
-            $this->validezFecha = false;
-        } else {
-            $this->validezFecha = true;
+            return false;
         }
+
+        if ($this->date < $hoy->copy()->subDays($numberDays)->toDateString()) {
+            $this->date = Carbon::now()->toDateString();
+            $this->updatedDate();
+            $this->emit(
+                "error_fecha",
+                "La fecha solo puede ser menor a {$numberDays} días de hoy.",
+            );
+            return false;
+        }
+
+        return true;
     }
 
     // ─────────────────────────────────────────────────────────────
     // Category
     // ─────────────────────────────────────────────────────────────
 
-    public function categoryType()
+    public function categoryType(): void
     {
         $this->category_id = "";
         $this->subcategoria_id = "";
 
-        if ($this->type !== null) {
-            $this->categorias = Category::where("type", $this->type)->get();
+        if ($this->type) {
+            $this->categorias = $this->getCategoriasForType($this->type);
         }
     }
 
-    public function changeCategory()
+    public function changeCategory(): void
     {
         $this->subcategoria_id = null;
         $this->subcategorias = AttrValue::where(
@@ -507,7 +460,7 @@ class CrearMovimiento extends Component
             $this->category_id,
         )->get();
 
-        if ($this->subcategorias->count() > 0) {
+        if ($this->subcategorias->isNotEmpty()) {
             $this->emit("tiene_subcategorias", "Hay subcategorias");
         }
     }
@@ -516,7 +469,7 @@ class CrearMovimiento extends Component
     // Customer / API
     // ─────────────────────────────────────────────────────────────
 
-    public function chageDocumentType()
+    public function changeDocumentType(): void
     {
         $this->full_name = "";
         $this->first_name = "";
@@ -525,24 +478,25 @@ class CrearMovimiento extends Component
         $this->address = "";
     }
 
-    public function ConsutasCustomer()
+    public function consultasCustomer(): void
     {
-        $cust = Customer::where("document", $this->documento)->first();
+        $customer = Customer::where("document", $this->documento)->first();
 
-        if ($cust != null) {
-            $this->customer_name = $cust->full_name;
+        if ($customer) {
+            $this->customer_name = $customer->full_name;
         } else {
-            $this->mensaje =
-                "No existe el Cliente o proveedor, SI ES SOCIO (CREARLO MEDIANTE EL MODULO DE SOCIOS)";
-            $this->emit("error", $this->mensaje);
+            $this->emit(
+                "error",
+                "No existe el cliente/proveedor. Si es un socio, créelo mediante el módulo de Socios.",
+            );
             $this->customer_name = null;
         }
     }
 
-    public function create()
+    public function create(): void
     {
         if ($this->document_type == 0) {
-            $this->full_name = $this->first_name . " " . $this->last_name;
+            $this->full_name = trim("{$this->first_name} {$this->last_name}");
         }
 
         $this->validate(
@@ -553,9 +507,10 @@ class CrearMovimiento extends Component
             ],
             [
                 "full_name.required" =>
-                    "El nombre del cliente o proveedor es requerido",
-                "document_type.required" => "El tipo de documento es requerido",
-                "document.required" => "El documento es requerido",
+                    "El nombre del cliente o proveedor es requerido.",
+                "document_type.required" =>
+                    "El tipo de documento es requerido.",
+                "document.required" => "El documento es requerido.",
             ],
         );
 
@@ -578,14 +533,14 @@ class CrearMovimiento extends Component
         $this->resetUI();
         $this->emit(
             "customer_added",
-            "Cliente o proveedor registrado exitosamente",
+            "Cliente o proveedor registrado exitosamente.",
         );
 
         $this->documento = $customer->document;
         $this->customer_name = $customer->full_name;
     }
 
-    public function clearDataApi()
+    public function clearDataApi(): void
     {
         $this->full_name = "";
         $this->first_name = "";
@@ -595,67 +550,61 @@ class CrearMovimiento extends Component
         $this->provisions = [];
     }
 
-    public function ConsutasApi()
+    public function consultasApi(): void
     {
-        sleep(1);
+        $cust =
+            $this->selected_id == 0
+                ? Customer::where("document", $this->document)->first()
+                : null;
 
-        if ($this->selected_id == 0) {
-            $cust = Customer::where("document", $this->document)->first();
-        }
-
-        if ($cust != null) {
-            $this->mensaje = "Ya existe el cliente o proveedor";
+        if ($cust !== null) {
             $this->documento = $cust->document;
             $this->customer_name = $cust->full_name;
-            $this->emit("registro-existente", $this->mensaje);
+            $this->emit(
+                "registro-existente",
+                "Ya existe el cliente o proveedor.",
+            );
             return;
         }
 
         $api = new ApiConsultasController();
 
         if ($this->document_type == "1") {
-            $this->dataApi = $api->apiDni($this->document);
+            $dataApi = $api->apiDni($this->document);
         } elseif ($this->document_type == "6") {
-            $this->dataApi = $api->apiRuc($this->document);
+            $dataApi = $api->apiRuc($this->document);
         } else {
-            $this->mensaje = "No es un documento";
+            $this->emit(
+                "error",
+                "Seleccione un tipo de documento válido (DNI o RUC).",
+            );
             return;
         }
 
-        if (isset($this->dataApi->error)) {
-            $this->mensaje = $this->dataApi->error;
-            $this->emit("error", $this->mensaje);
+        if (isset($dataApi->error)) {
+            $this->emit("error", $dataApi->error);
             return;
         }
 
-        if ($this->dataApi == null) {
-            $this->mensaje =
-                "No existe el documento o ingrese manualmente los campos con la opcion de documento OTRO";
-            $this->emit("error", $this->mensaje);
+        if ($dataApi === null) {
+            $this->emit(
+                "error",
+                'No se encontró el documento. Intente ingresarlo manualmente con la opción "Otro".',
+            );
             return;
         }
 
-        switch ($this->dataApi->tipoDocumento) {
-            case "1":
-                $this->full_name = $this->dataApi->nombre;
-                $this->first_name = $this->dataApi->nombres;
-                $this->last_name =
-                    $this->dataApi->apellidoPaterno .
-                    " " .
-                    $this->dataApi->apellidoMaterno;
-                $this->document_type = $this->dataApi->tipoDocumento;
-                $this->document = $this->dataApi->numeroDocumento;
-                $this->address = $this->buildAddressFromApi($this->dataApi);
-                break;
+        $this->document_type = $dataApi->tipoDocumento;
+        $this->document = $dataApi->numeroDocumento;
+        $this->full_name = $dataApi->nombre;
+        $this->address = $this->buildAddressFromApi($dataApi);
 
-            case "6":
-                $this->full_name = $this->dataApi->nombre;
-                $this->first_name = null;
-                $this->last_name = null;
-                $this->document_type = $this->dataApi->tipoDocumento;
-                $this->document = $this->dataApi->numeroDocumento;
-                $this->address = $this->buildAddressFromApi($this->dataApi);
-                break;
+        if ($dataApi->tipoDocumento === "1") {
+            $this->first_name = $dataApi->nombres;
+            $this->last_name = "{$dataApi->apellidoPaterno} {$dataApi->apellidoMaterno}";
+        } else {
+            $this->first_name = null;
+            $this->last_name = null;
         }
     }
 
@@ -663,7 +612,7 @@ class CrearMovimiento extends Component
     // Reset helpers
     // ─────────────────────────────────────────────────────────────
 
-    public function resetUI()
+    public function resetUI(): void
     {
         $this->resetPersonFields();
         $this->customer_name = "Clientes/Proveedores Varios";
@@ -671,7 +620,7 @@ class CrearMovimiento extends Component
         $this->resetValidation();
     }
 
-    public function resetUiApi()
+    public function resetUiApi(): void
     {
         $this->resetPersonFields();
         $this->resetValidation();
@@ -680,6 +629,20 @@ class CrearMovimiento extends Component
     // ─────────────────────────────────────────────────────────────
     // Private helpers
     // ─────────────────────────────────────────────────────────────
+
+    private function fetchTipoCambio(string $date): float
+    {
+        $tc = new TipoCambioService();
+        return $tc->getValue($date);
+    }
+
+    private function getCategoriasForType(
+        string $type,
+    ): \Illuminate\Support\Collection {
+        return Category::where("id", "!=", 1)
+            ->where("type", $type)
+            ->pluck("id", "name");
+    }
 
     private function resetPersonFields(): void
     {
@@ -711,18 +674,18 @@ class CrearMovimiento extends Component
     private function crearMovimientoMessages(): array
     {
         return [
-            "documento.required" => "El documento es requerido",
+            "documento.required" => "El documento es requerido.",
             "customer_name.required" =>
-                "El nombre del cliente o proveedor es requerido",
-            "date.required" => "La fecha es requerida",
-            "date.date" => "La fecha debe ser una fecha válida",
-            "type.required" => "El tipo de movimiento es requerido",
-            "amount.required" => "El monto es requerido",
-            "amount.numeric" => "El monto debe ser un valor positivo",
-            "amount.min" => "El monto deberia ser mayor a 0",
-            "account_id.required" => "La cuenta es requerida",
-            "user_id.required" => "El usuario es requerido",
-            "provision_code.required" => "El código es requerido",
+                "El nombre del cliente o proveedor es requerido.",
+            "date.required" => "La fecha es requerida.",
+            "date.date" => "La fecha debe ser una fecha válida.",
+            "type.required" => "El tipo de movimiento es requerido.",
+            "amount.required" => "El monto es requerido.",
+            "amount.numeric" => "El monto debe ser un número.",
+            "amount.min" => "El monto debe ser mayor a 0.",
+            "account_id.required" => "La cuenta es requerida.",
+            "user_id.required" => "El usuario es requerido.",
+            "provision_code.required" => "El código es requerido.",
         ];
     }
 

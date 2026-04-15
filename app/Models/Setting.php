@@ -14,6 +14,8 @@ class Setting extends Model
         'company_ruc',
         'email',
         'phone',
+        'address',
+        'website',
         'logo',
         'before_date_add',
         'number_of_days_add',

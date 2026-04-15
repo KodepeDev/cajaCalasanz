@@ -1,132 +1,145 @@
-<div class="pt-4">
-    <div class="card">
+<div class="pt-3">
 
-        <div wire:loading.class='overlay' class="d-none dark" wire:loading.class.remove='d-none'>
-            <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+    {{-- Loading overlay --}}
+    <div wire:loading.flex class="position-fixed w-100 h-100 justify-content-center align-items-center"
+        style="top:0;left:0;z-index:9999;background:rgba(0,0,0,.35);">
+        <div class="text-white text-center">
+            <i class="fas fa-3x fa-circle-notch fa-spin"></i>
+            <div class="mt-2 font-weight-bold">Procesando...</div>
         </div>
+    </div>
 
-        <div class="card-header">
-            <h3 class="card-title">PROVISION FIJA</h3>
-            <br>
-            <div class="row mt-4">
-                <div class="col-md-9">
-                    @include('livewire.movimientos.provisiones.searBoxProvision')
-                </div>
-                <div class="col-md-3 text-right">
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modalEliminarFija">
-                        <i class="fas fa-trash"></i> Eliminar</button>
-                    <button type="button" class="btn btn-primary" data-toggle="modal"
-                        data-target="#modalProvisionFija"> <i class="fas fa-plus-circle"></i> Nuevo</button>
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalProvisionExport">
-                        <i class="fas fa-download"></i> Exportar</button>
-                </div>
-                <!-- Button trigger modal -->
+    <div class="card card-primary">
+
+        {{-- Card header --}}
+        <div class="card-header d-flex align-items-center flex-wrap" style="gap:.5rem;">
+            <div class="d-flex align-items-center flex-fill">
+                <i class="fas fa-calendar-check mr-2"></i>
+                <h3 class="card-title mb-0">Provisiones Fijas</h3>
+            </div>
+            <div class="d-flex" style="gap:.4rem;">
+                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalEliminarFija">
+                    <i class="fas fa-trash mr-1"></i> Eliminar
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modalProvisionFija">
+                    <i class="fas fa-plus-circle mr-1"></i> Nuevo
+                </button>
+                <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#modalProvisionExport">
+                    <i class="fas fa-download mr-1"></i> Exportar
+                </button>
             </div>
         </div>
-        <div class="card-body">
+
+        {{-- Filters --}}
+        <div class="card-body pb-0">
+            @include('livewire.movimientos.provisiones.searBoxProvision')
+        </div>
+
+        {{-- Table --}}
+        <div class="card-body pt-0">
             <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead class="thead-dark">
+                <table class="table table-bordered table-hover table-sm mb-0">
+                    <thead class="bg-primary text-white">
                         <tr>
-                            <th>MES</th>
-                            <th>DESCRIPCION</th>
-                            <th>CATEGORIA</th>
+                            <th style="width:80px">MES</th>
+                            <th>DESCRIPCIÓN</th>
+                            <th style="width:160px">CATEGORÍA</th>
                             <th>ESTUDIANTE</th>
-                            <th>MONTO</th>
+                            <th class="text-right" style="width:130px">MONTO</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if ($total + $totalDolar > 0)
-                            @foreach ($detalles as $item)
-                                <tr>
-                                    <td scope="row">{{ $item->date->format('m-Y') }}</td>
-                                    <td>{{ $item->description }}</td>
-                                    <td>{{ $item->category->name }}</td>
-                                    <td>{{ $item->student->full_name }}</td>
-                                    <td> {{ number_format($item->amount, 2) }}
-                                        {{ $item->currency->name ?? 'Soles' }}
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @else
+                        @forelse ($detalles as $item)
                             <tr>
-                                <td class="text-center" scope="row" colspan="6">No hay ningún registro</td>
+                                <td class="text-center text-nowrap align-middle">
+                                    <span class="badge badge-secondary">
+                                        {{ $item->date->format('m/Y') }}
+                                    </span>
+                                </td>
+                                <td class="align-middle">{{ $item->description }}</td>
+                                <td class="align-middle">
+                                    <span class="badge badge-light border">
+                                        {{ $item->category->name }}
+                                    </span>
+                                </td>
+                                <td class="align-middle">{{ $item->student->full_name }}</td>
+                                <td class="text-right align-middle text-nowrap font-weight-bold">
+                                    {{ number_format($item->amount, 2) }}
+                                    <small class="text-muted font-weight-normal">
+                                        {{ $item->currency->name ?? 'S/.' }}
+                                    </small>
+                                </td>
                             </tr>
-                        @endif
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-5" style="background:#fafafa;">
+                                    <i class="fas fa-calendar-times fa-2x d-block mb-2 text-muted" style="opacity:.35;"></i>
+                                    <span class="text-muted">No hay provisiones fijas para el período seleccionado.</span>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="6">
-                                {{ $detalles->links() }}
-                            </td>
+                            <td colspan="5">{{ $detalles->links() }}</td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
-        <div class="card-footer text-muted">
-            <div class="row">
-                <div class="col-md-6">
 
-                </div>
-                <div class="col-md-3 text-center">
-                    <h3><span class="badge badge-pill badge-info">Total S/. {{ number_format($total, 2) }}</span></h3>
-                </div>
-                <div class="col-md-3 text-center">
-                    <h3><span class="badge badge-pill badge-warning">Total $. {{ number_format($totalDolar, 2) }}</span>
-                    </h3>
-                </div>
+        {{-- Footer totals --}}
+        <div class="card-footer">
+            <div class="d-flex justify-content-end align-items-center" style="gap:1rem;">
+                @if ($total > 0)
+                    <div class="text-center">
+                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;">Total Soles</div>
+                        <span class="badge badge-pill badge-info px-3" style="font-size:.85rem;">
+                            S/. {{ number_format($total, 2) }}
+                        </span>
+                    </div>
+                @endif
+                @if ($totalDolar > 0)
+                    <div class="text-center">
+                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;">Total Dólares</div>
+                        <span class="badge badge-pill badge-warning px-3" style="font-size:.85rem;">
+                            $. {{ number_format($totalDolar, 2) }}
+                        </span>
+                    </div>
+                @endif
+                @if ($total == 0 && $totalDolar == 0)
+                    <span class="text-muted small">Sin movimientos en el período</span>
+                @endif
             </div>
         </div>
     </div>
 
     @include('livewire.movimientos.provisiones.fijas.form')
     @include('livewire.movimientos.provisiones.fijas.form-delete')
-
     @include('livewire.movimientos.provisiones.variables.modal-variable-export')
 
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
 
-        window.livewire.on('error', msg => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Opss...!',
-                text: msg,
-            });
-        });
+@push('js')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const alertError = msg => Swal.fire({ icon: 'error', title: 'Error', text: msg });
+
+        window.livewire.on('error', alertError);
 
         window.livewire.on('provision_agregado', msg => {
-            Swal.fire({
-                icon: 'success',
-                title: '¡Buen Trabajo!',
-                text: msg,
-            });
-
+            Swal.fire({ icon: 'success', title: '¡Registrado!', text: msg });
             $('#modalProvisionFija').modal('hide');
         });
 
         window.livewire.on('provision_eliminado', msg => {
-            Swal.fire({
-                icon: 'success',
-                title: '¡Buen Trabajo!',
-                text: msg,
-            });
-
+            Swal.fire({ icon: 'success', title: '¡Eliminado!', text: msg });
             $('#modalEliminarFija').modal('hide');
         });
 
-
-        $('#modalProvisionFija').on('show.bs.modal', function() {
-            livewire.emit('resetUI');
-        });
-        $('#modalEliminarFija').on('show.bs.modal', function() {
-            livewire.emit('resetUI');
-        });
-        $('#modalProvisionExport').on('show.bs.modal', function() {
-            livewire.emit('resetUI');
-        });
-
+        $('#modalProvisionFija').on('show.bs.modal', () => livewire.emit('resetUI'));
+        $('#modalEliminarFija').on('show.bs.modal', () => livewire.emit('resetUI'));
+        $('#modalProvisionExport').on('show.bs.modal', () => livewire.emit('resetUI'));
     });
 </script>
+@endpush

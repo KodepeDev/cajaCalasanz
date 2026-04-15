@@ -18,6 +18,8 @@ class SchoolYear extends Model
 
     public function summaries()
     {
-        return $this->hasMany(\App\Models\Summary::class)->withoutGlobalScopes();
+        return $this->hasMany(
+            \App\Models\Summary::class,
+        )->withoutGlobalScopes();
     }
 }
