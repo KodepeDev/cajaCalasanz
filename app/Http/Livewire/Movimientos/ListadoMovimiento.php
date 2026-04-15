@@ -63,18 +63,10 @@ class ListadoMovimiento extends Component
         $baseQuery = $this->buildQuery();
 
         // Single aggregate query — avoids loading the full collection into memory
-        // $totals = (clone $baseQuery)
-        //     ->where('status', 'PAID')
-        //     ->selectRaw("
-        //         COALESCE(SUM(CASE WHEN type = 'add' THEN amount ELSE 0 END), 0) as total_ingresos,
-        //         COALESCE(SUM(CASE WHEN type = 'out' THEN amount ELSE 0 END), 0) as total_egresos,
-        //         COALESCE(SUM(CASE WHEN type = 'add' THEN tax    ELSE 0 END), 0) as total_ingresos_tx,
-        //         COALESCE(SUM(CASE WHEN type = 'out' THEN tax    ELSE 0 END), 0) as total_egresos_tx
-        //     ")
-        //     ->first();
         $totals = (clone $baseQuery)
+            ->reorder() // 🔥 elimina el ORDER BY
+            ->toBase() // 🔥 elimina comportamiento Eloquent (incluye SELECT *)
             ->where("status", "PAID")
-            ->selectRaw("1") // limpia columnas previas
             ->selectRaw(
                 "
                 COALESCE(SUM(CASE WHEN `type` = 'add' THEN amount ELSE 0 END), 0) AS total_ingresos,

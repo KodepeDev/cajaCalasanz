@@ -1,367 +1,525 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="application/pdf; charset=utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Recibo N°{{ $data->recipt_series }}-{{ $data->recipt_number }}</title>
-    {{-- <link rel="stylesheet" href="{{ asset('pdf/custom_page.css') }}"> --}}
-    {{-- <link rel="stylesheet" href="{{ asset('pdf/custom_pdf.css') }}"> --}}
     <style>
-        /*@page {
-            size: A5 landscape;
-            margin: 10mm;
-        }*/
+        @page {
+            size: A5 portrait;
+            margin: 7mm 7mm 22mm 7mm;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            max-width: 100%;
-            margin: 0 auto;
-            margin-top: -20px;
-            font-size: 0.8rem;
-            line-height: 1;
             font-family: Arial, Helvetica, sans-serif;
-            overflow: hidden;
-        }
-
-        body p {
-            font-size: 0.8rem;
-        }
-
-        hr {
-            border: 0.4px solid gray;
-        }
-
-        table {
-            text-align: center;
-            width: 100%;
-            font-size: 0.8rem;
-            border: 0.5px solid grey;
-            border-spacing: 0;
-            border-radius: 5px;
-            overflow: hidden;
-
-        }
-
-        th,
-        td {
-            padding: 3px;
-            font-size: 0.5rem;
-        }
-
-        .content th,
-        .content td {
-            border-bottom: 0.5px solid grey;
-        }
-
-        .thead {
-            background-color: #76143d;
-            color: white;
-            padding: 0.5rem;
-        }
-
-        header {
-            text-align: center;
-            line-height: 1;
-        }
-
-        header h1 {
-            font-size: 0.8rem;
+            font-size: 8pt;
+            line-height: 1.4;
+            color: #222;
             margin: 0;
             padding: 0;
-            text-decoration: underline;
-            margin-bottom: 5px;
         }
 
-        .bussiness_info p {
-            margin: 0;
-            margin-top: 2px;
-            padding: 0;
-            font-size: .5rem;
-        }
-
-        header h6 {
-            line-height: 0.8;
-        }
-
-        .ticket_logo {
-            width: 90px;
-        }
-
-        small {
-            background-color: #e3e3e3;
-            font-size: 0.8rem;
-            padding: 5px;
-            border: 2px solid black;
-            border-radius: 5px;
-            display: block;
-        }
-
-        .body_content {
-            position: relative;
-            height: 100%;
-        }
-
-        .nulled_container {
-            color: red;
-            text-align: center;
-            border: 2px solid red;
-            position: absolute;
-            width: 350px;
-            height: 180px;
-            top: 35%;
-            left: 25%;
-            transform: translate(50%, -50%);
-            transform: rotate(-45deg);
-            padding: 5px;
-        }
-
-        .nulled_title {
-            font-size: 20px;
-            letter-spacing: 8px;
-            font-weight: bolder;
-        }
-
-        .receipt_number {
-            margin-top: 10px;
-        }
-
-        .receipt_number tr td {
-            border: 0.5px solid gray;
-            border-bottom: 0;
-            padding: 5px 0 5px 0;
-        }
-
-        .rec_name {
-            color: white;
-            font-weight: bold;
-            background-color: #76143d;
-        }
-
-        .company_info {
-            border: unset;
-            margin-bottom: 5px;
-        }
-
-        header>table td {
-            padding-left: 0;
-            padding-right: 0;
-        }
-
-        .student_table {
-            border: unset;
-        }
-
-        footer {
-            position: fixed;
-            width: 100%;
-            bottom: 5px;
-        }
-
-        footer table td,
-        footer table th {
-            font-size: .5rem;
-        }
-
-        body {
-            padding: 0;
-            margin: 0;
-        }
-
+        /* ── WATERMARK ─────────────────────────── */
         .watermark {
             position: absolute;
-            top: 18%;
-            left: 25%;
-            width: 300px;
-            z-index: -1;
-            opacity: .1;
+            top: 30%;
+            left: 20%;
+            width: 260px;
+            opacity: 0.06;
+            z-index: 0;
         }
 
-        .watermark2 {
+        /* ── ANULADO STAMP ─────────────────────── */
+        .nulled-stamp {
             position: absolute;
-            top: 22%;
-            left: 15%;
-            width: 200px;
-            z-index: -1;
-            opacity: .1;
+            top: 38%;
+            left: 50%;
+            width: 220px;
+            margin-left: -110px;
+            border: 3px solid #cc0000;
+            text-align: center;
+            padding: 6px 10px;
+            z-index: 10;
+        }
+        .nulled-stamp .nulled-title {
+            font-size: 22pt;
+            font-weight: bold;
+            color: #cc0000;
+            letter-spacing: 6px;
+            margin: 0;
+            padding: 0;
+        }
+        .nulled-stamp .nulled-motive {
+            font-size: 7pt;
+            color: #cc0000;
+            margin: 2px 0 0 0;
+            padding: 0;
         }
 
-        .total_letras {
-            margin-top: 8px;
+        /* ── TOP ACCENT BAR ────────────────────── */
+        .accent-bar {
+            background-color: #76143d;
+            height: 4px;
+            width: 100%;
+            margin-bottom: 6px;
+        }
+
+        /* ── HEADER ────────────────────────────── */
+        .header-table {
+            width: 100%;
+            border: none;
+            border-spacing: 0;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+        }
+        .header-table td {
+            border: none;
+            padding: 0;
+            vertical-align: top;
+        }
+        .header-logo {
+            width: 70px;
+            display: block;
+        }
+        .company-name {
+            font-size: 9pt;
+            font-weight: bold;
+            color: #76143d;
+            margin: 0 0 3px 0;
+            padding: 0;
+            text-transform: uppercase;
+        }
+        .company-detail {
+            font-size: 6.5pt;
+            color: #444;
+            margin: 1px 0;
+            padding: 0;
+        }
+
+        /* ── RECEIPT BOX (top-right) ───────────── */
+        .receipt-box {
+            border: 1.5px solid #76143d;
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        .receipt-box td {
+            padding: 4px 6px;
+            border: none;
+        }
+        .receipt-box .rtype-cell {
+            background-color: #76143d;
+            color: #fff;
+            font-size: 7pt;
+            font-weight: bold;
             text-align: center;
-            font-size: 0.7rem;
+            letter-spacing: 1px;
+            padding: 5px 4px;
+        }
+        .receipt-box .rtype-area {
+            font-size: 6pt;
+            font-weight: normal;
+            letter-spacing: 0;
+            display: block;
+            margin-top: 1px;
+        }
+        .receipt-box .rnum-cell {
+            text-align: center;
+            font-size: 9pt;
+            font-weight: bold;
+            color: #76143d;
+            border-top: 1px solid #76143d;
+            padding: 4px;
+        }
+        .receipt-box .rdate-cell {
+            text-align: center;
+            font-size: 6.5pt;
+            color: #555;
+            border-top: 1px dashed #ccc;
+            padding: 3px 4px;
+        }
+
+        /* ── SECTION DIVIDER ───────────────────── */
+        .section-divider {
+            border: none;
+            border-top: 1px solid #76143d;
+            margin: 5px 0;
+        }
+
+        /* ── INFO TABLES (student / customer) ──── */
+        .info-wrap {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            border: none;
+            margin-bottom: 5px;
+        }
+        .info-wrap > tbody > tr > td {
+            border: none;
+            padding: 0;
+            vertical-align: top;
+        }
+        .info-wrap > tbody > tr > td:first-child {
+            padding-right: 4px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            border: 1px solid #ddd;
+            font-size: 7pt;
+        }
+        .data-table thead tr th {
+            background-color: #76143d;
+            color: #fff;
+            font-size: 7pt;
+            font-weight: bold;
+            text-align: center;
+            padding: 4px 5px;
+            letter-spacing: 0.5px;
+        }
+        .data-table tbody tr th {
+            text-align: left;
+            font-weight: bold;
+            color: #555;
+            padding: 3px 5px;
+            width: 35%;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #eee;
+        }
+        .data-table tbody tr td {
+            text-align: left;
+            padding: 3px 5px;
+            color: #222;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* ── ITEMS TABLE ───────────────────────── */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            border: 1px solid #ddd;
+            font-size: 7pt;
+            margin-top: 6px;
+        }
+        .items-table thead tr th {
+            background-color: #76143d;
+            color: #fff;
+            font-size: 7pt;
+            font-weight: bold;
+            padding: 5px 6px;
+            border-bottom: 1px solid #5a0f2e;
+        }
+        .items-table thead tr th.th-right {
+            text-align: right;
+        }
+        .items-table thead tr th.th-left {
+            text-align: left;
+        }
+        .items-table tbody tr td {
+            padding: 4px 6px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        .items-table tbody tr.row-alt td {
+            background-color: #fdf5f8;
+        }
+        .items-table tfoot tr td {
+            padding: 5px 6px;
+            border-top: 2px solid #76143d;
+            background-color: #f9f0f4;
+        }
+        .total-label {
+            text-align: right;
+            font-size: 8pt;
+            font-weight: bold;
+            color: #76143d;
+        }
+        .total-amount {
+            text-align: right;
+            font-size: 10pt;
+            font-weight: bold;
+            color: #76143d;
+        }
+
+        /* ── TOTAL EN LETRAS ───────────────────── */
+        .total-words {
+            text-align: center;
+            font-size: 7pt;
             font-style: italic;
             font-weight: bold;
+            color: #444;
+            border: 1px dashed #bbb;
+            padding: 4px 8px;
+            margin-top: 6px;
+            background-color: #fafafa;
         }
 
-        .main-table {
-            margin-top: 10px;
+        /* ── FOOTER (fixed at page bottom) ─────── */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
         }
-        .body-content {
-            transform: rotate(-90deg);
+        .footer-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            border: none;
+        }
+        .footer-table > tbody > tr > td {
+            border: none;
+            padding: 0;
+            vertical-align: top;
+        }
+        .footer-table > tbody > tr > td:first-child {
+            padding-right: 4px;
+        }
+
+        .footer-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            border: 1px solid #ddd;
+            font-size: 6.5pt;
+        }
+        .footer-info-table thead tr th {
+            background-color: #76143d;
+            color: #fff;
+            font-size: 6.5pt;
+            font-weight: bold;
+            text-align: center;
+            padding: 3px 5px;
+        }
+        .footer-info-table tbody tr th {
+            text-align: left;
+            font-weight: bold;
+            color: #555;
+            padding: 2px 5px;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #eee;
+            width: 38%;
+        }
+        .footer-info-table tbody tr td {
+            text-align: left;
+            padding: 2px 5px;
+            color: #222;
+            border-bottom: 1px solid #eee;
+        }
+        .footer-generated {
+            text-align: center;
+            font-size: 6pt;
+            color: #777;
+            font-style: italic;
+            padding: 3px 0 0 0;
+            border-top: 1px solid #eee;
+        }
+
+        .footer-sign-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            border: 1px solid #ddd;
+            font-size: 6.5pt;
+        }
+        .footer-sign-table thead tr th {
+            background-color: #76143d;
+            color: #fff;
+            font-size: 6.5pt;
+            font-weight: bold;
+            text-align: center;
+            padding: 3px 5px;
+        }
+        .footer-sign-table tbody tr td {
+            height: 47px;
+            text-align: center;
+            vertical-align: bottom;
+            font-size: 6pt;
+            color: #999;
+            padding: 0 5px 3px;
+            border-top: 1px solid #bbb;
+        }
+
+        .bottom-bar {
+            background-color: #76143d;
+            height: 3px;
+            width: 100%;
+            margin-top: 4px;
         }
     </style>
 </head>
 
-<body class="body_content" onload="window.print();">
-    @if ($data->status == 'NULLED')
-        <div class="nulled_container">
-            <h1 class="nulled_title">ANULADO</h1>
-            <h5 class="nulled_motive">{{ $data->nulled_motive }}</h5>
-        </div>
-    @endif
+<body>
+    {{-- Watermark --}}
     @if ($data->type == 'add' && $data->student)
         <img src="{{ config('kodepe.logo') }}" class="watermark" />
     @else
-        <img src="{{ config('kodepe.logo') }}" class="watermark2" />
+        <img src="{{ config('kodepe.logo') }}" class="watermark" style="top: 28%; left: 18%; width: 200px;" />
     @endif
-    <header>
-        <table class="company_info">
-            <tr>
-                <td width="12%" align="left">
-                    <img src="{{ config('kodepe.logo') }}" alt="" class="ticket_logo">
-                </td>
-                <td align="left" valign="top" class="bussiness_info">
-                    <h1>I.E.P. SAN JOSÉ DE CALASANZ</h1>
-                    <p><b>RUC:</b> 20610085548</p>
-                    <p><b>CEL:</b> +51 933 043 954</p>
-                    <p><b>CORREO:</b> calasanzschool@gmail.com - informes@calasanz.edu.pe</p>
-                    <p><b>WEB:</b> www.calasanz.edu.pe</p>
-                    <p><b>DIRECCIÓN:</b> Jr. Borax N° 631 Mz. T-III Lt. 36 - Lima - San Juan de Lurigancho</p>
-                </td>
-                <td width="40%" valign="top">
-                    <table class="receipt_number">
-                        <tr>
-                            <td class="rec_name">
-                                RECIBO DE {{ $data->type == 'add' ? 'INGRESO' : 'GASTO' }}
-                                <br>
-                                @if ($data->section_type)
+
+    {{-- ANULADO stamp --}}
+    @if ($data->status == 'NULLED')
+        <div class="nulled-stamp">
+            <p class="nulled-title">ANULADO</p>
+            @if ($data->nulled_motive)
+                <p class="nulled-motive">{{ $data->nulled_motive }}</p>
+            @endif
+        </div>
+    @endif
+
+    {{-- Top accent bar --}}
+    <div class="accent-bar"></div>
+
+    {{-- ══ HEADER ══════════════════════════════════════ --}}
+    <table class="header-table">
+        <tr>
+            {{-- Logo --}}
+            <td width="15%" style="padding-right: 6px;">
+                <img src="{{ config('kodepe.logo') }}" class="header-logo" alt="Logo" />
+            </td>
+
+            {{-- Company info --}}
+            <td style="padding-right: 8px;">
+                <p class="company-name">I.E.P. San José de Calasanz</p>
+                <p class="company-detail"><b>RUC:</b> 20610085548</p>
+                <p class="company-detail"><b>CEL:</b> +51 933 043 954</p>
+                <p class="company-detail"><b>EMAIL:</b> informes@calasanz.edu.pe</p>
+                <p class="company-detail"><b>WEB:</b> www.calasanz.edu.pe</p>
+                <p class="company-detail"><b>DIR.:</b> Jr. Borax N° 631 Mz. T-III Lt. 36 - S.J.L., Lima</p>
+            </td>
+
+            {{-- Receipt number box --}}
+            <td width="38%" valign="top">
+                <table class="receipt-box">
+                    <tr>
+                        <td class="rtype-cell">
+                            RECIBO DE {{ $data->type == 'add' ? 'INGRESO' : 'GASTO' }}
+                            @if ($data->section_type)
+                                <span class="rtype-area">
                                     @switch($data->section_type)
-                                        @case('1E')
-                                            AREA PRINCIPAL
-                                        @break
-
-                                        @case('2E')
-                                            - AREA SECUNDARIA
-                                        @break
-
-                                        @default
-                                            ADMINISTRACION
+                                        @case('1E') ÁREA PRINCIPAL @break
+                                        @case('2E') ÁREA SECUNDARIA @break
+                                        @default ADMINISTRACIÓN
                                     @endswitch
-                                @endif
-                            </td>
-                            <td class="rec_number">
-                                <b>{{ $data->recipt_series . ' - ' . str_pad($data->recipt_number, 8, '0', STR_PAD_LEFT) }}</b>
-                            </td>
-                        </tr>
+                                </span>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="rnum-cell">
+                            {{ $data->recipt_series }}-{{ str_pad($data->recipt_number, 8, '0', STR_PAD_LEFT) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="rdate-cell">
+                            Emisión: <b>{{ $data->date->format('d/m/Y') }}</b>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <hr class="section-divider" />
+
+    {{-- ══ CUSTOMER / STUDENT DATA ══════════════════════ --}}
+    @if ($data->type == 'add' && $data->student)
+        <table class="info-wrap">
+            <tr>
+                <td width="50%">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th colspan="2">DATOS DEL ESTUDIANTE</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>NOMBRES:</th>
+                                <td>{{ $data->student->full_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>DNI:</th>
+                                <td>{{ $data->student->document }}</td>
+                            </tr>
+                            <tr>
+                                <th>GRADO:</th>
+                                <td>{{ $data->student->grade->name }}</td>
+                            </tr>
+                        </tbody>
                     </table>
-                    <br>
-                    <i>FECHA DE EMISIÓN: {{ $data->date->format('d/m/Y') }}</i>
+                </td>
+                <td width="50%">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th colspan="2">PADRE / MADRE / TUTOR</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>NOMBRES:</th>
+                                <td>{{ $data->customer->full_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>DNI:</th>
+                                <td>{{ $data->customer->document }}</td>
+                            </tr>
+                            <tr>
+                                <th>DIRECCIÓN:</th>
+                                <td>{{ $data->customer->address }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </td>
             </tr>
         </table>
-
-        @if ($data->type == 'add' && $data->student)
-            <table class="student_table">
-                <tbody class="">
-                    <tr>
-                        <td style="padding-right: 5px" width="50%">
-                            <table class="content">
-                                <thead class="thead">
-                                    <tr>
-                                        <th colspan="2">DATOS DEL ESTUDIANTE</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th style="text-align: left">
-                                            NOMBRES:
-                                        </th>
-                                        <td style="text-align: left">{{ $data->student->full_name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th style="text-align: left">DNI</th>
-                                        <td style="text-align: left">{{ $data->student->document }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th style="text-align: left">GRADO:</th>
-                                        <td style="text-align: left">{{ $data->student->grade->name }}</td>
-
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                        <td style="padding-left: 5px">
-                            <table class="content">
-                                <thead class="thead">
-                                    <tr>
-                                        <th colspan="2">DATOS DE PADRE/MADRE O TUTOR</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th style="text-align: left">
-                                            NOMBRES:
-                                        </th>
-                                        <td style="text-align: left">{{ $data->customer->full_name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th style="text-align: left">DNI:</th>
-                                        <td style="text-align: left">{{ $data->customer->document }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th style="text-align: left">Dirección:</th>
-                                        <td style="text-align: left">{{ $data->customer->address }}</td>
-
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        @else
-            <table class="content">
+    @else
+        <table class="data-table" style="margin-bottom: 5px;">
+            <thead>
                 <tr>
-                    <th style="text-align: left">{{ $data->type == 'add' ? 'Cliente: ' : 'Proveedor: ' }}
+                    <th colspan="2">
+                        {{ $data->type == 'add' ? 'DATOS DEL CLIENTE' : 'DATOS DEL PROVEEDOR' }}
                     </th>
-                    <td style="text-align: left">{{ $data->customer->full_name }}</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>{{ $data->type == 'add' ? 'CLIENTE:' : 'PROVEEDOR:' }}</th>
+                    <td>{{ $data->customer->full_name }}</td>
                 </tr>
                 <tr>
-                    <th style="text-align: left">RUC/DNI/OTRO:</th>
-                    <td style="text-align: left">{{ $data->customer->document }}</td>
+                    <th>RUC / DNI:</th>
+                    <td>{{ $data->customer->document }}</td>
                 </tr>
                 <tr>
-                    <th style="text-align: left">Dirección:</th>
-                    <td style="text-align: left">{{ $data->customer->address }}</td>
-
+                    <th>DIRECCIÓN:</th>
+                    <td>{{ $data->customer->address }}</td>
                 </tr>
-            </table>
-        @endif
-    </header>
+            </tbody>
+        </table>
+    @endif
 
-    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 content main-table">
-        <thead class="thead">
+    {{-- ══ ITEMS TABLE ══════════════════════════════════ --}}
+    <table class="items-table">
+        <thead>
             <tr>
-                <th style="text-align: left" class="px-6 py-3">MES</th>
-                <th style="text-align: left" class="px-6 py-3" width="35%">DESCRIPCIÓN</th>
-                {{-- <th style="text-align: left" class="px-6 py-3">CATEGORIA</th> --}}
-                <th style="text-align: right" class="px-6 py-3">MONTO</th>
+                <th class="th-left" width="14%">MES</th>
+                <th class="th-left">DESCRIPCIÓN</th>
+                <th class="th-right" width="20%">MONTO</th>
             </tr>
         </thead>
         <tbody>
-            {{-- <tr>
-                    <td style="text-align: left" scope="row">{{$data->concept}}</td>
-                    <td>{{$data->stand}}</td>
-                    <td style="text-align: right">{{number_format($data->amount, 2)}}</td>
-                </tr> --}}
             @if ($data->status == 'PAID')
                 @foreach ($data->details as $item)
-                    <tr>
-                        <td style="text-align: left" scope="row">{{ $item->date->format('m-Y') }}</td>
-                        <td style="text-align: left" scope="row">{{ $item->description }}</td>
-                        {{-- <td style="text-align: left" scope="row">{{$item->category->name}}</td> --}}
-                        <td style="text-align: right">
+                    <tr class="{{ $loop->even ? 'row-alt' : '' }}">
+                        <td style="text-align: left;">{{ $item->date->format('m/Y') }}</td>
+                        <td style="text-align: left;">{{ $item->description }}</td>
+                        <td style="text-align: right;">
                             @if ($item->currency->id == 2)
                                 S/ {{ number_format($item->changed_amount, 2) }}
                             @else
@@ -371,89 +529,65 @@
                     </tr>
                 @endforeach
             @else
-                @foreach ($data->nulledDetails as $items)
-                    <tr>
-                        <td style="text-align: left" scope="row">{{ $items->date->format('m-Y') }}</td>
-                        <td style="text-align: left" scope="row">{{ $items->description }}</td>
-                        {{-- <td style="text-align: left" scope="row">{{$items->category->name}}</td> --}}
-                        <td style="text-align: right">
-                            {{ number_format($items->amount, 2) }}
-                        </td>
+                @foreach ($data->nulledDetails as $item)
+                    <tr class="{{ $loop->even ? 'row-alt' : '' }}">
+                        <td style="text-align: left;">{{ $item->date->format('m/Y') }}</td>
+                        <td style="text-align: left;">{{ $item->description }}</td>
+                        <td style="text-align: right;">S/ {{ number_format($item->amount, 2) }}</td>
                     </tr>
                 @endforeach
             @endif
-
         </tbody>
-        <br>
         <tfoot>
             <tr>
-                <td colspan="2" scope="row" style="text-align: right"><b>TOTAL S/.:</b></td>
-                <td scope="row" class="text-red-800 text-right" style="text-align: right" colspan="1">
-                    <b>{{ number_format($data->amount, 2) }}</b>
-                </td>
+                <td colspan="2" class="total-label">TOTAL A PAGAR (S/.):</td>
+                <td class="total-amount">{{ number_format($data->amount, 2) }}</td>
             </tr>
         </tfoot>
     </table>
 
-    <p class="total_letras">SON {{ $textoTotal }}</p>
+    {{-- Amount in words --}}
+    <div class="total-words">SON: {{ $textoTotal }}</div>
 
+    {{-- ══ FOOTER (fixed bottom) ════════════════════════ --}}
     <footer>
-        <table style="border: unset;">
-            <tbody>
-                <tr>
-                    <td width="70%">
-                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                            <thead class="thead">
-                                <tr>
-                                    <th colspan="2" style="text-align: center" class="px-6 py-3">INFORMACIÓN
-                                        ADICIONAL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                                <tr>
-                                    <th style="text-align: left" scope="row">PAGADO POR:</th>
-                                    <td style="text-align: left" scope="row">{{ $data->paid_by }}</td>
-                                </tr>
-                                <tr>
-                                    <th style="text-align: left" scope="row">#OPER/FACT/BOLET/ETC:</th>
-                                    <td style="text-align: left" scope="row">{{ $data->operation_number }}</td>
-                                </tr>
-                                <tr>
-                                    <th style="text-align: left" scope="row">OBSERVACIONES:</th>
-                                    <td style="text-align: left" scope="row">{{ $data->observation }}</td>
-                                </tr>
-                                <tr>
-                                    <th style="text-align: center" colspan="2" scope="row">
-                                        <hr><i>GENERADO POR: {{ $data->user->first_name }}</i>
-                                    </th>
-                                </tr>
-
-                            </tbody>
-                        </table>
-                    </td>
-                    <td>
-                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                            <thead class="thead">
-                                <tr>
-                                    <th colspan="2" style="text-align: center" class="px-6 py-3">FIRMA</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                                <tr>
-                                    <td rowspan="9" style="text-align: left" scope="row">
-
-                                    </td>
-                                </tr>
-
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-            </tbody>
+        <table class="footer-table">
+            <tr>
+                <td width="68%">
+                    <table class="footer-info-table">
+                        <thead>
+                            <tr><th colspan="2">INFORMACIÓN ADICIONAL</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>PAGADO POR:</th>
+                                <td>{{ $data->paid_by }}</td>
+                            </tr>
+                            <tr>
+                                <th># OPER / COMP.:</th>
+                                <td>{{ $data->operation_number }}</td>
+                            </tr>
+                            <tr>
+                                <th>OBSERVACIONES:</th>
+                                <td>{{ $data->observation }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td width="32%">
+                    <table class="footer-sign-table">
+                        <thead>
+                            <tr><th>FIRMA Y SELLO</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>____________________</td></tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
         </table>
+        <p class="footer-generated">Generado por: {{ $data->user->first_name }}</p>
+        <div class="bottom-bar"></div>
     </footer>
 </body>
-
 </html>
