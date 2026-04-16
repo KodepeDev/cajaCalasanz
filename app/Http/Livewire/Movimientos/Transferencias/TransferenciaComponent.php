@@ -2,109 +2,91 @@
 
 namespace App\Http\Livewire\Movimientos\Transferencias;
 
-use Carbon\Carbon;
 use App\Models\Account;
-use App\Models\Summary;
-use Livewire\Component;
 use App\Models\Customer;
+use App\Models\Summary;
 use App\Models\Transfer;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class TransferenciaComponent extends Component
 {
-    public $cuenta1, $cuenta2, $cuentas, $saldoCuenta1, $saldoCuenta2, $hoy, $validezFecha;
+    public $cuenta1   = -1;
+    public $cuenta2   = -1;
+    public $amount;
+    public $date;
 
-    public $date, $amount, $future, $customer;
-
-    public function mount()
-    {
-        $this->hoy = Carbon::now()->format('Y-m-d');
-        $this->cuentas = Account::pluck('account_name', 'id');
-        $this->validezFecha = true;
-        $this->cuenta1 = -1;
-        $this->cuenta2 = -1;
-        $this->customer = Customer::where('document', '=', '99999999')->first();
-    }
     public function render()
     {
-        if($this->cuenta1 > 0){
-            $this->saldoCuenta1 = Summary::where('account_id', '=', $this->cuenta1)->where('type', 'add')->where('date', '<=', $this->hoy)->sum('amount') - Summary::where('account_id', '=', $this->cuenta1)->where('type', 'out')->where('date', '<=', $this->hoy)->sum('amount');
-        }else {
-            $this->saldoCuenta1 = 0;
-        }
-        if($this->cuenta2 > 0){
-            $this->saldoCuenta2 = Summary::where('account_id', '=', $this->cuenta2)->where('type', 'add')->where('date', '<=', $this->hoy)->sum('amount') - Summary::where('account_id', '=', $this->cuenta2)->where('type', 'out')->where('date', '<=', $this->hoy)->sum('amount');
-        }else{
-            $this->saldoCuenta2 = 0;
-        }
+        $today = Carbon::today()->toDateString();
 
+        $balanceOf = function (int $accountId) use ($today): float {
+            if ($accountId < 1) {
+                return 0.0;
+            }
+            return (float) Summary::where('status', 'PAID')
+                ->where('account_id', $accountId)
+                ->where('date', '<=', $today)
+                ->selectRaw("SUM(CASE WHEN type='add' THEN amount ELSE -amount END) as net")
+                ->value('net');
+        };
 
-        return view('livewire.movimientos.transferencias.transferencia-component')->extends('adminlte::page');
+        return view('livewire.movimientos.transferencias.transferencia-component', [
+            'cuentas'       => Account::pluck('account_name', 'id'),
+            'saldoCuenta1'  => $balanceOf($this->cuenta1),
+            'saldoCuenta2'  => $balanceOf($this->cuenta2),
+        ])->extends('adminlte::page');
     }
 
-    public function crearTransferencia()
+    public function crearTransferencia(): void
     {
-        $this->validarFechas();
+        $today = Carbon::today()->toDateString();
 
-        if ($this->date <= $this->hoy) {
-
-            $this->future = 1;
-
-        } else {
-
-            $this->future = 2;
-
-        }
-
-
-        $rules = [
-            'date' => 'required|date|after_or_equal:'.$this->hoy,
-            'amount' => 'required|numeric|min:0',
+        $this->validate([
+            'date'    => 'required|date|after_or_equal:' . $today,
+            'amount'  => 'required|numeric|min:0.01',
             'cuenta1' => 'required|not_in:-1',
             'cuenta2' => 'required|not_in:-1|different:cuenta1',
-        ];
+        ], [
+            'date.required'       => 'La fecha es requerida.',
+            'date.after_or_equal' => 'La fecha no puede ser anterior a hoy.',
+            'amount.required'     => 'El monto es requerido.',
+            'amount.numeric'      => 'El monto debe ser un valor numérico.',
+            'amount.min'          => 'El monto debe ser mayor a 0.',
+            'cuenta1.not_in'      => 'Seleccione la cuenta de origen.',
+            'cuenta2.not_in'      => 'Seleccione la cuenta de destino.',
+            'cuenta2.different'   => 'La cuenta de origen y destino deben ser diferentes.',
+        ]);
 
-        $messages = [
-            'date.required' => 'La fecha es requerida',
-            'date.date' => 'La fecha debe ser una fecha válida',
-            'date.after_or_equal' => 'La fecha para esta transaccion no puede ser menor a la fecha de hoy',
-            'amount.required' => 'El monto es requerido',
-            'amount.numeric' => 'El monto debe ser un valor numerico',
-            'amount.min' => 'El monto deberia ser como mínimo 0',
-            'cuenta1.required' => 'La cuenta de origen es requerida',
-            'cuenta1.not_in' => 'La cuenta de origen es requerida',
-            'cuenta2.required' => 'La cuenta de destino es requerida',
-            'cuenta2.not_in' => 'La cuenta de destino es requerida',
-            'cuenta2.different' => 'La cuenta de origen y la cuenta de destino deben ser diferentes',
-        ];
+        $future   = $this->date <= $today ? 1 : 2;
+        $customer = Customer::where('document', '99999999')->first();
 
-        $this->validate($rules, $messages);
-
-        $account1 = Account::find($this->cuenta1);
-        $account2 = Account::find($this->cuenta2);
+        $account1 = Account::findOrFail($this->cuenta1);
+        $account2 = Account::findOrFail($this->cuenta2);
 
         $destino = Summary::create([
-            'date' =>  $this->date,
-            'concept' => "Transferencia Recibida de: " .$account1->account_name,
-            'type' => 'add',
-            'future' => $this->future,
-            'amount' => $this->amount,
-            'user_id'=>Auth::id(),
-            'account_id' => $this->cuenta2,
+            'date'        => $this->date,
+            'concept'     => 'Transferencia recibida de: ' . $account1->account_name,
+            'type'        => 'add',
+            'future'      => $future,
+            'amount'      => $this->amount,
+            'user_id'     => Auth::id(),
+            'account_id'  => $this->cuenta2,
             'category_id' => 1,
-            'customer_id' => $this->customer->id,
+            'customer_id' => $customer->id,
         ]);
 
         $origen = Summary::create([
-            'date' =>  $this->date,
-            'concept' => "Transferencia Enviada a: " .$account2->account_name,
-            'type' => 'out',
-            'future' => $this->future,
-            'amount' => $this->amount,
-            'user_id'=>Auth::id(),
-            'account_id' => $this->cuenta1,
+            'date'        => $this->date,
+            'concept'     => 'Transferencia enviada a: ' . $account2->account_name,
+            'type'        => 'out',
+            'future'      => $future,
+            'amount'      => $this->amount,
+            'user_id'     => Auth::id(),
+            'account_id'  => $this->cuenta1,
             'category_id' => 1,
-            'customer_id' => $this->customer->id,
+            'customer_id' => $customer->id,
         ]);
 
         $transfer = Transfer::create([
@@ -112,32 +94,9 @@ class TransferenciaComponent extends Component
             'id_out' => $origen->id,
         ]);
 
-        $summary = Summary::find($destino->id);
-        $summary->id_transfer = $transfer->id;
-        $summary->save();
+        $destino->update(['id_transfer' => $transfer->id]);
+        $origen->update(['id_transfer'  => $transfer->id]);
 
-        $summary = Summary::find($origen->id);
-        $summary->id_transfer = $transfer->id;
-        $summary->save();
-
-        $this->emit('added', 'Transferencia exitosa');
-
-        return redirect()->route('movimientos.listado');
-
-    }
-
-    public function validarFechas()
-    {
-        $hoy = Carbon::now();
-
-        if($this->date < $hoy->format('Y-m-d')){
-
-            $this->emit('error_fecha', 'La fecha para esta transaccion no puede ser menor a la fecha de hoy');
-            $this->validezFecha = false;
-
-        }else{
-
-           $this->validezFecha = true;
-        }
+        redirect()->route('movimientos.listado');
     }
 }

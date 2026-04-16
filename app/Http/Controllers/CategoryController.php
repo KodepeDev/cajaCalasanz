@@ -8,181 +8,154 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
-        $categories = Category::where('id', '!=', 1)->get();
+        $categories = Category::where('id', '!=', 1)
+            ->withCount('details')
+            ->orderBy('type')
+            ->orderBy('name')
+            ->get();
 
         return view('admin.categorias.index', compact('categories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        //
         return view('admin.categorias.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
-        $valores = array(
-            'name' => $request->name,
-            'description' => $request->description,
-            'type' => $request->type,
-            );
-        $category = Category::create($valores);
+        $data = $request->validate([
+            'name'        => 'required|string|max:200',
+            'type'        => 'required|in:add,out',
+            'description' => 'nullable|string|max:200',
+        ]);
 
-        // dd($category->id);
+        $category = Category::create($data);
 
-        // return redirect('/admin/categories/view_attr/'.$category->id);
-        return redirect('/admin/categories/');
+        return redirect("/admin/categories/edit/{$category->id}")
+            ->with('success', 'Categoría creada. Puede agregar subcategorías a continuación.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function edit(int $id)
     {
-        //
+        $category   = Category::findOrFail($id);
+        $attributes = AttrValue::where('category_id', $id)->get();
+
+        return view('admin.categorias.edit', compact('category', 'attributes'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function update(Request $request, int $id)
     {
-        //
         $category = Category::findOrFail($id);
 
-		$attribute = AttrValue::where('category_id',$id)->get();
+        $data = $request->validate([
+            'name'        => 'required|string|max:200',
+            'type'        => 'required|in:add,out',
+            'description' => 'nullable|string|max:200',
+            'name_.*'     => 'nullable|string|max:200',
+            'value_.*'    => 'nullable|string|max:200',
+        ]);
 
-		return view('admin.categorias.edit',['data'=>$category,'data1'=>$attribute]);
+        $category->update([
+            'name'        => $data['name'],
+            'type'        => $data['type'],
+            'description' => $data['description'] ?? null,
+        ]);
 
-    }
+        $names  = $request->input('name_', []);
+        $values = $request->input('value_', []);
+        $ids    = $request->input('id', []);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        $name = $request->input('name');
-		$names = $request->input('name_');
-		$ids= $request->input('id');
-    	$values = $request->input('value_');
+        foreach ($names as $n => $name) {
+            if (blank($name)) {
+                continue;
+            }
 
+            $attrId = (int) ($ids[$n] ?? 0);
 
-    	if($names !== null){
-            foreach ($names as $n => $v ) {
-                $valores = array(
-                        'name' => $v,
-                        'value' => $values[$n],
-                        'category_id' => $id,
-                        );
-                if($ids[$n]==0){
-                    AttrValue::insert($valores);
-                }else{
-                    AttrValue::where('id',$ids[$n])->update($valores);
-                }
-
+            if ($attrId > 0) {
+                AttrValue::where('id', $attrId)->update([
+                    'name'        => $name,
+                    'value'       => $values[$n] ?? '',
+                    'category_id' => $id,
+                ]);
+            } else {
+                AttrValue::create([
+                    'name'        => $name,
+                    'value'       => $values[$n] ?? '',
+                    'category_id' => $id,
+                ]);
             }
         }
 
-        $categories = Category::find($id);
-        $categories->name = $request->name;
-		$categories->description = $request->description;
-		$categories->type = $request->type;
-		$categories->save();
-
-        return redirect('admin/categories');
+        return redirect(route('categorias'))
+            ->with('success', 'Categoría actualizada correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        //
+        $category = Category::withCount('details')->findOrFail($id);
 
-        $categories = Category::find($id);
+        if ($category->details_count > 0) {
+            return redirect(route('categorias'))
+                ->with('error', 'No se puede eliminar: la categoría tiene detalles asociados.');
+        }
 
-		$data = Category::where('id',$id)->first();
-    	$attributes = AttrValue::where('category_id',$id)->delete();
+        AttrValue::where('category_id', $id)->delete();
+        $category->delete();
 
-        $categories->delete();
-
-        return redirect('admin/categories');
+        return redirect(route('categorias'))
+            ->with('success', 'Categoría eliminada correctamente.');
     }
 
+    // ── Subcategory attr routes ───────────────────────────────────────────────
 
+    public function view_attr(int $id)
+    {
+        $categorie = Category::findOrFail($id);
 
-
-    public function view_attr($id=null){
-
-        $categorie = Category::find($id);
-        return view('admin.categorias.attr',['categorie'=>$categorie]);
-
+        return view('admin.categorias.attr', compact('categorie'));
     }
 
-    public function save_attr(Request $request,$id=null){
+    public function save_attr(Request $request, int $id)
+    {
+        $request->validate([
+            'name_.*'  => 'required|string|max:200',
+            'value_.*' => 'nullable|string|max:200',
+        ]);
 
+        $names  = $request->input('name_', []);
+        $values = $request->input('value_', []);
 
-            $name = $request->input('name_');
-            $values = $request->input('value_');
-
-            foreach ($name as $n => $v) {
-                $valores = array(
-                    'name' => $v,
-                    'value' => $values[$n],
-                    'category_id' => $id
-                );
-                AttrValue::insert($valores);
+        foreach ($names as $n => $name) {
+            if (blank($name)) {
+                continue;
             }
 
-            return redirect('admin/categories');
+            AttrValue::create([
+                'name'        => $name,
+                'value'       => $values[$n] ?? '',
+                'category_id' => $id,
+            ]);
+        }
 
+        return redirect(route('categorias'))
+            ->with('success', 'Subcategorías guardadas correctamente.');
     }
 
-    public function destroyattr( $id)
-  	{
-        $categories = AttrValue::find($id);
-        $categories->delete();
+    public function destroyattr(int $id)
+    {
+        AttrValue::findOrFail($id)->delete();
 
-        return back();
+        return back()->with('success', 'Subcategoría eliminada.');
     }
 
-    public function get_all($id){
-
-    	$data = AttrValue::where('category_id',$id)->get();
-    	return response()->json($data);
-
+    public function get_all(int $id)
+    {
+        return response()->json(
+            AttrValue::where('category_id', $id)->get()
+        );
     }
 }
