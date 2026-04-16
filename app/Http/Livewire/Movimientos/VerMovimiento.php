@@ -3,45 +3,42 @@
 namespace App\Http\Livewire\Movimientos;
 
 use Carbon\Carbon;
+use App\Models\Setting;
 use App\Models\Summary;
-use App\Services\TipoCambioService;
 use Livewire\Component;
 
 class VerMovimiento extends Component
 {
-    public $cuentas, $paymentMethods, $categorias, $subcategorias, $componentName, $selected_id, $movimiento;
+    public $movimiento;
+    public $setting;
 
-    public $date, $hour, $concept, $type, $amount, $tax, $recipt_series,$puesto, $recipt_number, $future, $account_id, $category_id, $subcategoria_id, $payment_method, $numero_operacion, $user_id, $customer_id, $partner_id, $sublet_id;
+    public string $date = '';
+    public string $hour = '';
+    public ?float $tc   = null;
 
-    public $tc;
-
-    public function mount($id)
+    public function mount(int $id): void
     {
-        $this->selected_id = $id;
-        $summary = Summary::find($id);
-        $this->movimiento = $summary;
-        $this->hour = Carbon::parse($summary->created_at)->format('h:i A');
-        $this->date = $summary->date->format('d/m/Y');
-        $this->concept = $summary->concept;
-        $this->type = $summary->type;
-        $this->amount = $summary->amount;
-        $this->tax = $summary->tax;
-        $this->recipt_series = $summary->recipt_series;
-        $this->recipt_number = $summary->recipt_number;
-        $this->numero_operacion = $summary->numero_operacion;
-        $this->tc = $summary->tipo_cambio;
+        $this->movimiento = Summary::with([
+            'customer',
+            'account',
+            'paymentMethod',
+            'user',
+            'student',
+            'tutor.students',
+            'details.category',
+            'details.currency',
+            'nulledDetails',
+        ])->findOrFail($id);
 
-        // $this->calcularTipoCambio();
+        $this->date     = $this->movimiento->date->format('d/m/Y');
+        $this->hour     = Carbon::parse($this->movimiento->created_at)->format('h:i A');
+        $this->tc       = $this->movimiento->tipo_cambio;
+        $this->setting  = Setting::first();
     }
+
     public function render()
     {
-        return view('livewire.movimientos.ver-movimiento')->extends('adminlte::page');
+        return view('livewire.movimientos.ver-movimiento')
+            ->extends('adminlte::page');
     }
-
-
-    // public function calcularTipoCambio()
-    // {
-    //     $tipoCambio = new TipoCambioService;
-    //     $this->tc = $tipoCambio->getValue(Carbon::parse($this->date)->format('Y-m-d'));
-    // }
 }

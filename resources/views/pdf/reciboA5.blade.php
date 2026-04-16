@@ -27,8 +27,8 @@
         .watermark {
             position: absolute;
             top: 30%;
-            left: 20%;
-            width: 260px;
+            left: 25%;
+            width: 250px;
             opacity: 0.06;
             z-index: 0;
         }
@@ -359,11 +359,7 @@
 
 <body>
     {{-- Watermark --}}
-    @if ($data->type == 'add' && $data->student)
-        <img src="{{ config('kodepe.logo') }}" class="watermark" />
-    @else
-        <img src="{{ config('kodepe.logo') }}" class="watermark" style="top: 28%; left: 18%; width: 200px;" />
-    @endif
+    <img src="{{ config('kodepe.logo') }}" class="watermark" />
 
     {{-- ANULADO stamp --}}
     @if ($data->status == 'NULLED')

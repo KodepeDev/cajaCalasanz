@@ -13,6 +13,8 @@ class Account extends Model
         'account_name',
         'account_number',
         'account_type',
+        'add_serie',
+        'out_serie',
     ];
 
     public function summaries(){

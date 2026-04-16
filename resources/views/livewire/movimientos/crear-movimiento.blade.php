@@ -15,7 +15,8 @@
         <div class="card-header d-flex align-items-center">
             <i class="fa fa-file-invoice-dollar mr-2"></i>
             <div>
-                <h3 class="card-title mb-0">Nuevo Movimiento</h3>
+                <h3 class="card-title mb-0">Cobranza Por Provision</h3>
+                <br>
                 <small class="text-light opacity-75">
                     Las provisiones en dólares están sujetas al tipo de cambio de la fecha de cobro
                 </small>
